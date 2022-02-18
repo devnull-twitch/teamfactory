@@ -10,16 +10,13 @@ namespace TeamFactory.Map
         public int TeamID;
 
         [Export]
-        public int InfraPlaced;
+        public PackedScene Infra;
 
         [Export]
         public bool IsFinal;
 
         [Export]
-        public bool FlipX;
-
-        [Export]
-        public bool FlipY;
+        public GridManager.Direction Direction;
 
         [Export]
         public int ConnectedTo = -1;
@@ -34,19 +31,12 @@ namespace TeamFactory.Map
 
         public int[] PathToTarget;
 
-        public float TimeToNextSpawn;
-
         [Export]
         public ItemResource SpawnResource;
 
         public bool IsReadyForSpawn
         {
             get {
-                if (TimeToNextSpawn > 0)
-                {
-                    return false;
-                }
-
                 foreach(System.Collections.Generic.KeyValuePair<string, int> tuple in Requirements)
                 {
                     if (!Storage.ContainsKey(tuple.Key))
@@ -71,8 +61,6 @@ namespace TeamFactory.Map
                 GD.Print("Called PostSpawn but tile isnt ready");
                 return;
             }
-
-            TimeToNextSpawn = SpawnInterval;
 
             foreach(System.Collections.Generic.KeyValuePair<string, int> tuple in Requirements)
             {

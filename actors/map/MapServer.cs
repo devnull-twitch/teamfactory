@@ -43,6 +43,7 @@ namespace TeamFactory.Map
             this.node = node;
         }
 
+/*
         public void Tick(float delta)
         {
             for (int i = 0; i < node.CurrentMap.Tiles.Count; i++)
@@ -62,17 +63,6 @@ namespace TeamFactory.Map
                 }
             }
         }
-
-        public void SpawnItem(ItemResource spawnItem, Vector2 pos, Vector2[] path, TileResource targetTR)
-        {
-            PackedScene packedItemNode = GD.Load<PackedScene>("res://actors/items/Item.tscn");
-            ItemNode newItemNode = packedItemNode.Instance<ItemNode>();
-            newItemNode.Item = spawnItem;
-            newItemNode.Position = pos;
-            newItemNode.Path = path;
-            newItemNode.Callback = new ArrivalCallback(targetTR, this);
-
-            node.GetNode<Node>("/root/Game/Items").AddChild(newItemNode);
-        }
+*/
     }
 }

@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using TeamFactory.Infra;
 
 namespace TeamFactory.Items 
 {
@@ -9,7 +10,9 @@ namespace TeamFactory.Items
 
         public Vector2[] Path;
 
-        public Map.ArrivalCallback Callback;
+        public InfraSprite OwnerNode;
+
+        public InfraSprite TargetNode;
 
         public ItemResource Item
         {
@@ -20,11 +23,6 @@ namespace TeamFactory.Items
             get {
                 return item;
             }
-        }
-
-        public override void _Ready()
-        {
-            
         }
 
         public override void _PhysicsProcess(float delta)
@@ -43,7 +41,7 @@ namespace TeamFactory.Items
                     {
                         // end of path
                         Path = null;
-                        Callback.ItemArrived(Item);
+                        TargetNode.ItemArrived(this);
                         QueueFree();
                         return;
                     }

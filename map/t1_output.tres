@@ -1,0 +1,15 @@
+[gd_resource type="Resource" load_steps=3 format=2]
+
+[ext_resource path="res://actors/map/TileResource.cs" type="Script" id=1]
+[ext_resource path="res://actors/output/OutputNode.tscn" type="PackedScene" id=2]
+
+[resource]
+script = ExtResource( 1 )
+TeamID = 1
+Infra = ExtResource( 2 )
+IsFinal = true
+Direction = 3
+ConnectedTo = -1
+SpawnInterval = 0.0
+Requirements = {
+}
