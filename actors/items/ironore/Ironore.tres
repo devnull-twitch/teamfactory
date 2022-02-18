@@ -1,0 +1,10 @@
+[gd_resource type="Resource" load_steps=3 format=2]
+
+[ext_resource path="res://actors/items/ItemResource.cs" type="Script" id=1]
+[ext_resource path="res://actors/items/ironore/IronOre.png" type="Texture" id=2]
+
+[resource]
+script = ExtResource( 1 )
+Name = "Ironore"
+PointValue = 0
+Texture = ExtResource( 2 )
