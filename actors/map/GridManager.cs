@@ -99,6 +99,11 @@ namespace TeamFactory.Map
             }
         }
 
+        public int[] GetPathTo(int from, int to)
+        {
+            return infraMap.GetIdPath(from, to);
+        }
+
         public Vector2 IndexToMap(int i)
         {
             int x = i % map.Width;
@@ -113,6 +118,14 @@ namespace TeamFactory.Map
             float y = i / map.Width * CELLSIZE + (CELLSIZE / 2);
 
             return new Vector2(x, y);
+        }
+
+        public int WorldToIndex(Vector2 position)
+        {
+            int x = (int)position.x / CELLSIZE;
+            int y = (int)position.y / CELLSIZE;
+
+            return y * map.Width + x;
         }
 
         public Vector2[] IndicesToWorld(int[] indices)

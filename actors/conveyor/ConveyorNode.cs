@@ -86,8 +86,6 @@ namespace TeamFactory.Conveyor
                 Texture = Curve2;
                 RotationDegrees = 270;
             }
-
-            GD.Print($"InputDir={InputDir} & OutputDir={OutputDir}");
         }
 
         public static GridManager.Direction GetDirectionFromIndices(int selfIndex, int targetIndex)

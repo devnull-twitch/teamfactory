@@ -7,15 +7,15 @@ namespace TeamFactory.Map
     {
         private MapServer server;
 
-        private GridManager manager;
+        public GridManager Manager;
 
         public override void _Ready()
         {
             MapResource map = GD.Load<MapResource>("res://map/Starter.tres");
 
-            manager = new GridManager(map, this);
+            Manager = new GridManager(map, this);
             // TODO: if server
-            manager.SetupMap();
+            Manager.SetupMap();
 
             // TODO: if server
             server = new MapServer(this);

@@ -7,9 +7,12 @@ namespace TeamFactory.Player
     {
         private PlayerClient client;
 
+        private PlayerServer server;
+
         public override void _Ready()
         {
-            client = new PlayerClient(this);
+            server = new PlayerServer(this);
+            client = new PlayerClient(this, server);
 
             GetNode<Area2D>("Picker").Connect("input_event", this, nameof(OnInput));
         }
@@ -25,6 +28,19 @@ namespace TeamFactory.Player
             }
 
             GetNode<Area2D>("Picker")._InputEvent(viewport, e, shape_idx);
+        }
+
+        public override void _Input(InputEvent @event)
+        {
+            if (@event is InputEventMouseButton clickEvent && clickEvent.Pressed)
+            {
+                client.requestMoveTo(GetGlobalMousePosition());
+            }
+        }
+
+        public override void _PhysicsProcess(float delta)
+        {
+            server.Tick(delta);
         }
     }
 }
