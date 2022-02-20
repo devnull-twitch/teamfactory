@@ -1,17 +1,20 @@
 using Godot;
-using System;
+using Godot.Collections;
 using TeamFactory.Map;
 using TeamFactory.Items;
+using TeamFactory.Lib.Multiplayer;
 
 namespace TeamFactory.Factory
 {
-    public class FactoryServer
+    public class FactoryServer : Reference, IServer
     {
         private FactoryNode node;
 
         private TileResource tileResource;
 
         private float cooldown;
+
+        private Dictionary<string, int> storage = new Dictionary<string, int>();
 
         public FactoryServer(FactoryNode node, TileResource tileResource)
         {
@@ -21,27 +24,59 @@ namespace TeamFactory.Factory
             cooldown = tileResource.SpawnInterval;
         }
 
+        public void ClientRequest(string method, params object[] args)
+        {
+            throw new System.NotImplementedException();
+        }
+
         public void Tick(float delta)
         {
             cooldown -= delta;
-            if (cooldown <= 0 && tileResource.IsReadyForSpawn)
+            if (cooldown <= 0 && RequiredmentsCheck())
             {
-                tileResource.PostSpawn();
+                PopFromStorage();
                 cooldown = tileResource.SpawnInterval;
 
-                PackedScene packedItemNode = GD.Load<PackedScene>("res://actors/items/Item.tscn");
-                ItemNode newItemNode = packedItemNode.Instance<ItemNode>();
-                newItemNode.Item = tileResource.SpawnResource;
-                newItemNode.Position = node.Position;
-                newItemNode.Path = node.GridManager.IndicesToWorld(tileResource.PathToTarget);
-                newItemNode.OwnerNode = node;
-                
-                if (node.Target != null) 
+                node.SpawnItem();
+                node.ServerSend("SpawnItem");
+            }
+        }
+
+        public void ItemArrived(ItemNode itemNode)
+        {
+            
+            if (!storage.ContainsKey(itemNode.Item.Name))
+            {
+                storage.Add(itemNode.Item.Name, 1);
+                return;
+            }
+
+            storage[itemNode.Item.Name] += 1;
+        }
+
+        private bool RequiredmentsCheck()
+        {
+            foreach(System.Collections.Generic.KeyValuePair<string, int> tuple in tileResource.SpawnResource.Requirements)
+            {
+                if (!storage.ContainsKey(tuple.Key))
                 {
-                    newItemNode.TargetNode = node.Target;
+                    return false;
                 }
 
-                node.GetNode<Node>("/root/Game/Items").AddChild(newItemNode);
+                if (storage[tuple.Key] < tuple.Value)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private void PopFromStorage()
+        {
+            foreach(System.Collections.Generic.KeyValuePair<string, int> tuple in tileResource.SpawnResource.Requirements)
+            {
+                storage[tuple.Key] -= tuple.Value;
             }
         }
     }

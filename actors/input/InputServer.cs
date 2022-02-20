@@ -24,22 +24,16 @@ namespace TeamFactory.Input
         public void Tick(float delta)
         {
             cooldown -= delta;
-            if (cooldown <= 0 && tileResource.IsReadyForSpawn)
+            if (cooldown <= 0)
             {
-                tileResource.PostSpawn();
                 cooldown = tileResource.SpawnInterval;
 
                 PackedScene packedItemNode = GD.Load<PackedScene>("res://actors/items/Item.tscn");
                 ItemNode newItemNode = packedItemNode.Instance<ItemNode>();
                 newItemNode.Item = tileResource.SpawnResource;
-                newItemNode.Position = node.Position;
+                newItemNode.GlobalPosition = node.GlobalPosition;
                 newItemNode.Path = node.GridManager.IndicesToWorld(tileResource.PathToTarget);
-                newItemNode.OwnerNode = node;
-                
-                if (node.Target != null) 
-                {
-                    newItemNode.TargetNode = node.Target;
-                }
+                newItemNode.Target = node.Target;
 
                 node.GetNode<Node>("/root/Game/Items").AddChild(newItemNode);
             }

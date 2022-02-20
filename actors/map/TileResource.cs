@@ -26,46 +26,9 @@ namespace TeamFactory.Map
 
         public Dictionary<string, int> Storage = new Dictionary<string, int>();
 
-        [Export]
-        public Dictionary<string, int> Requirements = new Dictionary<string, int>();
-
         public int[] PathToTarget;
 
         [Export]
         public ItemResource SpawnResource;
-
-        public bool IsReadyForSpawn
-        {
-            get {
-                foreach(System.Collections.Generic.KeyValuePair<string, int> tuple in Requirements)
-                {
-                    if (!Storage.ContainsKey(tuple.Key))
-                    {
-                        return false;
-                    }
-
-                    if (Storage[tuple.Key] < tuple.Value)
-                    {
-                        return false;
-                    }
-                }
-
-                return true;
-            }
-        }
-
-        public void PostSpawn()
-        {
-            if (!IsReadyForSpawn)
-            {
-                GD.Print("Called PostSpawn but tile isnt ready");
-                return;
-            }
-
-            foreach(System.Collections.Generic.KeyValuePair<string, int> tuple in Requirements)
-            {
-                Storage[tuple.Key] -= tuple.Value;
-            }
-        }
     }
 }

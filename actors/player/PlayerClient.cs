@@ -1,5 +1,7 @@
 using Godot;
+using Godot.Collections;
 using TeamFactory.Map;
+using TeamFactory.Gui;
 
 namespace TeamFactory.Player 
 {
@@ -26,6 +28,11 @@ namespace TeamFactory.Player
         public void requestMoveTo(Vector2 position)
         {
             if (!isPosessed)
+            {
+                return;
+            }
+
+            if (!node.GetNode<Hud>("/root/Game/HUD").AllowPlayerMovement)
             {
                 return;
             }

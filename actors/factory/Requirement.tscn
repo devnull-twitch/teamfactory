@@ -1,0 +1,22 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://actors/items/ironore/IronOre.png" type="Texture" id=1]
+
+[node name="Requirement" type="HBoxContainer"]
+margin_right = 83.0
+margin_bottom = 64.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Amount" type="Label" parent="."]
+margin_top = 25.0
+margin_right = 15.0
+margin_bottom = 39.0
+text = "2x"
+
+[node name="Input" type="TextureRect" parent="."]
+margin_left = 19.0
+margin_right = 83.0
+margin_bottom = 64.0
+texture = ExtResource( 1 )

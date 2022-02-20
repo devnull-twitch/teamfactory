@@ -31,7 +31,5 @@ namespace TeamFactory.Infra
                 return;
             }
         }
-
-        abstract public void ItemArrived(ItemNode itemNode);
     }
 }

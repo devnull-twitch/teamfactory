@@ -1,6 +1,7 @@
 using Godot;
 using TeamFactory.Infra;
 using TeamFactory.Items;
+using TeamFactory.Lib.Multiplayer;
 
 namespace TeamFactory.Factory
 {
@@ -10,42 +11,84 @@ namespace TeamFactory.Factory
 
         private FactoryClient client;
 
+        private NodeWrapper<FactoryNode, FactoryServer, FactoryClient> multiplayerWrapper;
+
         // Called when the node enters the scene tree for the first time.
         public override void _Ready()
         {
             server = new FactoryServer(this, TileRes);
-            client = new FactoryClient(this, server);
-
-            GetNode<Area2D>("Picker").Connect("input_event", this, nameof(OnInput));
+            client = new FactoryClient(this);
+            multiplayerWrapper = new NodeWrapper<FactoryNode, FactoryServer, FactoryClient>(this, server, client);
         }
 
-        public override void ItemArrived(ItemNode itemNode)
+        public override void _Notification(int what)
         {
-            
-            if (!TileRes.Storage.ContainsKey(itemNode.Item.Name))
+            if (multiplayerWrapper != null)
             {
-                TileRes.Storage.Add(itemNode.Item.Name, 1);
-                return;
+                multiplayerWrapper.Notification(what);
             }
 
-            TileRes.Storage[itemNode.Item.Name] += 1;
+            base._Notification(what);
         }
 
         public override void _PhysicsProcess(float delta)
         {
-            server.Tick(delta);
+            if (multiplayerWrapper != null)
+            {
+                multiplayerWrapper.Notification(NotificationPhysicsProcess);
+            }
+            base._PhysicsProcess(delta);
         }
 
-        public void OnInput(Node viewport, InputEvent e, int shape_idx)
+        // ClientSend provides access to the client to access the multiplayer wrapper
+        public void ClientSend(string method, params object[] args)
         {
-            if ( e is InputEventMouseButton eventMouseButton && 
-                eventMouseButton.ButtonIndex == (int)ButtonList.Left &&
-                eventMouseButton.Pressed == true)
-            {
-                return;
-            }
+            multiplayerWrapper.ClientSend(method, args);
+        }
 
-            GetNode<Area2D>("Picker")._InputEvent(viewport, e, shape_idx);
+        // ServerSend provides access to the server to access the multiplayer wrapper
+        public void ServerSend(string method, params object[] args)
+        {
+            multiplayerWrapper.ServerSend(method, args);
+        }
+
+        // ServerRequest is called from network on the node and has to be relayed onto the client
+        public void ServerRequest(params object[] args)
+        {
+            string method = (string)args[0];
+            object[] restArgs = shift(args);
+            client.ServerRequest(method, restArgs);
+        }
+
+        // ClientRequest is called from network on the node and has to be relayed onto the client
+        public void ClientRequest(params object[] args)
+        {
+            string method = (string)args[0];
+            object[] restArgs = shift(args);
+            server.ClientRequest(method, restArgs);
+        }
+
+        public void SpawnItem()
+        {
+            PackedScene packedItemNode = GD.Load<PackedScene>("res://actors/items/Item.tscn");
+            ItemNode newItemNode = packedItemNode.Instance<ItemNode>();
+            newItemNode.Item = TileRes.SpawnResource;
+            newItemNode.Path = GridManager.IndicesToWorld(TileRes.PathToTarget);
+            newItemNode.Target = Target;
+            AddChild(newItemNode);
+            newItemNode.GlobalPosition = GlobalPosition;
+        }
+
+        public void ItemArrived(ItemNode itemNode)
+        {
+            server.ItemArrived(itemNode);
+        }
+
+        private object[] shift(params object[] args)
+        {
+            object[] shifted = new object[args.Length - 1];
+            System.Array.Copy(args, 1, shifted, 0, shifted.Length);
+            return shifted;
         }
     }
 }

@@ -1,5 +1,5 @@
 using Godot;
-using System;
+using TeamFactory.Lib.Multiplayer;
 
 namespace TeamFactory.Map 
 {
@@ -8,6 +8,12 @@ namespace TeamFactory.Map
         private MapServer server;
 
         public GridManager Manager;
+
+        public MapNode() : base()
+        {
+            // TODO: read from somewhere
+            NetState.Mode = Mode.LOCAL;
+        }
 
         public override void _Ready()
         {

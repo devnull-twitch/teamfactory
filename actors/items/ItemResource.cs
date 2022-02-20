@@ -1,5 +1,5 @@
 using Godot;
-using System;
+using Godot.Collections;
 
 namespace TeamFactory.Items 
 {
@@ -13,5 +13,8 @@ namespace TeamFactory.Items
 
         [Export]
         public Texture Texture;
+
+        [Export]
+        public Dictionary<string, int> Requirements = new Dictionary<string, int>();
     }
 }

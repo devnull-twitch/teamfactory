@@ -11,8 +11,5 @@ Infra = ExtResource( 2 )
 IsFinal = false
 Direction = 3
 ConnectedTo = 81
-SpawnInterval = 0.0
-Requirements = {
-"Ironore": 2
-}
+SpawnInterval = 0.2
 SpawnResource = ExtResource( 3 )

@@ -19,10 +19,5 @@ namespace TeamFactory.Input
         {
             server.Tick(delta);
         }
-
-        public override void ItemArrived(ItemNode itemNode)
-        {
-            return;
-        }
     }
 }
