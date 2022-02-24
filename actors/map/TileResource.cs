@@ -9,8 +9,13 @@ namespace TeamFactory.Map
         [Export]
         public int TeamID;
 
+        public int MapIndex;
+
         [Export]
         public PackedScene Infra;
+
+        [Export]
+        public Texture InfraTexture;
 
         [Export]
         public bool IsFinal;

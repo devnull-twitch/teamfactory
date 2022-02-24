@@ -21,21 +21,11 @@ namespace TeamFactory.Factory
             multiplayerWrapper = new NodeWrapper<FactoryNode, FactoryServer, FactoryClient>(this, server, client);
         }
 
-        public override void _Notification(int what)
-        {
-            if (multiplayerWrapper != null)
-            {
-                multiplayerWrapper.Notification(what);
-            }
-
-            base._Notification(what);
-        }
-
         public override void _PhysicsProcess(float delta)
         {
             if (multiplayerWrapper != null)
             {
-                multiplayerWrapper.Notification(NotificationPhysicsProcess);
+                multiplayerWrapper.Notification(NotificationPhysicsProcess, delta);
             }
             base._PhysicsProcess(delta);
         }

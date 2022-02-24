@@ -1,4 +1,5 @@
 using Godot;
+using Godot.Collections;
 using TeamFactory.Lib.Multiplayer;
 using TeamFactory.Items;
 
@@ -7,6 +8,10 @@ namespace TeamFactory.Factory
     public class FactoryClient : Reference, IClient
     {
         private FactoryNode node;
+
+        private FactoryWindow factoryWindow;
+
+        public Dictionary<string, int> Storage = new Dictionary<string, int>();
 
         public FactoryClient(FactoryNode node)
         {
@@ -27,9 +32,10 @@ namespace TeamFactory.Factory
                 }
 
                 PackedScene packedPanel = GD.Load<PackedScene>("res://actors/factory/FactoryWindow.tscn");
-                FactoryWindow factoryWindow = packedPanel.Instance<FactoryWindow>();
+                factoryWindow = packedPanel.Instance<FactoryWindow>();
                 node.GetNode<CanvasLayer>("/root/Game/HUD").AddChild(factoryWindow);
-                factoryWindow.TileResource = node.TileRes;
+                factoryWindow.FactoryClient = this;
+                factoryWindow.FactoryNode = node;
                 factoryWindow.Popup_();
                 return;
             }
@@ -47,6 +53,17 @@ namespace TeamFactory.Factory
 
                 case "SpawnItem":
                     SpawnItem();
+                    break;
+
+                case "StorageUpdate":
+                    string keyName = (string)args[0];
+                    int storageVal = (int)args[1];
+                    Storage[keyName] = storageVal;
+                    if (FactoryWindow.IsInstanceValid(factoryWindow))
+                    {
+                        GD.Print($"{keyName}={storageVal}");
+                        factoryWindow.UpdateStorage();
+                    }
                     break;
 
                 default:

@@ -31,6 +31,40 @@ namespace TeamFactory.Map
             this.mapNode = mapNode;
         }
 
+        public bool AddTileResouce(TileResource tr, int mapIndex)
+        {
+            if (infraMap.IsPointDisabled(mapIndex)) 
+            {
+                return false;
+            }
+
+            addInfraNode(tr, mapIndex);
+            if (tr.ConnectedTo != -1)
+            {
+                connectNode(tr, mapIndex);
+            }
+            return true;
+        }
+
+        public bool ConnectTileResource(TileResource src, int target)
+        {
+            if (target > infraCache.Count - 1)
+            {
+                GD.Print($"target out of bound {target}");
+                return false;
+            }
+
+            if (infraCache[target] == null)
+            {
+                GD.Print($"target is empty {target}");
+                return false;
+            }
+
+            src.ConnectedTo = target;
+            connectNode(src, target);
+            return true;
+        }
+
         public void SetupMap()
         {
             infraMap = new AStar2D();
@@ -51,50 +85,16 @@ namespace TeamFactory.Map
 
                 if (tr != null)
                 {
-                    InfraSprite infraNode = tr.Infra.Instance<InfraSprite>();
-                    infraNode.Position = IndexToWorld(i);
-                    infraNode.RotateFromDirection(tr.Direction);
-                    infraNode.TileRes = tr;
-                    infraNode.GridManager = this;
-                    mapNode.AddChild(infraNode);
-                    infraMap.SetPointDisabled(i, true);
-
-                    infraCache[i] = infraNode;
+                    addInfraNode(tr, i);
                 }
             }
 
-            PackedScene packedConveyor = GD.Load<PackedScene>("res://actors/conveyor/ConveyorNode.tscn");
             for (int i = 0; i < map.Tiles.Count; i++)
             {
                 TileResource tr = map.Tiles[i];
                 if (tr != null && tr.ConnectedTo != -1)
                 {
-                    infraCache[i].Target = infraCache[tr.ConnectedTo];
-
-                    // make path without source and dest
-                    int[] path = infraMap.GetIdPath(i + 1, tr.ConnectedTo - 1);
-                    int[] completePath = new int[path.Length + 2];
-                    System.Array.Copy(path, 0, completePath, 1, path.Length);
-                    completePath[0] = i;
-                    // add in source and dest ( blocked in a star because they are infra )
-                    completePath[completePath.Length - 1] = tr.ConnectedTo;
-
-                    // save path in tile indices to target node
-                    tr.PathToTarget = completePath;
-
-                    for(int j = 1; j < completePath.Length - 1; j++)
-                    {
-                        int pathSegmentIndex = completePath[j];
-                        int x = pathSegmentIndex % map.Width;
-                        int y = pathSegmentIndex / map.Width;
-
-                        ConveyorNode conveyorInstance = packedConveyor.Instance<ConveyorNode>();
-                        conveyorInstance.Position = IndexToWorld(completePath[j]);
-                        conveyorInstance.InputDir = ConveyorNode.GetDirectionFromIndices(completePath[j], completePath[j-1]);
-                        conveyorInstance.OutputDir = ConveyorNode.GetDirectionFromIndices(completePath[j], completePath[j+1]);
-
-                        mapNode.AddChild(conveyorInstance);
-                    }
+                    connectNode(tr, i);
                 }
             }
         }
@@ -137,6 +137,52 @@ namespace TeamFactory.Map
             }
 
             return res;
+        }
+
+        private void addInfraNode(TileResource tr, int index)
+        {
+            tr.MapIndex = index;
+
+            InfraSprite infraNode = tr.Infra.Instance<InfraSprite>();
+            infraNode.Position = IndexToWorld(index);
+            infraNode.RotateFromDirection(tr.Direction);
+            infraNode.TileRes = tr;
+            infraNode.GridManager = this;
+            mapNode.AddChild(infraNode);
+            infraMap.SetPointDisabled(index, true);
+
+            infraCache[index] = infraNode;
+        }
+
+        private void connectNode(TileResource tr, int index)
+        {
+            infraCache[index].Target = infraCache[tr.ConnectedTo];
+
+            // make path without source and dest
+            int[] path = infraMap.GetIdPath(index + 1, tr.ConnectedTo - 1);
+            int[] completePath = new int[path.Length + 2];
+            System.Array.Copy(path, 0, completePath, 1, path.Length);
+            completePath[0] = index;
+            // add in source and dest ( blocked in a star because they are infra )
+            completePath[completePath.Length - 1] = tr.ConnectedTo;
+
+            // save path in tile indices to target node
+            tr.PathToTarget = completePath;
+
+            PackedScene packedConveyor = GD.Load<PackedScene>("res://actors/conveyor/ConveyorNode.tscn");
+            for(int j = 1; j < completePath.Length - 1; j++)
+            {
+                int pathSegmentIndex = completePath[j];
+                int x = pathSegmentIndex % map.Width;
+                int y = pathSegmentIndex / map.Width;
+
+                ConveyorNode conveyorInstance = packedConveyor.Instance<ConveyorNode>();
+                conveyorInstance.Position = IndexToWorld(completePath[j]);
+                conveyorInstance.InputDir = ConveyorNode.GetDirectionFromIndices(completePath[j], completePath[j-1]);
+                conveyorInstance.OutputDir = ConveyorNode.GetDirectionFromIndices(completePath[j], completePath[j+1]);
+
+                mapNode.AddChild(conveyorInstance);
+            }
         }
     }
 }

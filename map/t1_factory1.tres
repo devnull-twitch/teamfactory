@@ -1,15 +1,17 @@
-[gd_resource type="Resource" load_steps=4 format=2]
+[gd_resource type="Resource" load_steps=5 format=2]
 
 [ext_resource path="res://actors/map/TileResource.cs" type="Script" id=1]
 [ext_resource path="res://actors/factory/FactoryNode.tscn" type="PackedScene" id=2]
 [ext_resource path="res://actors/items/ironbar/Ironbar.tres" type="Resource" id=3]
+[ext_resource path="res://sprites/tilemaps/TransformNode.png" type="Texture" id=4]
 
 [resource]
 script = ExtResource( 1 )
 TeamID = 1
 Infra = ExtResource( 2 )
+InfraTexture = ExtResource( 4 )
 IsFinal = false
 Direction = 3
 ConnectedTo = 81
-SpawnInterval = 0.2
+SpawnInterval = 1.0
 SpawnResource = ExtResource( 3 )

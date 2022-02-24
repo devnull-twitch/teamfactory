@@ -52,6 +52,8 @@ namespace TeamFactory.Factory
             }
 
             storage[itemNode.Item.Name] += 1;
+
+            node.ServerSend("StorageUpdate", itemNode.Item.Name, storage[itemNode.Item.Name]);
         }
 
         private bool RequiredmentsCheck()
@@ -77,6 +79,7 @@ namespace TeamFactory.Factory
             foreach(System.Collections.Generic.KeyValuePair<string, int> tuple in tileResource.SpawnResource.Requirements)
             {
                 storage[tuple.Key] -= tuple.Value;
+                node.ServerSend("StorageUpdate", tuple.Key, storage[tuple.Key]);
             }
         }
     }

@@ -13,13 +13,19 @@ namespace TeamFactory.Items
 
         public Vector2[] Path;
 
+        private ItemServer server;
+
+        private ItemClient client;
+
         private NodeWrapper<ItemNode, ItemServer, ItemClient> multiplayerWrapper;
 
         // Called when the node enters the scene tree for the first time.
         public override void _Ready()
         {
-            ItemServer server = new ItemServer(this);
-            ItemClient client = new ItemClient(this);
+            server = new ItemServer(this);
+            server.Path = Path;
+
+            client = new ItemClient(this);
             multiplayerWrapper = new NodeWrapper<ItemNode, ItemServer, ItemClient>(this, server, client);
 
             ZIndex = ZIndex + 5;
@@ -36,56 +42,46 @@ namespace TeamFactory.Items
             }
         }
 
-        public override void _Notification(int what)
+        public void ClientSend(string method, params object[] args)
         {
-            if (multiplayerWrapper != null)
-            {
-                multiplayerWrapper.Notification(what);
-            }
+            multiplayerWrapper.ClientSend(method, args);
+        }
 
-            base._Notification(what);
+        // ServerSend provides access to the server to access the multiplayer wrapper
+        public void ServerSend(string method, params object[] args)
+        {
+            multiplayerWrapper.ServerSend(method, args);
+        }
+
+        // ServerRequest is called from network on the node and has to be relayed onto the client
+        public void ServerRequest(params object[] args)
+        {
+            string method = (string)args[0];
+            object[] restArgs = shift(args);
+            client.ServerRequest(method, restArgs);
+        }
+
+        // ClientRequest is called from network on the node and has to be relayed onto the client
+        public void ClientRequest(params object[] args)
+        {
+            string method = (string)args[0];
+            object[] restArgs = shift(args);
+            server.ClientRequest(method, restArgs);
         }
 
         public override void _PhysicsProcess(float delta)
         {
-            if (Path != null && Path.Length > 0)
+            if (multiplayerWrapper != null)
             {
-                float totalDistance = GlobalPosition.DistanceTo(Path[0]);
-                if(totalDistance < 2)
-                {
-                    if(Path.Length > 1)
-                    {
-                        Path = shiftArray(Path);
-                        return;
-                    }
-                    else
-                    {
-                        // end of path
-                        Path = null;
-                        if (Target is Factory.FactoryNode targetFactory)
-                        {
-                            targetFactory.ItemArrived(this);
-                        }
-                        QueueFree();
-                        return;
-                    }
-                }
-
-                GlobalPosition = GlobalPosition.MoveToward(Path[0], 50 * delta);
+                multiplayerWrapper.Notification(NotificationPhysicsProcess, delta);
             }
         }
 
-        private Vector2[] shiftArray(Vector2[] src)
+        private object[] shift(params object[] args)
         {
-            if (src.Length < 1)
-            {
-                return src;
-            }
-
-            Vector2[] target = new Vector2[src.Length - 1];
-            Array.Copy(src, 1, target, 0, src.Length - 1);
-
-            return target;
+            object[] shifted = new object[args.Length - 1];
+            System.Array.Copy(args, 1, shifted, 0, shifted.Length);
+            return shifted;
         }
     }
 }

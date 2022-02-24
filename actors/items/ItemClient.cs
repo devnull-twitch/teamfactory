@@ -1,3 +1,4 @@
+using Godot;
 using TeamFactory.Lib.Multiplayer;
 
 namespace TeamFactory.Items
@@ -13,7 +14,19 @@ namespace TeamFactory.Items
 
         public void ServerRequest(string method, params object[] args)
         {
-            throw new System.NotImplementedException();
+            switch (method)
+            {
+                case "Move":
+                    float x = (float)args[0];
+                    float y = (float)args[1];
+                    if (NetState.Mode == Mode.NET_CLIENT) {
+                        node.GlobalPosition = new Vector2(x, y);
+                    }
+                    break;
+
+                default:
+                    throw new System.NotImplementedException();
+            }
         }
     }
 }
