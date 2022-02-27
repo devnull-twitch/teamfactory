@@ -1,0 +1,80 @@
+{
+    "width": 15,
+    "height": 13,
+    "infras": [
+        {
+            "index": 60,
+            "team_id": 1,
+            "infra_scene": "res://actors/input/InputNode.tscn",
+            "infra_texture": "res://sprites/tilemaps/InputNode.png",
+            "is_final": false,
+            "direction": 4,
+            "connections": {
+                "4": {
+                    "target_direction": 3,
+                    "target_map_index": 62
+                }
+            },
+            "spawn_interval": 1.5,
+            "spawn_resource": "res://actors/items/ironore/Ironore.tres"
+        },
+        {
+            "index": 33,
+            "team_id": 1,
+            "infra_scene": "res://actors/factory/FactoryNode.tscn",
+            "infra_texture": "res://sprites/tilemaps/TransformNode.png",
+            "is_final": false,
+            "direction": 4,
+            "connections": {
+                "4": {
+                    "target_direction": 3,
+                    "target_map_index": 81
+                }
+            },
+            "spawn_interval": 0.5,
+            "spawn_resource": "res://actors/items/ironbar/Ironbar.tres"
+        },
+        {
+            "index": 62,
+            "team_id": 1,
+            "infra_scene": "res://actors/splitter/SplitterNode.tscn",
+            "infra_texture": "res://actors/splitter/Splitter.png",
+            "is_final": false,
+            "direction": 4,
+            "connections": {
+                "1": {
+                    "target_direction": 3,
+                    "target_map_index": 33
+                },
+                "2": {
+                    "target_direction": 3,
+                    "target_map_index": 111
+                }
+            },
+            "spawn_interval": 0,
+            "spawn_resource": ""
+        },
+        {
+            "index": 81,
+            "team_id": 1,
+            "infra_scene": "res://actors/output/OutputNode.tscn",
+            "infra_texture": "res://sprites/tilemaps/OutputNode.png",
+            "is_final": true,
+            "direction": 3,
+            "connections": {},
+            "spawn_interval": 0,
+            "spawn_resource": ""
+        },
+        {
+            "index": 111,
+            "team_id": 1,
+            "infra_scene": "res://actors/output/OutputNode.tscn",
+            "infra_texture": "res://sprites/tilemaps/OutputNode.png",
+            "is_final": true,
+            "direction": 3,
+            "connections": {},
+            "spawn_interval": 0,
+            "spawn_resource": "0"
+        }
+    ]
+}

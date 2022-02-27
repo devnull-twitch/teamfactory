@@ -89,9 +89,9 @@ namespace TeamFactory.Factory
 
         public int GetTargetIndex()
         {
-            foreach(System.Collections.Generic.KeyValuePair<GridManager.Direction, int> tuple in Node.TileRes.Connections)
+            foreach(System.Collections.Generic.KeyValuePair<GridManager.Direction, ConnectionTarget> tuple in Node.TileRes.Connections)
             {
-                return tuple.Value;
+                return tuple.Value.MapIndex;
             }
 
             return -1;

@@ -24,7 +24,7 @@ namespace TeamFactory.Map
         public GridManager.Direction Direction;
 
         [Export]
-        public Dictionary<GridManager.Direction, int> Connections;
+        public Dictionary<GridManager.Direction, ConnectionTarget> Connections;
 
         [Export]
         public float SpawnInterval;

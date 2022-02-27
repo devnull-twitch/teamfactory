@@ -17,7 +17,7 @@ namespace TeamFactory.Splitter
         public override void _Ready()
         {
             SysGen.IList<GridManager.Direction> keyList = SplitterServer.ConvertKeyCollection(Node.TileRes.Connections.Keys);
-            int targetIndex = Node.TileRes.Connections[keyList[currentTargetIndex]];
+            int targetIndex = Node.TileRes.Connections[keyList[currentTargetIndex]].MapIndex;
             currentTargetMapIndex = targetIndex;
             Node.Target = Node.GridManager.GetInfraAtIndex(targetIndex);
         }
@@ -39,7 +39,7 @@ namespace TeamFactory.Splitter
             }
             
             SysGen.IList<GridManager.Direction> keyList = SplitterServer.ConvertKeyCollection(Node.TileRes.Connections.Keys);
-            int targetIndex = Node.TileRes.Connections[keyList[currentTargetIndex]];
+            int targetIndex = Node.TileRes.Connections[keyList[currentTargetIndex]].MapIndex;
             currentTargetMapIndex = targetIndex;
             Node.Target = Node.GridManager.GetInfraAtIndex(targetIndex);
         }

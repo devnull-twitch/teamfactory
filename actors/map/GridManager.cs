@@ -65,7 +65,7 @@ namespace TeamFactory.Map
                 return false;
             }
 
-            src.Connections[outputDir] = target;
+            src.Connections[outputDir] = new ConnectionTarget(target, Direction.Left);
             connectNode(src, target);
             return true;
         }
@@ -161,21 +161,22 @@ namespace TeamFactory.Map
 
         private void connectNode(TileResource tr, int index)
         {
-            foreach(System.Collections.Generic.KeyValuePair<Direction, int> tuple in tr.Connections)
+            foreach(System.Collections.Generic.KeyValuePair<Direction, ConnectionTarget> tuple in tr.Connections)
             {
-                infraCache[index].Target = infraCache[tuple.Value];
+                infraCache[index].Target = infraCache[tuple.Value.MapIndex];
                 int startIndex = GetIndicesFromDirection(index, tuple.Key);
+                int endIndex = GetIndicesFromDirection(tuple.Value.MapIndex, tuple.Value.Direction);
 
                 // make path without source and dest
-                int[] path = infraMap.GetIdPath(startIndex, tuple.Value - 1);
+                int[] path = infraMap.GetIdPath(startIndex, endIndex);
                 int[] completePath = new int[path.Length + 2];
                 System.Array.Copy(path, 0, completePath, 1, path.Length);
                 completePath[0] = index;
                 // add in source and dest ( blocked in a star because they are infra )
-                completePath[completePath.Length - 1] = tuple.Value;
+                completePath[completePath.Length - 1] = tuple.Value.MapIndex;
 
                 // save path in tile indices to target node
-                tr.PathToTarget[tuple.Value] = completePath;
+                tr.PathToTarget[tuple.Value.MapIndex] = completePath;
 
                 PackedScene packedConveyor = GD.Load<PackedScene>("res://actors/conveyor/ConveyorNode.tscn");
                 for(int j = 1; j < completePath.Length - 1; j++)

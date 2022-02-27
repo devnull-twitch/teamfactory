@@ -87,23 +87,5 @@ namespace TeamFactory.Conveyor
                 RotationDegrees = 270;
             }
         }
-
-        public static GridManager.Direction GetDirectionFromIndices(int selfIndex, int targetIndex)
-        {
-            int diff = targetIndex - selfIndex;
-            switch (diff)
-            {
-                case 1:
-                    return GridManager.Direction.Right;
-                case -1:
-                    return GridManager.Direction.Left;
-                case 15:
-                    return GridManager.Direction.Down;
-                case -15:
-                    return GridManager.Direction.Up;
-            }
-
-            throw new Exception($"target {targetIndex} is not next to self {selfIndex}");
-        }
     }
 }

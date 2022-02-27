@@ -1,5 +1,6 @@
 using Godot;
 using TeamFactory.Lib.Multiplayer;
+using TeamFactory.Lib.JsonMap;
 
 namespace TeamFactory.Map 
 {
@@ -17,9 +18,13 @@ namespace TeamFactory.Map
 
         public override void _Ready()
         {
-            MapResource map = GD.Load<MapResource>("res://map/Starter.tres");
+            File testJson = new File();
+            testJson.Open("res://map/testing.json", File.ModeFlags.Read);
 
-            Manager = new GridManager(map, this);
+            Parser parser = new Parser();
+            MapResource mapResource = parser.ParseAsMap(testJson.GetAsText());
+
+            Manager = new GridManager(mapResource, this);
             // TODO: if server
             Manager.SetupMap();
 
