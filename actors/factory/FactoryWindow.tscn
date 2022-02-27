@@ -4,7 +4,6 @@
 [ext_resource path="res://actors/items/ironbar/IronBar.png" type="Texture" id=2]
 
 [node name="Panel" type="WindowDialog"]
-visible = true
 margin_right = 405.0
 margin_bottom = 215.0
 mouse_default_cursor_shape = 4

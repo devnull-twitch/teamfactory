@@ -10,6 +10,8 @@ TeamID = 1
 Infra = ExtResource( 2 )
 IsFinal = false
 Direction = 4
-ConnectedTo = 62
+Connections = {
+4: 62
+}
 SpawnInterval = 1.5
 SpawnResource = ExtResource( 3 )

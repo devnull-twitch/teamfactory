@@ -1,84 +1,73 @@
 using Godot;
+using Godot.Collections;
+using TeamFactory.Map;
 using TeamFactory.Infra;
 using TeamFactory.Items;
 using TeamFactory.Lib.Multiplayer;
 
 namespace TeamFactory.Factory
 {
-    public class FactoryNode : InfraSprite
+    public class FactoryNode : InfraSprite, IServerProvider
     {
-        private FactoryServer server;
+        public Dictionary<string, int> Storage = new Dictionary<string, int>();
 
-        private FactoryClient client;
+        public FactoryServer Server;
 
-        private NodeWrapper<FactoryNode, FactoryServer, FactoryClient> multiplayerWrapper;
+        public Node ServerNode {
+            get {
+                return Server;
+            }
+        }
 
-        // Called when the node enters the scene tree for the first time.
         public override void _Ready()
         {
-            server = new FactoryServer(this, TileRes);
-            client = new FactoryClient(this);
-            multiplayerWrapper = new NodeWrapper<FactoryNode, FactoryServer, FactoryClient>(this, server, client);
-        }
+            Server = new FactoryServer();
+            Server.Node = this;
+            AddChild(Server);
 
-        public override void _PhysicsProcess(float delta)
-        {
-            if (multiplayerWrapper != null)
+            if (NetState.Mode == Mode.NET_SERVER)
             {
-                multiplayerWrapper.Notification(NotificationPhysicsProcess, delta);
+                return;
             }
-            base._PhysicsProcess(delta);
+
+            GetNode<Area2D>("Picker").Connect("input_event", this, nameof(OnInput));
         }
 
-        // ClientSend provides access to the client to access the multiplayer wrapper
-        public void ClientSend(string method, params object[] args)
+        public void OnInput(Node viewport, InputEvent e, int shape_idx)
         {
-            multiplayerWrapper.ClientSend(method, args);
+            if ( e is InputEventMouseButton eventMouseButton && 
+                eventMouseButton.ButtonIndex == (int)ButtonList.Left &&
+                eventMouseButton.Pressed == true)
+            {
+                if (GetNodeOrNull<CanvasLayer>("/root/Game/HUD/FactoryPanel") != null)
+                {
+                    return;
+                }
+
+                PackedScene packedPanel = GD.Load<PackedScene>("res://actors/factory/FactoryWindow.tscn");
+                FactoryWindow factoryWindow = packedPanel.Instance<FactoryWindow>();
+                GetNode<CanvasLayer>("/root/Game/HUD").AddChild(factoryWindow);
+                factoryWindow.FactoryNode = this;
+                factoryWindow.Popup_();
+                return;
+            }
+
+            GetNode<Area2D>("Picker")._InputEvent(viewport, e, shape_idx);
         }
 
-        // ServerSend provides access to the server to access the multiplayer wrapper
-        public void ServerSend(string method, params object[] args)
+        [Remote]
+        public void RequestSpawnResourceChange(string itemName)
         {
-            multiplayerWrapper.ServerSend(method, args);
+            ItemDB itemDB = GD.Load<ItemDB>("res://actors/items/ItemDB.tres");
+            TileRes.SpawnResource = itemDB.Database[itemName];
+            NetState.Rpc(this, "SpawnResourceChange", itemName);
         }
 
-        // ServerRequest is called from network on the node and has to be relayed onto the client
-        public void ServerRequest(params object[] args)
+        [RemoteSync]
+        public void SpawnResourceChange(string itemName)
         {
-            string method = (string)args[0];
-            object[] restArgs = shift(args);
-            client.ServerRequest(method, restArgs);
-        }
-
-        // ClientRequest is called from network on the node and has to be relayed onto the client
-        public void ClientRequest(params object[] args)
-        {
-            string method = (string)args[0];
-            object[] restArgs = shift(args);
-            server.ClientRequest(method, restArgs);
-        }
-
-        public void SpawnItem()
-        {
-            PackedScene packedItemNode = GD.Load<PackedScene>("res://actors/items/Item.tscn");
-            ItemNode newItemNode = packedItemNode.Instance<ItemNode>();
-            newItemNode.Item = TileRes.SpawnResource;
-            newItemNode.Path = GridManager.IndicesToWorld(TileRes.PathToTarget);
-            newItemNode.Target = Target;
-            AddChild(newItemNode);
-            newItemNode.GlobalPosition = GlobalPosition;
-        }
-
-        public void ItemArrived(ItemNode itemNode)
-        {
-            server.ItemArrived(itemNode);
-        }
-
-        private object[] shift(params object[] args)
-        {
-            object[] shifted = new object[args.Length - 1];
-            System.Array.Copy(args, 1, shifted, 0, shifted.Length);
-            return shifted;
+            ItemDB itemDB = GD.Load<ItemDB>("res://actors/items/ItemDB.tres");
+            TileRes.SpawnResource = itemDB.Database[itemName];
         }
     }
 }

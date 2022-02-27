@@ -3,51 +3,43 @@ using TeamFactory.Lib.Multiplayer;
 
 namespace TeamFactory.Items
 {
-    public class ItemServer : IServer
+    public class ItemServer : Node
     {
-        public Vector2[] Path;
-
         private float timeToArrive;
 
-        private ItemNode node;
+        public ItemNode Node;
 
-        public ItemServer(ItemNode node)
+        public override void _PhysicsProcess(float delta)
         {
-            this.node = node;
-        }
-
-        public void ClientRequest(string method, params object[] args)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public void Tick(float delta)
-        {
-            if (Path != null && Path.Length > 0)
+            if (Node.Path != null && Node.Path.Length > 0)
             {
-                float totalDistance = node.GlobalPosition.DistanceTo(Path[0]);
+                float totalDistance = Node.GlobalPosition.DistanceTo(Node.Path[0]);
                 if(totalDistance < 2)
                 {
-                    if(Path.Length > 1)
+                    if(Node.Path.Length > 1)
                     {
-                        Path = shiftArray(Path);
+                        Node.Path = shiftArray(Node.Path);
                         return;
                     }
                     else
                     {
                         // end of path
-                        Path = null;
-                        if (node.Target is Factory.FactoryNode targetFactory)
+                        Node.Path = null;
+                        if (Node.Target is Infra.IServerProvider serverProviderNode)
                         {
-                            targetFactory.ItemArrived(node);
+                            Node serverNode = serverProviderNode.ServerNode;
+                            if (serverNode is Infra.IItemReceiver itemReceiverNode)
+                            {
+                                itemReceiverNode.ItemArrived(Node);
+                            }
                         }
-                        node.QueueFree();
+                        Node.QueueFree();
                         return;
                     }
                 }
 
-                node.GlobalPosition = node.GlobalPosition.MoveToward(Path[0], 50 * delta);
-                node.ServerSend("Move", node.GlobalPosition.x, node.GlobalPosition.y);
+                Vector2 newPosition = Node.GlobalPosition.MoveToward(Node.Path[0], 50 * delta);
+                NetState.Rpc(this, "Move", newPosition.x, newPosition.y);
             }
         }
 
@@ -62,6 +54,12 @@ namespace TeamFactory.Items
             System.Array.Copy(src, 1, target, 0, src.Length - 1);
 
             return target;
+        }
+
+        [RemoteSync]
+        public void Move(float x, float y)
+        {
+            Node.GlobalPosition = new Vector2(x, y);
         }
     }
 }

@@ -24,14 +24,14 @@ namespace TeamFactory.Map
         public GridManager.Direction Direction;
 
         [Export]
-        public int ConnectedTo = -1;
+        public Dictionary<GridManager.Direction, int> Connections;
 
         [Export]
         public float SpawnInterval;
 
         public Dictionary<string, int> Storage = new Dictionary<string, int>();
 
-        public int[] PathToTarget;
+        public Dictionary<int, int[]> PathToTarget = new Dictionary<int, int[]>();
 
         [Export]
         public ItemResource SpawnResource;

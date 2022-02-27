@@ -1,9 +1,9 @@
 [gd_resource type="Resource" load_steps=5 format=2]
 
 [ext_resource path="res://actors/map/TileResource.cs" type="Script" id=1]
-[ext_resource path="res://actors/factory/FactoryNode.tscn" type="PackedScene" id=2]
+[ext_resource path="res://actors/splitter/SplitterNode.tscn" type="PackedScene" id=2]
 [ext_resource path="res://actors/items/ironbar/Ironbar.tres" type="Resource" id=3]
-[ext_resource path="res://sprites/tilemaps/TransformNode.png" type="Texture" id=4]
+[ext_resource path="res://actors/splitter/Splitter.png" type="Texture" id=4]
 
 [resource]
 script = ExtResource( 1 )
@@ -13,7 +13,8 @@ InfraTexture = ExtResource( 4 )
 IsFinal = false
 Direction = 3
 Connections = {
-4: 81
+1: 33,
+2: 111
 }
 SpawnInterval = 1.0
 SpawnResource = ExtResource( 3 )

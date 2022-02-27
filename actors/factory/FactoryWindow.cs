@@ -2,6 +2,7 @@ using Godot;
 using System.Collections.Generic;
 using TeamFactory.Items;
 using TeamFactory.Map;
+using TeamFactory.Lib.Multiplayer;
 
 namespace TeamFactory.Factory
 {
@@ -23,8 +24,6 @@ namespace TeamFactory.Factory
                 UpdateWindow();
             }
         }
-
-        public FactoryClient FactoryClient;
 
         public override void _Ready()
         {
@@ -48,7 +47,7 @@ namespace TeamFactory.Factory
                 MapNode mapNode = GetNode<MapNode>("/root/Game/GridManager");
                 int targetIndex = mapNode.Manager.WorldToIndex(pos);
 
-                bool success = mapNode.Manager.ConnectTileResource(tileResource, targetIndex);
+                bool success = mapNode.Manager.ConnectTileResource(tileResource, targetIndex, GridManager.Direction.Right);
                 isConnecting = false;
                 GD.Print($"connection done {success}");
             }
@@ -62,9 +61,7 @@ namespace TeamFactory.Factory
         public void OnSelectOutputResource(int index)
         {
             string itemName = outputSelector.GetItemText(index);
-            ItemDB itemDB = GD.Load<ItemDB>("res://actors/items/ItemDB.tres");
-            tileResource.SpawnResource = itemDB.Database[itemName];
-            UpdateWindow();
+            NetState.RpcId(factoryNode, 1, "RequestSpawnResourceChange", itemName);
         }
 
         private void UpdateWindow()
@@ -103,7 +100,7 @@ namespace TeamFactory.Factory
                 child.QueueFree();
             }
 
-            foreach(KeyValuePair<string, int> tuple in FactoryClient.Storage)
+            foreach(KeyValuePair<string, int> tuple in factoryNode.Storage)
             {
                 HBoxContainer req = reqPacked.Instance<HBoxContainer>();
                 req.GetNode<Label>("Amount").Text = $"{tuple.Value}x";

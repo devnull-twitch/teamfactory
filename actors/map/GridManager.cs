@@ -39,14 +39,19 @@ namespace TeamFactory.Map
             }
 
             addInfraNode(tr, mapIndex);
-            if (tr.ConnectedTo != -1)
+            if (tr.Connections.Count > 0)
             {
                 connectNode(tr, mapIndex);
             }
             return true;
         }
 
-        public bool ConnectTileResource(TileResource src, int target)
+        public InfraSprite GetInfraAtIndex(int index)
+        {
+            return infraCache[index];
+        }
+
+        public bool ConnectTileResource(TileResource src, int target, Direction outputDir)
         {
             if (target > infraCache.Count - 1)
             {
@@ -60,7 +65,7 @@ namespace TeamFactory.Map
                 return false;
             }
 
-            src.ConnectedTo = target;
+            src.Connections[outputDir] = target;
             connectNode(src, target);
             return true;
         }
@@ -92,7 +97,7 @@ namespace TeamFactory.Map
             for (int i = 0; i < map.Tiles.Count; i++)
             {
                 TileResource tr = map.Tiles[i];
-                if (tr != null && tr.ConnectedTo != -1)
+                if (tr != null && tr.Connections.Count > 0)
                 {
                     connectNode(tr, i);
                 }
@@ -156,33 +161,72 @@ namespace TeamFactory.Map
 
         private void connectNode(TileResource tr, int index)
         {
-            infraCache[index].Target = infraCache[tr.ConnectedTo];
-
-            // make path without source and dest
-            int[] path = infraMap.GetIdPath(index + 1, tr.ConnectedTo - 1);
-            int[] completePath = new int[path.Length + 2];
-            System.Array.Copy(path, 0, completePath, 1, path.Length);
-            completePath[0] = index;
-            // add in source and dest ( blocked in a star because they are infra )
-            completePath[completePath.Length - 1] = tr.ConnectedTo;
-
-            // save path in tile indices to target node
-            tr.PathToTarget = completePath;
-
-            PackedScene packedConveyor = GD.Load<PackedScene>("res://actors/conveyor/ConveyorNode.tscn");
-            for(int j = 1; j < completePath.Length - 1; j++)
+            foreach(System.Collections.Generic.KeyValuePair<Direction, int> tuple in tr.Connections)
             {
-                int pathSegmentIndex = completePath[j];
-                int x = pathSegmentIndex % map.Width;
-                int y = pathSegmentIndex / map.Width;
+                infraCache[index].Target = infraCache[tuple.Value];
+                int startIndex = GetIndicesFromDirection(index, tuple.Key);
 
-                ConveyorNode conveyorInstance = packedConveyor.Instance<ConveyorNode>();
-                conveyorInstance.Position = IndexToWorld(completePath[j]);
-                conveyorInstance.InputDir = ConveyorNode.GetDirectionFromIndices(completePath[j], completePath[j-1]);
-                conveyorInstance.OutputDir = ConveyorNode.GetDirectionFromIndices(completePath[j], completePath[j+1]);
+                // make path without source and dest
+                int[] path = infraMap.GetIdPath(startIndex, tuple.Value - 1);
+                int[] completePath = new int[path.Length + 2];
+                System.Array.Copy(path, 0, completePath, 1, path.Length);
+                completePath[0] = index;
+                // add in source and dest ( blocked in a star because they are infra )
+                completePath[completePath.Length - 1] = tuple.Value;
 
-                mapNode.AddChild(conveyorInstance);
+                // save path in tile indices to target node
+                tr.PathToTarget[tuple.Value] = completePath;
+
+                PackedScene packedConveyor = GD.Load<PackedScene>("res://actors/conveyor/ConveyorNode.tscn");
+                for(int j = 1; j < completePath.Length - 1; j++)
+                {
+                    int pathSegmentIndex = completePath[j];
+                    int x = pathSegmentIndex % map.Width;
+                    int y = pathSegmentIndex / map.Width;
+
+                    ConveyorNode conveyorInstance = packedConveyor.Instance<ConveyorNode>();
+                    conveyorInstance.Position = IndexToWorld(completePath[j]);
+                    conveyorInstance.InputDir = GetDirectionFromIndices(completePath[j], completePath[j-1]);
+                    conveyorInstance.OutputDir = GetDirectionFromIndices(completePath[j], completePath[j+1]);
+
+                    mapNode.AddChild(conveyorInstance);
+                }
             }
+        }
+
+        public static Direction GetDirectionFromIndices(int selfIndex, int targetIndex)
+        {
+            int diff = targetIndex - selfIndex;
+            switch (diff)
+            {
+                case 1:
+                    return Direction.Right;
+                case -1:
+                    return Direction.Left;
+                case 15:
+                    return Direction.Down;
+                case -15:
+                    return Direction.Up;
+            }
+
+            throw new System.Exception($"target {targetIndex} is not next to self {selfIndex}");
+        }
+
+        public static int GetIndicesFromDirection(int selfIndex, Direction dir)
+        {
+            switch (dir)
+            {
+                case Direction.Right:
+                    return selfIndex + 1;
+                case Direction.Left:
+                    return selfIndex - 1;
+                case Direction.Down:
+                    return selfIndex + 15;
+                case Direction.Up:
+                    return selfIndex - 15;
+            }
+
+            throw new System.Exception($"Invalid direction {dir}");
         }
     }
 }

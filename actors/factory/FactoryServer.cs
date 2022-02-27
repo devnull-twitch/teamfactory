@@ -1,71 +1,49 @@
 using Godot;
-using Godot.Collections;
+using TeamFactory.Lib.Multiplayer;
 using TeamFactory.Map;
 using TeamFactory.Items;
-using TeamFactory.Lib.Multiplayer;
+using TeamFactory.Infra;
 
 namespace TeamFactory.Factory
 {
-    public class FactoryServer : Reference, IServer
+    public class FactoryServer : Node, IItemReceiver
     {
-        private FactoryNode node;
-
-        private TileResource tileResource;
-
         private float cooldown;
 
-        private Dictionary<string, int> storage = new Dictionary<string, int>();
+        public FactoryNode Node;
 
-        public FactoryServer(FactoryNode node, TileResource tileResource)
+        public override void _PhysicsProcess(float delta)
         {
-            this.node = node;
-            this.tileResource = tileResource;
+            if (NetState.Mode == Mode.NET_CLIENT)
+            {
+                return;
+            }
 
-            cooldown = tileResource.SpawnInterval;
-        }
-
-        public void ClientRequest(string method, params object[] args)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public void Tick(float delta)
-        {
             cooldown -= delta;
             if (cooldown <= 0 && RequiredmentsCheck())
             {
                 PopFromStorage();
-                cooldown = tileResource.SpawnInterval;
+                cooldown = Node.TileRes.SpawnInterval;
 
-                node.SpawnItem();
-                node.ServerSend("SpawnItem");
+                NetState.Rpc(this, "SpawnItem");
             }
-        }
-
-        public void ItemArrived(ItemNode itemNode)
-        {
-            
-            if (!storage.ContainsKey(itemNode.Item.Name))
-            {
-                storage.Add(itemNode.Item.Name, 1);
-                return;
-            }
-
-            storage[itemNode.Item.Name] += 1;
-
-            node.ServerSend("StorageUpdate", itemNode.Item.Name, storage[itemNode.Item.Name]);
         }
 
         private bool RequiredmentsCheck()
         {
-            foreach(System.Collections.Generic.KeyValuePair<string, int> tuple in tileResource.SpawnResource.Requirements)
+            if (Node.TileRes == null)
             {
-                if (!storage.ContainsKey(tuple.Key))
+                return false;
+            }
+
+            foreach(System.Collections.Generic.KeyValuePair<string, int> tuple in Node.TileRes.SpawnResource.Requirements)
+            {
+                if (!Node.Storage.ContainsKey(tuple.Key))
                 {
                     return false;
                 }
 
-                if (storage[tuple.Key] < tuple.Value)
+                if (Node.Storage[tuple.Key] < tuple.Value)
                 {
                     return false;
                 }
@@ -76,11 +54,47 @@ namespace TeamFactory.Factory
 
         private void PopFromStorage()
         {
-            foreach(System.Collections.Generic.KeyValuePair<string, int> tuple in tileResource.SpawnResource.Requirements)
+            foreach(System.Collections.Generic.KeyValuePair<string, int> tuple in Node.TileRes.SpawnResource.Requirements)
             {
-                storage[tuple.Key] -= tuple.Value;
-                node.ServerSend("StorageUpdate", tuple.Key, storage[tuple.Key]);
+                NetState.Rpc(this, "StorageUpdate", tuple.Key, Node.Storage[tuple.Key] - tuple.Value);
             }
+        }
+
+        public void ItemArrived(ItemNode itemNode)
+        {
+            int newVal = 1;
+            if (Node.Storage.ContainsKey(itemNode.Item.Name)) {
+                newVal = Node.Storage[itemNode.Item.Name] + 1;
+            }
+            NetState.Rpc(this, "StorageUpdate", itemNode.Item.Name, newVal);
+        }
+
+        [RemoteSync]
+        public void StorageUpdate(string itemName, int newValue)
+        {
+            Node.Storage[itemName] = newValue;
+        }
+
+        [RemoteSync]
+        public void SpawnItem()
+        {
+            PackedScene packedItemNode = GD.Load<PackedScene>("res://actors/items/Item.tscn");
+            ItemNode newItemNode = packedItemNode.Instance<ItemNode>();
+            newItemNode.Item = Node.TileRes.SpawnResource;
+            newItemNode.Path = Node.GridManager.IndicesToWorld(Node.TileRes.PathToTarget[GetTargetIndex()]);
+            newItemNode.Target = Node.Target;
+            AddChild(newItemNode);
+            newItemNode.GlobalPosition = Node.GlobalPosition;
+        }
+
+        public int GetTargetIndex()
+        {
+            foreach(System.Collections.Generic.KeyValuePair<GridManager.Direction, int> tuple in Node.TileRes.Connections)
+            {
+                return tuple.Value;
+            }
+
+            return -1;
         }
     }
 }

@@ -3,27 +3,24 @@ using TeamFactory.Map;
 
 namespace TeamFactory.Player 
 {
-    public class PlayerServer
+    public class PlayerServer : Node
     {
-        private PlayerNode node;
-
-        private int[] pathToTarget;
+        public PlayerNode Node;
 
         private float timeTillNextStep = 0.5f;
 
-        public PlayerServer(PlayerNode node)
-        {
-            this.node = node;
-        }
+        private int lastSeenTargetMapIndex;
 
-        public void setNewTarget(int targetIndex)
-        {
-            MapNode mapNode = node.GetNode<MapNode>("../../");
-            pathToTarget = mapNode.Manager.GetPathTo(mapNode.Manager.WorldToIndex(node.Position), targetIndex);
-        }
+        private int[] pathToTarget;
 
-        public void Tick(float delta)
+        public override void _PhysicsProcess(float delta)
         {
+            if (lastSeenTargetMapIndex != Node.TargetMapIndex)
+            {
+                setNewTarget(Node.TargetMapIndex);
+                lastSeenTargetMapIndex = Node.TargetMapIndex;
+            }
+
             timeTillNextStep -= delta;
             if (timeTillNextStep <= 0)
             {
@@ -32,12 +29,18 @@ namespace TeamFactory.Player
             }
         }
 
+        public void setNewTarget(int targetIndex)
+        {
+            MapNode mapNode = GetNode<MapNode>("../../../");
+            pathToTarget = mapNode.Manager.GetPathTo(mapNode.Manager.WorldToIndex(Node.GlobalPosition), targetIndex);
+        }
+
         private void step()
         {
             if (pathToTarget != null && pathToTarget.Length > 0)
             {
-                MapNode mapNode = node.GetNode<MapNode>("../../");
-                node.Position = mapNode.Manager.IndexToWorld(pathToTarget[0]);
+                MapNode mapNode = GetNode<MapNode>("../../../");
+                Node.Position = mapNode.Manager.IndexToWorld(pathToTarget[0]);
 
                 if (pathToTarget.Length <= 1)
                 {

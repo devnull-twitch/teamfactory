@@ -5,38 +5,38 @@ using TeamFactory.Items;
 
 namespace TeamFactory.Input
 {
-    public class InputServer
+    public class InputServer : Node
     {
-        private InputNode node;
-
-        private TileResource tileResource;
+        public InputNode Node;
 
         private float cooldown;
 
-        public InputServer(InputNode node, TileResource tileResource)
-        {
-            this.node = node;
-            this.tileResource = tileResource;
-
-            cooldown = tileResource.SpawnInterval;
-        }
-
-        public void Tick(float delta)
+        public override void _PhysicsProcess(float delta)
         {
             cooldown -= delta;
             if (cooldown <= 0)
             {
-                cooldown = tileResource.SpawnInterval;
+                cooldown = Node.TileRes.SpawnInterval;
 
                 PackedScene packedItemNode = GD.Load<PackedScene>("res://actors/items/Item.tscn");
                 ItemNode newItemNode = packedItemNode.Instance<ItemNode>();
-                newItemNode.Item = tileResource.SpawnResource;
-                newItemNode.GlobalPosition = node.GlobalPosition;
-                newItemNode.Path = node.GridManager.IndicesToWorld(tileResource.PathToTarget);
-                newItemNode.Target = node.Target;
+                newItemNode.Item = Node.TileRes.SpawnResource;
+                newItemNode.GlobalPosition = Node.GlobalPosition;
+                newItemNode.Path = Node.GridManager.IndicesToWorld(Node.TileRes.PathToTarget[GetTargetIndex()]);
+                newItemNode.Target = Node.Target;
 
-                node.GetNode<Node>("/root/Game/Items").AddChild(newItemNode);
+                AddChild(newItemNode);
             }
+        }
+
+        public int GetTargetIndex()
+        {
+            foreach(System.Collections.Generic.KeyValuePair<GridManager.Direction, int> tuple in Node.TileRes.Connections)
+            {
+                return tuple.Value;
+            }
+
+            return -1;
         }
     }
 }
