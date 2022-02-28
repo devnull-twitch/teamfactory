@@ -7,7 +7,7 @@ namespace TeamFactory.Map
     public class TileResource : Resource
     {
         [Export]
-        public int TeamID;
+        public int OwnerID;
 
         public int MapIndex;
 
@@ -16,6 +16,8 @@ namespace TeamFactory.Map
 
         [Export]
         public Texture InfraTexture;
+
+        public Dictionary<string, string> InfraOptions;
 
         [Export]
         public bool IsFinal;

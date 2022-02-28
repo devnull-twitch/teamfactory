@@ -10,6 +10,9 @@ namespace TeamFactory.Map
         public int Width;
 
         [Export]
+        public int Height;
+
+        [Export]
         public Array<TileResource> Tiles;
     }
 }

@@ -1,6 +1,7 @@
 using Godot;
 using TeamFactory.Conveyor;
 using TeamFactory.Infra;
+using TeamFactory.Factory;
 using Godot.Collections;
 
 namespace TeamFactory.Map 
@@ -130,7 +131,18 @@ namespace TeamFactory.Map
             int x = (int)position.x / CELLSIZE;
             int y = (int)position.y / CELLSIZE;
 
-            return y * map.Width + x;
+            if (x < 0 || y < 0)
+            {
+                throw new OutOfMapException();
+            }
+
+            int index = y * map.Width + x;
+            if (index >= map.Width * map.Height)
+            {
+                throw new OutOfMapException();
+            }
+
+            return index;
         }
 
         public Vector2[] IndicesToWorld(int[] indices)
@@ -153,8 +165,17 @@ namespace TeamFactory.Map
             infraNode.RotateFromDirection(tr.Direction);
             infraNode.TileRes = tr;
             infraNode.GridManager = this;
-            mapNode.AddChild(infraNode);
             infraMap.SetPointDisabled(index, true);
+
+            if (tr.InfraOptions != null)
+            {
+                if (infraNode is FactoryNode factoryNode && tr.InfraOptions.ContainsKey("is_multi") && tr.InfraOptions["is_multi"] == "1")
+                {
+                    factoryNode.IsMulti = true;
+                }
+            }
+
+            mapNode.AddChild(infraNode);
 
             infraCache[index] = infraNode;
         }

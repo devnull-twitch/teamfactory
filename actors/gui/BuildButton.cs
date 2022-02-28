@@ -28,7 +28,7 @@ public class BuildButton : TextureButton
                 TileResource newTR = new TileResource();
                 newTR.Infra = InfraToBuild.Infra;
                 // TODO get current player team ID from NetState
-                newTR.TeamID = 1;
+                newTR.OwnerID = 1337;
                 newTR.SpawnResource = InfraToBuild.SpawnResource;
                 newTR.SpawnInterval = 2;
                 mapNode.Manager.AddTileResouce(newTR, mapIndex);

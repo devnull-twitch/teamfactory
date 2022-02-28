@@ -1,12 +1,14 @@
-[gd_scene load_steps=3 format=2]
+[gd_scene load_steps=4 format=2]
 
 [ext_resource path="res://actors/merger/Merger.png" type="Texture" id=1]
+[ext_resource path="res://actors/merger/MergerNode.cs" type="Script" id=2]
 
 [sub_resource type="RectangleShape2D" id=1]
 extents = Vector2( 64, 63.5 )
 
 [node name="Merger" type="Sprite"]
 texture = ExtResource( 1 )
+script = ExtResource( 2 )
 
 [node name="Picker" type="Area2D" parent="."]
 

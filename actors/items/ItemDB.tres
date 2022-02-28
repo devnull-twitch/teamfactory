@@ -1,14 +1,16 @@
-[gd_resource type="Resource" load_steps=6 format=2]
+[gd_resource type="Resource" load_steps=7 format=2]
 
 [ext_resource path="res://actors/items/ItemDB.cs" type="Script" id=1]
 [ext_resource path="res://actors/items/ironbar/Ironbar.tres" type="Resource" id=2]
 [ext_resource path="res://actors/items/ironore/Ironore.tres" type="Resource" id=3]
 [ext_resource path="res://actors/items/copperbar/Copperbar.tres" type="Resource" id=4]
 [ext_resource path="res://actors/items/copperore/Copperore.tres" type="Resource" id=5]
+[ext_resource path="res://actors/items/chip/Chip.tres" type="Resource" id=6]
 
 [resource]
 script = ExtResource( 1 )
 Database = {
+"Chip": ExtResource( 6 ),
 "Copperbar": ExtResource( 4 ),
 "Copperore": ExtResource( 5 ),
 "Ironbar": ExtResource( 2 ),

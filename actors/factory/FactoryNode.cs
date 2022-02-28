@@ -13,6 +13,8 @@ namespace TeamFactory.Factory
 
         public FactoryServer Server;
 
+        public bool IsMulti;
+
         public Node ServerNode {
             get {
                 return Server;
@@ -24,6 +26,11 @@ namespace TeamFactory.Factory
             Server = new FactoryServer();
             Server.Node = this;
             AddChild(Server);
+
+            if (IsMulti)
+            {
+                Texture = GD.Load<Texture>("res://actors/factory/MultiFactory.png");
+            }
 
             if (NetState.Mode == Mode.NET_SERVER)
             {
