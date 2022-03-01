@@ -31,6 +31,12 @@ namespace TeamFactory.Player
 
             if (@event is InputEventMouseButton clickEvent && clickEvent.Pressed)
             {
+                // Transform2D t2d = GetGlobalTransform();
+                // t2d.origin = GetGlobalMousePosition();
+                // Viewport vp = GetViewport();
+                // vp.GlobalCanvasTransform = t2d;
+
+                // return;
                 try 
                 {
                     MapNode mapNode = GetNode<MapNode>("../../");

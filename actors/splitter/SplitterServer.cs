@@ -16,10 +16,7 @@ namespace TeamFactory.Splitter
 
         public override void _Ready()
         {
-            SysGen.IList<GridManager.Direction> keyList = SplitterServer.ConvertKeyCollection(Node.TileRes.Connections.Keys);
-            int targetIndex = Node.TileRes.Connections[keyList[currentTargetIndex]].MapIndex;
-            currentTargetMapIndex = targetIndex;
-            Node.Target = Node.GridManager.GetInfraAtIndex(targetIndex);
+            setNextTarget();
         }
 
         public void ItemArrived(ItemNode itemNode)
@@ -38,10 +35,7 @@ namespace TeamFactory.Splitter
                 currentTargetIndex = 0;
             }
             
-            SysGen.IList<GridManager.Direction> keyList = SplitterServer.ConvertKeyCollection(Node.TileRes.Connections.Keys);
-            int targetIndex = Node.TileRes.Connections[keyList[currentTargetIndex]].MapIndex;
-            currentTargetMapIndex = targetIndex;
-            Node.Target = Node.GridManager.GetInfraAtIndex(targetIndex);
+            setNextTarget();
         }
 
         public static SysGen.IList<GridManager.Direction> ConvertKeyCollection(SysGen.ICollection<GridManager.Direction> keys)
@@ -52,6 +46,15 @@ namespace TeamFactory.Splitter
                 res.Add(key);
             }
             return res;
+        }
+
+        private void setNextTarget()
+        {
+            SysGen.IList<GridManager.Direction> keyList = SplitterServer.ConvertKeyCollection(Node.TileRes.Connections.Keys);
+            Vector2 targetCoords = Node.TileRes.Connections[keyList[currentTargetIndex]].TargetCoords;
+            int targetIndex = Node.GridManager.MapToIndex(targetCoords);
+            currentTargetMapIndex = targetIndex;
+            Node.Target = Node.GridManager.GetInfraAtIndex(targetIndex);
         }
     }
 }

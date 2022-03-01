@@ -3,8 +3,8 @@
     "height": 13,
     "infras": [
         {
-            "index": 60,
-            "owner_id": 1337,
+            "x": 0,
+            "y": 3,
             "infra_scene": "res://actors/input/InputNode.tscn",
             "infra_texture": "res://sprites/tilemaps/InputNode.png",
             "is_final": false,
@@ -12,15 +12,16 @@
             "connections": {
                 "4": {
                     "target_direction": 3,
-                    "target_map_index": 33
+                    "target_coords_x": 5,
+                    "target_coords_y": 3
                 }
             },
             "spawn_interval": 1.5,
             "spawn_resource": "res://actors/items/ironore/Ironore.tres"
         },
         {
-            "index": 90,
-            "owner_id": 1337,
+            "x": 0,
+            "y": 5,
             "infra_scene": "res://actors/input/InputNode.tscn",
             "infra_texture": "res://sprites/tilemaps/InputNode.png",
             "is_final": false,
@@ -28,15 +29,16 @@
             "connections": {
                 "4": {
                     "target_direction": 3,
-                    "target_map_index": 92
+                    "target_coords_x": 5,
+                    "target_coords_y": 5
                 }
             },
             "spawn_interval": 2.5,
             "spawn_resource": "res://actors/items/copperore/Copperore.tres"
         },
         {
-            "index": 33,
-            "owner_id": 1337,
+            "x": 5,
+            "y": 3,
             "infra_scene": "res://actors/factory/FactoryNode.tscn",
             "infra_texture": "res://sprites/tilemaps/TransformNode.png",
             "is_final": false,
@@ -44,15 +46,16 @@
             "connections": {
                 "4": {
                     "target_direction": 1,
-                    "target_map_index": 94
+                    "target_coords_x": 10,
+                    "target_coords_y": 10
                 }
             },
             "spawn_interval": 0.5,
             "spawn_resource": "res://actors/items/ironbar/Ironbar.tres"
         },
         {
-            "index": 92,
-            "owner_id": 1337,
+            "x": 5,
+            "y": 5,
             "infra_scene": "res://actors/factory/FactoryNode.tscn",
             "infra_texture": "res://sprites/tilemaps/TransformNode.png",
             "is_final": false,
@@ -60,15 +63,16 @@
             "connections": {
                 "4": {
                     "target_direction": 3,
-                    "target_map_index": 94
+                    "target_coords_x": 10,
+                    "target_coords_y": 10
                 }
             },
             "spawn_interval": 0.5,
             "spawn_resource": "res://actors/items/copperbar/Copperbar.tres"
         },
         {
-            "index": 111,
-            "owner_id": 1337,
+            "x": 14,
+            "y": 4,
             "infra_scene": "res://actors/output/OutputNode.tscn",
             "infra_texture": "res://sprites/tilemaps/OutputNode.png",
             "is_final": true,
@@ -78,8 +82,8 @@
             "spawn_resource": ""
         },
         {
-            "index": 94,
-            "owner_id": 1337,
+            "x": 10,
+            "y": 10,
             "infra_scene": "res://actors/factory/FactoryNode.tscn",
             "infra_texture": "res://sprites/tilemaps/TransformNode.png",
             "is_final": false,
@@ -90,7 +94,8 @@
             "connections": {
                 "4": {
                     "target_direction": 3,
-                    "target_map_index": 111
+                    "target_coords_x": 14,
+                    "target_coords_y": 4
                 }
             },
             "spawn_interval": 0.5,

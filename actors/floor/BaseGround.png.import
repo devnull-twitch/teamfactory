@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/BaseGround.png-21769bb6a951b1c90b6031f98cdb2621.stex"
+path="res://.import/BaseGround.png-33e2ec8676f80065bdd99f1d8b58830f.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://sprites/tilemaps/BaseGround.png"
-dest_files=[ "res://.import/BaseGround.png-21769bb6a951b1c90b6031f98cdb2621.stex" ]
+source_file="res://actors/floor/BaseGround.png"
+dest_files=[ "res://.import/BaseGround.png-33e2ec8676f80065bdd99f1d8b58830f.stex" ]
 
 [params]
 

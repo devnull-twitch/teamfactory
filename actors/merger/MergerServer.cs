@@ -22,7 +22,7 @@ public class MergerServer : Node, IItemReceiver
         {
             foreach(System.Collections.Generic.KeyValuePair<GridManager.Direction, ConnectionTarget> tuple in Node.TileRes.Connections)
             {
-                return tuple.Value.MapIndex;
+                return Node.GridManager.MapToIndex(tuple.Value.TargetCoords);
             }
 
             return -1;

@@ -4,13 +4,13 @@ namespace TeamFactory.Map
 {
     public class ConnectionTarget : Resource
     {
-        public int MapIndex;
+        public Vector2 TargetCoords;
 
         public GridManager.Direction Direction;
 
-        public ConnectionTarget(int mapIndex, GridManager.Direction direction)
+        public ConnectionTarget(Vector2 targetCoords, GridManager.Direction direction)
         {
-            this.MapIndex = mapIndex;
+            this.TargetCoords = targetCoords;
             this.Direction = direction;
         }
     }

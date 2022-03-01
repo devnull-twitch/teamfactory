@@ -3,6 +3,7 @@ using TeamFactory.Conveyor;
 using TeamFactory.Infra;
 using TeamFactory.Factory;
 using Godot.Collections;
+using TeamFactory.Lib.JsonMap;
 
 namespace TeamFactory.Map 
 {
@@ -18,18 +19,26 @@ namespace TeamFactory.Map
 
         const int CELLSIZE = 128;
 
-        private MapResource map;
+        private int mapWidth;
+
+        private int mapHeight;
 
         private AStar2D infraMap;
 
         private Node2D mapNode;
 
+        private int offset;
+
         private Dictionary<int, InfraSprite> infraCache = new Dictionary<int, InfraSprite>();
 
-        public GridManager(MapResource map, Node2D mapNode)
+        private Parser parser;
+
+        public GridManager(Node2D mapNode, Parser parser)
         {
-            this.map = map;
             this.mapNode = mapNode;
+            this.parser = parser;
+
+            infraMap = new AStar2D();
         }
 
         public bool AddTileResouce(TileResource tr, int mapIndex)
@@ -66,42 +75,104 @@ namespace TeamFactory.Map
                 return false;
             }
 
-            src.Connections[outputDir] = new ConnectionTarget(target, Direction.Left);
+            Vector2 targetMapCoords = IndexToMap(target);
+            src.Connections[outputDir] = new ConnectionTarget(targetMapCoords, Direction.Left);
             connectNode(src, target);
             return true;
         }
 
-        public void SetupMap()
+        public void AddPlayerZone(int ownerNetID)
         {
-            infraMap = new AStar2D();
+            MapResource map = parser.CreateMapData();
+            mapWidth = map.Width;
+            mapHeight = map.Height;
 
-            for (int i = 0; i < map.Tiles.Count; i++)
+            addPlayerFloor(map);
+
+            int relMaxIndex = mapWidth * mapHeight;
+            for (int i = 0; i < relMaxIndex; i++)
             {
-                TileResource tr = map.Tiles[i];
-                
-                Vector2 mapPos = IndexToMap(i);
-                infraMap.AddPoint(i, mapPos, 1);
-                if (mapPos.x > 0) {
-                    infraMap.ConnectPoints(i, i - 1, true);
+                int absoluteIndex = offset + i;
+                Vector2 relCoords = IndexToMap(i);
+                Vector2 absCoords = IndexToMap(absoluteIndex);
+                infraMap.AddPoint(absoluteIndex, absCoords, 1);
+                if (relCoords.x > 0) {
+                    infraMap.ConnectPoints(absoluteIndex, absoluteIndex - 1, true);
                 }
-                if (mapPos.y > 0)
+                if (relCoords.y > 0)
                 {
-                    infraMap.ConnectPoints(i, i - map.Width, true);
-                }
-
-                if (tr != null)
-                {
-                    addInfraNode(tr, i);
+                    infraMap.ConnectPoints(absoluteIndex, absoluteIndex - map.Width, true);
                 }
             }
 
             for (int i = 0; i < map.Tiles.Count; i++)
             {
                 TileResource tr = map.Tiles[i];
+                tr.OwnerID = ownerNetID;
+                
+                Vector2 relativeMapPos = tr.Coords;
+                int relativeIndex = MapToIndex(relativeMapPos);
+                int absoluteIndex = offset + relativeIndex;
+
+                addInfraNode(tr, absoluteIndex);
+            }
+
+            for (int i = 0; i < map.Tiles.Count; i++)
+            {
+                TileResource tr = map.Tiles[i];
+                Vector2 relativeMapPos = tr.Coords;
+                int relativeIndex = MapToIndex(relativeMapPos);
+                int absoluteIndex = offset + relativeIndex;
+
+                Dictionary<Direction, ConnectionTarget> fixedConnectionDict = new Dictionary<Direction, ConnectionTarget>();
+                foreach(System.Collections.Generic.KeyValuePair<Direction, ConnectionTarget> tuple in tr.Connections)
+                {
+                    int relIndex = MapToIndex(tuple.Value.TargetCoords);
+                    Vector2 fixedCoords = IndexToMap(relIndex + offset);
+
+                    fixedConnectionDict[tuple.Key] = new ConnectionTarget(fixedCoords, tuple.Value.Direction);
+                }
+                tr.Connections = fixedConnectionDict;
+                
                 if (tr != null && tr.Connections.Count > 0)
                 {
-                    connectNode(tr, i);
+                    connectNode(tr, absoluteIndex);
                 }
+            }
+
+            offset += mapWidth * (mapHeight + 1);
+        }
+
+        private void addPlayerFloor(MapResource map)
+        {
+            TileMap floor = mapNode.GetNode<TileMap>("/root/Game/Floor");
+            int newTileID = floor.TileSet.GetLastUnusedTileId();
+            Texture floorTexture = GD.Load<Texture>("res://actors/floor/BaseGround.png");
+            ShaderMaterial shaderMaterial = GD.Load<ShaderMaterial>("res://materials/FloorA.tres");
+            shaderMaterial.SetShaderParam("TeamColor", new Color(255 % newTileID, 0, 255 % newTileID));
+
+            floor.TileSet.CreateTile(newTileID);
+            floor.TileSet.TileSetTexture(newTileID, floorTexture);
+            floor.TileSet.TileSetMaterial(newTileID, shaderMaterial);
+
+            Vector2 offsetCoords = IndexToMap(offset);
+
+            for (int x = 0; x < map.Width; x++)
+            {
+                floor.SetCell((int)offsetCoords.x + x, (int)offsetCoords.y - 1, 1, false, false, true);
+                for (int y = 0; y < map.Height; y++)
+                {
+                    if (x == 0)
+                    {
+                        floor.SetCell((int)offsetCoords.x - 1, (int)offsetCoords.y + y, 1);
+                    }
+                    floor.SetCell((int)offsetCoords.x + x, (int)offsetCoords.y + y, newTileID);
+                    if (x == map.Width - 1)
+                    {
+                        floor.SetCell((int)offsetCoords.x + map.Width, (int)offsetCoords.y + y, 1);
+                    }
+                }
+                floor.SetCell((int)offsetCoords.x + x, (int)offsetCoords.y + map.Height, 1, false, false, true);
             }
         }
 
@@ -112,16 +183,23 @@ namespace TeamFactory.Map
 
         public Vector2 IndexToMap(int i)
         {
-            int x = i % map.Width;
-            int y = i / map.Width;
+            int x = i % mapWidth;
+            int y = i / mapWidth;
 
             return new Vector2(x, y);
         }
 
+        public int MapToIndex(Vector2 v)
+        {
+            int index = (int)v.y * mapWidth + (int)v.x;
+
+            return index;
+        }
+
         public Vector2 IndexToWorld(int i)
         {
-            float x = i % map.Width * CELLSIZE + (CELLSIZE / 2);
-            float y = i / map.Width * CELLSIZE + (CELLSIZE / 2);
+            float x = i % mapWidth * CELLSIZE + (CELLSIZE / 2);
+            float y = i / mapWidth * CELLSIZE + (CELLSIZE / 2);
 
             return new Vector2(x, y);
         }
@@ -136,13 +214,7 @@ namespace TeamFactory.Map
                 throw new OutOfMapException();
             }
 
-            int index = y * map.Width + x;
-            if (index >= map.Width * map.Height)
-            {
-                throw new OutOfMapException();
-            }
-
-            return index;
+            return MapToIndex(new Vector2(x, y));
         }
 
         public Vector2[] IndicesToWorld(int[] indices)
@@ -158,8 +230,6 @@ namespace TeamFactory.Map
 
         private void addInfraNode(TileResource tr, int index)
         {
-            tr.MapIndex = index;
-
             InfraSprite infraNode = tr.Infra.Instance<InfraSprite>();
             infraNode.Position = IndexToWorld(index);
             infraNode.RotateFromDirection(tr.Direction);
@@ -184,9 +254,10 @@ namespace TeamFactory.Map
         {
             foreach(System.Collections.Generic.KeyValuePair<Direction, ConnectionTarget> tuple in tr.Connections)
             {
-                infraCache[index].Target = infraCache[tuple.Value.MapIndex];
+                int targetAbsIndex = MapToIndex(tuple.Value.TargetCoords);
+                infraCache[index].Target = infraCache[targetAbsIndex];
                 int startIndex = GetIndicesFromDirection(index, tuple.Key);
-                int endIndex = GetIndicesFromDirection(tuple.Value.MapIndex, tuple.Value.Direction);
+                int endIndex = GetIndicesFromDirection(targetAbsIndex, tuple.Value.Direction);
 
                 // make path without source and dest
                 int[] path = infraMap.GetIdPath(startIndex, endIndex);
@@ -194,17 +265,17 @@ namespace TeamFactory.Map
                 System.Array.Copy(path, 0, completePath, 1, path.Length);
                 completePath[0] = index;
                 // add in source and dest ( blocked in a star because they are infra )
-                completePath[completePath.Length - 1] = tuple.Value.MapIndex;
+                completePath[completePath.Length - 1] = targetAbsIndex;
 
                 // save path in tile indices to target node
-                tr.PathToTarget[tuple.Value.MapIndex] = completePath;
+                tr.PathToTarget[targetAbsIndex] = completePath;
 
                 PackedScene packedConveyor = GD.Load<PackedScene>("res://actors/conveyor/ConveyorNode.tscn");
                 for(int j = 1; j < completePath.Length - 1; j++)
                 {
                     int pathSegmentIndex = completePath[j];
-                    int x = pathSegmentIndex % map.Width;
-                    int y = pathSegmentIndex / map.Width;
+                    int x = pathSegmentIndex % mapWidth;
+                    int y = pathSegmentIndex / mapWidth;
 
                     ConveyorNode conveyorInstance = packedConveyor.Instance<ConveyorNode>();
                     conveyorInstance.Position = IndexToWorld(completePath[j]);

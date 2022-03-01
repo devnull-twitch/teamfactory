@@ -1,7 +1,7 @@
 [gd_scene load_steps=5 format=2]
 
 [ext_resource path="res://materials/FloorA.tres" type="Material" id=1]
-[ext_resource path="res://sprites/tilemaps/BaseGround.png" type="Texture" id=2]
+[ext_resource path="res://actors/floor/BaseGround.png" type="Texture" id=2]
 [ext_resource path="res://sprites/tilemaps/BaseWall.png" type="Texture" id=3]
 
 [sub_resource type="TileSet" id=7]

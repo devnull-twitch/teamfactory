@@ -7,9 +7,10 @@ namespace TeamFactory.Map
     public class TileResource : Resource
     {
         [Export]
-        public int OwnerID;
+        public Vector2 Coords;
 
-        public int MapIndex;
+        [Export]
+        public int OwnerID;
 
         [Export]
         public PackedScene Infra;
@@ -38,4 +39,6 @@ namespace TeamFactory.Map
         [Export]
         public ItemResource SpawnResource;
     }
+
+
 }
