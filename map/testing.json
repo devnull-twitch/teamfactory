@@ -43,6 +43,7 @@
             "infra_texture": "res://sprites/tilemaps/TransformNode.png",
             "is_final": false,
             "direction": 3,
+            "inputs": [3],
             "connections": {
                 "4": {
                     "target_direction": 1,
@@ -60,6 +61,7 @@
             "infra_texture": "res://sprites/tilemaps/TransformNode.png",
             "is_final": false,
             "direction": 3,
+            "inputs": [3],
             "connections": {
                 "4": {
                     "target_direction": 3,
@@ -77,6 +79,7 @@
             "infra_texture": "res://sprites/tilemaps/OutputNode.png",
             "is_final": true,
             "direction": 3,
+            "inputs": [4],
             "connections": {},
             "spawn_interval": 0,
             "spawn_resource": ""
@@ -90,6 +93,7 @@
             "options": {
                 "is_multi": "1"
             },
+            "inputs": [3, 1, 2],
             "direction": 3,
             "connections": {
                 "4": {

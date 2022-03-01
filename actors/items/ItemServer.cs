@@ -38,7 +38,7 @@ namespace TeamFactory.Items
                     }
                 }
 
-                Vector2 newPosition = Node.GlobalPosition.MoveToward(Node.Path[0], 50 * delta);
+                Vector2 newPosition = Node.GlobalPosition.MoveToward(Node.Path[0], 200 * delta);
                 NetState.Rpc(this, "Move", newPosition.x, newPosition.y);
             }
         }

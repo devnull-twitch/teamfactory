@@ -22,12 +22,14 @@ namespace TeamFactory.Map
 
         [Export]
         public bool IsFinal;
-
+        
         [Export]
         public GridManager.Direction Direction;
 
         [Export]
         public Dictionary<GridManager.Direction, ConnectionTarget> Connections;
+
+        public Array<GridManager.Direction> Inputs;
 
         [Export]
         public float SpawnInterval;

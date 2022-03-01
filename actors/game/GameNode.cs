@@ -1,6 +1,7 @@
 using Godot;
 using Godot.Collections;
 using TeamFactory.Lib.Multiplayer;
+using TeamFactory.Gui;
 
 namespace TeamFactory.Game
 {
@@ -18,9 +19,7 @@ namespace TeamFactory.Game
 
         private Label TtnrUi;
 
-        private GridContainer ScoresUi;
-
-        private PackedScene ScoreEntryScene;
+        private ScoreGrid ScoresUi;
 
         // Called when the node enters the scene tree for the first time.
         public override void _Ready()
@@ -36,9 +35,7 @@ namespace TeamFactory.Game
 
             TtnrUi = GetNode<Label>("/root/Game/HUD/TopUI/HBoxContainer/RoundTime");
             PointUi = GetNode<Label>("/root/Game/HUD/TopUI/HBoxContainer/Points");
-            ScoresUi = GetNode<GridContainer>("/root/Game/HUD/GridContainer");
-
-            ScoreEntryScene = GD.Load<PackedScene>("res://actors/gui/ScoreEntry.tscn");
+            ScoresUi = GetNode<ScoreGrid>("/root/Game/HUD/GridContainer");
         }
 
         public override void _Process(float delta)
@@ -65,16 +62,7 @@ namespace TeamFactory.Game
             }
 
             Scores[ownerID] = points;
-            ScoresUi.AddChild(CreateWithText($"{ownerID}"));
-            ScoresUi.AddChild(CreateWithText($"{points}"));
-        }
-
-        public Control CreateWithText(string text)
-        {
-            Control newLabel = ScoreEntryScene.Instance<Control>();
-            newLabel.GetNode<Label>("Label").Text = text;
-
-            return newLabel;
+            ScoresUi.SetScore(ownerID, points);
         }
     }
 }

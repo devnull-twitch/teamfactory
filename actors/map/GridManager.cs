@@ -245,6 +245,18 @@ namespace TeamFactory.Map
                 }
             }
 
+            foreach(Direction inputDir in tr.Inputs)
+            {
+                int inputIndex = GetIndicesFromDirection(index, inputDir);
+                infraMap.SetPointWeightScale(inputIndex, 3f);
+            }
+
+            foreach(Direction outputDir in tr.Connections.Keys)
+            {
+                int inputIndex = GetIndicesFromDirection(index, outputDir);
+                infraMap.SetPointWeightScale(inputIndex, 3f);
+            }
+
             mapNode.AddChild(infraNode);
 
             infraCache[index] = infraNode;
@@ -281,6 +293,8 @@ namespace TeamFactory.Map
                     conveyorInstance.Position = IndexToWorld(completePath[j]);
                     conveyorInstance.InputDir = GetDirectionFromIndices(completePath[j], completePath[j-1]);
                     conveyorInstance.OutputDir = GetDirectionFromIndices(completePath[j], completePath[j+1]);
+
+                    infraMap.SetPointWeightScale(completePath[j], 3f);
 
                     mapNode.AddChild(conveyorInstance);
                 }
