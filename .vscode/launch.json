@@ -15,6 +15,21 @@
                 "--path",
                 "${workspaceRoot}"
             ]
+        },
+        {
+            "name": "Launch server",
+            "type": "godot-mono",
+            "request": "launch",
+            "mode": "executable",
+            "preLaunchTask": "build",
+            "executable": "${env:GODOT}/Godot_v3.4.2-stable_mono_win64.exe\r",
+            "executableArguments": [
+                "--no-window",
+                "--path",
+                "${workspaceRoot}",
+                "scenes/Lobby.tscn",
+                "--server"
+            ]
         }
     ]
 }

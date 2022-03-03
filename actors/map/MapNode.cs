@@ -10,12 +10,6 @@ namespace TeamFactory.Map
 
         public GridManager Manager;
 
-        public MapNode() : base()
-        {
-            // TODO: read from somewhere
-            NetState.Mode = Mode.LOCAL;
-        }
-
         public override void _Ready()
         {
             File testJson = new File();

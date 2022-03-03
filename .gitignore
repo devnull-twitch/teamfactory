@@ -8,3 +8,7 @@ lib/
 
 # Mono-specific ignores
 .mono/
+
+# Project specific
+/force_local.txt
+run-sever.ps1
