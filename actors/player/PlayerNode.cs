@@ -9,6 +9,8 @@ namespace TeamFactory.Player
         public int TargetMapIndex;
 
         public int OwnerID = 1337;
+
+        public string PlayerName;
     
         public override void _Ready()
         {
@@ -20,6 +22,8 @@ namespace TeamFactory.Player
             {
                 return;
             }
+
+            initCamera();
         }
 
         public override void _Input(InputEvent @event)
@@ -31,15 +35,9 @@ namespace TeamFactory.Player
 
             if (@event is InputEventMouseButton clickEvent && clickEvent.Pressed)
             {
-                // Transform2D t2d = GetGlobalTransform();
-                // t2d.origin = GetGlobalMousePosition();
-                // Viewport vp = GetViewport();
-                // vp.GlobalCanvasTransform = t2d;
-
-                // return;
                 try 
                 {
-                    MapNode mapNode = GetNode<MapNode>("../../");
+                    MapNode mapNode = GetNode<MapNode>("../../GridManager");
                     int movementTargetIndex = mapNode.Manager.WorldToIndex(GetGlobalMousePosition());
                     NetState.RpcId(this, 1, "RequestMoveTo", movementTargetIndex);
                 }
@@ -51,10 +49,25 @@ namespace TeamFactory.Player
             }
         }
 
+        private void initCamera()
+        {
+            GD.Print("init camera called");
+            if (OwnerID == NetState.NetworkId(this))
+            {
+                GetNode<Camera2D>("Camera2D").Current = true;
+            }
+        }
+
         [RemoteSync]
         public void RequestMoveTo(int mapIndex)
         {
             TargetMapIndex = mapIndex;
+        }
+
+        [Remote]
+        public void setPosition(float x, float y)
+        {
+            Position = new Vector2(x, y);
         }
     }
 }

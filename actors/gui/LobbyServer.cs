@@ -1,6 +1,7 @@
 using Godot;
 using Godot.Collections;
 using TeamFactory.Lib.Multiplayer;
+using TeamFactory.Game;
 
 namespace TeamFactory.Gui
 {
@@ -93,10 +94,12 @@ namespace TeamFactory.Gui
 
             if (NetState.Mode != Mode.LOCAL)
             {
+                /*
                 if (readyState.Count < 2)
                 {
                     return;
                 }
+                */
                 foreach(bool readyFlag in readyState.Values)
                 {
                     if (!readyFlag)
@@ -111,8 +114,12 @@ namespace TeamFactory.Gui
             PackedScene gamePacked = GD.Load<PackedScene>("res://scenes/Game.tscn");
             GetNode<Node2D>("/root/Lobby").QueueFree();
 
-            Node gameNode = gamePacked.Instance();
-            // copy over player ID to name dictionary
+            GameNode gameNode = gamePacked.Instance<GameNode>();
+            GameServer gameServerNode = gameNode.GetNode<GameServer>("GameServer");
+            foreach(int netID in players.Keys)
+            {
+                gameServerNode.AddPlayer(netID, players[netID]);
+            }
             GetTree().Root.AddChild(gameNode);
 
             NetState.Rpc(Node, "SwitchToGame");

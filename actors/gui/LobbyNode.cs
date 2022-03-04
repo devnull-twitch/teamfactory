@@ -20,6 +20,11 @@ namespace TeamFactory.Gui
             server.Node = this;
             server.Name = "LobbyServer";
             AddChild(server);
+
+            if (NetState.Mode == Mode.NET_CLIENT)
+            {
+                setupNetClient();
+            }
         }
 
         [Remote]
@@ -43,8 +48,10 @@ namespace TeamFactory.Gui
             }
         }
 
+        [Remote]
         public void SwitchToGame()
         {
+            GD.Print("SwitchToGame");
             if(NetState.Mode != Mode.NET_CLIENT)
             {
                 return;
@@ -56,6 +63,21 @@ namespace TeamFactory.Gui
             Node gameNode = gamePacked.Instance();
             // copy over player ID to name dictionary
             GetTree().Root.AddChild(gameNode);
+        }
+
+        private void setupNetClient()
+        {
+            GD.PrintS("Starting Client!\n");
+
+            NetworkedMultiplayerENet peer = new NetworkedMultiplayerENet();
+            var error = peer.CreateClient(ServerIP, ServerPort);
+            if (error != Error.Ok) 
+            {
+                GD.PrintErr(error);
+                return;
+            }
+
+            GetTree().NetworkPeer = peer;
         }
     }
 }

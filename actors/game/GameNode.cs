@@ -2,13 +2,13 @@ using Godot;
 using Godot.Collections;
 using TeamFactory.Lib.Multiplayer;
 using TeamFactory.Gui;
+using TeamFactory.Player;
+using TeamFactory.Map;
 
 namespace TeamFactory.Game
 {
     public class GameNode : Node2D
     {
-        public GameServer Server;
-
         public int UserPoints;
 
         protected Dictionary<int, int> Scores = new Dictionary<int, int>();
@@ -21,13 +21,13 @@ namespace TeamFactory.Game
 
         private ScoreGrid ScoresUi;
 
+        private PackedScene playerPackaged;
+
+        
+
         // Called when the node enters the scene tree for the first time.
         public override void _Ready()
         {
-            Server = new GameServer();
-            Server.Node = this;
-            AddChild(Server);
-
             if (NetState.Mode == Mode.NET_SERVER)
             {
                 return;
@@ -36,6 +36,13 @@ namespace TeamFactory.Game
             TtnrUi = GetNode<Label>("/root/Game/HUD/TopUI/HBoxContainer/RoundTime");
             PointUi = GetNode<Label>("/root/Game/HUD/TopUI/HBoxContainer/Points");
             ScoresUi = GetNode<ScoreGrid>("/root/Game/HUD/GridContainer");
+
+            if (NetState.Mode == Mode.NET_CLIENT)
+            {
+                GameServer gsNode = GetNode<GameServer>("GameServer");
+                NetState.RpcId(gsNode, 1, "requestClientInit");
+                GD.Print("requesting players");
+            }
         }
 
         public override void _Process(float delta)
@@ -63,6 +70,23 @@ namespace TeamFactory.Game
 
             Scores[ownerID] = points;
             ScoresUi.SetScore(ownerID, points);
+        }
+
+        [Remote]
+        public void AddPlayer(int ownerID, string name)
+        {
+            if (playerPackaged == null)
+            {
+                playerPackaged = GD.Load<PackedScene>("res://actors/player/Player.tscn");
+            }
+
+            PlayerNode newPlayerNode = playerPackaged.Instance<PlayerNode>();
+            newPlayerNode.OwnerID = ownerID;
+            newPlayerNode.PlayerName = name;
+            newPlayerNode.Name = $"{ownerID}";
+
+            GetNode<Node>("Players").AddChild(newPlayerNode);
+            GetNode<MapNode>("GridManager").CreatePlayerZone(ownerID);
         }
     }
 }

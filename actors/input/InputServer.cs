@@ -2,6 +2,7 @@ using Godot;
 using System;
 using TeamFactory.Map;
 using TeamFactory.Items;
+using TeamFactory.Lib.Multiplayer;
 
 namespace TeamFactory.Input
 {
@@ -13,6 +14,16 @@ namespace TeamFactory.Input
 
         public override void _PhysicsProcess(float delta)
         {
+            if (NetState.Mode == Mode.NET_CLIENT)
+            {
+                return;
+            }
+
+            if (Node.TileRes.Connections.Count <= 0)
+            {
+                return;
+            }
+
             cooldown -= delta;
             if (cooldown <= 0)
             {

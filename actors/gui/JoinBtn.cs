@@ -26,8 +26,16 @@ namespace TeamFactory.Gui
             PackedScene lobbyPackged = GD.Load<PackedScene>("res://scenes/Lobby.tscn");
             GetNode<Node2D>("/root/Menu").QueueFree();
 
-            Node lobbyNode = lobbyPackged.Instance();
-            // set networking information on lobby
+            LobbyNode lobbyNode = lobbyPackged.Instance<LobbyNode>();
+            
+            string codeInput = GetNode<LineEdit>("../GameCodeInput").Text;
+            if (codeInput.Contains(":"))
+            {
+                string[] parts = codeInput.Split(":");
+                lobbyNode.ServerIP = parts[0];
+                lobbyNode.ServerPort = int.Parse(parts[1]);
+            }
+
             GetTree().Root.AddChild(lobbyNode);
         }
     }

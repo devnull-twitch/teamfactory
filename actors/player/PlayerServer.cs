@@ -1,5 +1,6 @@
 using Godot;
 using TeamFactory.Map;
+using TeamFactory.Lib.Multiplayer;
 
 namespace TeamFactory.Player 
 {
@@ -31,7 +32,7 @@ namespace TeamFactory.Player
 
         public void setNewTarget(int targetIndex)
         {
-            MapNode mapNode = GetNode<MapNode>("../../../");
+            MapNode mapNode = GetNode<MapNode>("../../../GridManager");
             pathToTarget = mapNode.Manager.GetPathTo(mapNode.Manager.WorldToIndex(Node.GlobalPosition), targetIndex);
         }
 
@@ -39,8 +40,10 @@ namespace TeamFactory.Player
         {
             if (pathToTarget != null && pathToTarget.Length > 0)
             {
-                MapNode mapNode = GetNode<MapNode>("../../../");
+                MapNode mapNode = GetNode<MapNode>("../../../GridManager");
                 Node.Position = mapNode.Manager.IndexToWorld(pathToTarget[0]);
+
+                NetState.Rpc(Node, "setPosition", Node.Position.x, Node.Position.y);
 
                 if (pathToTarget.Length <= 1)
                 {

@@ -19,6 +19,11 @@ namespace TeamFactory.Factory
                 return;
             }
 
+            if (Node.TileRes.Connections.Count <= 0)
+            {
+                return;
+            }
+
             cooldown -= delta;
             if (cooldown <= 0 && RequiredmentsCheck())
             {

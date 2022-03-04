@@ -1,0 +1,2 @@
+C:\DevNull\Godot_v3.4.2-stable_mono_win64.exe --build-solutions --path "C:\DevNull\GodotProjects\teamfactory" --no-window -v -q
+C:\DevNull\Godot_v3.4.2-stable_mono_win64.exe --path "C:\DevNull\GodotProjects\teamfactory"

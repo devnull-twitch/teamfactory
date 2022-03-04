@@ -1,0 +1,36 @@
+{
+    "width": 10,
+    "height": 5,
+    "time": 10,
+    "unlocked_items": [
+        "Ironbar", "Copperbar"
+    ],
+    "spwan_position": {
+        "x": 1,
+        "y": 3
+    },
+    "infras": [
+        {
+            "x": 0,
+            "y": 3,
+            "infra_scene": "res://actors/input/InputNode.tscn",
+            "infra_texture": "res://sprites/tilemaps/InputNode.png",
+            "is_final": false,
+            "direction": 4,
+            "connections": {},
+            "spawn_interval": 1.5,
+            "spawn_resource": "res://actors/items/ironore/Ironore.tres"
+        },
+        {
+            "x": 9,
+            "y": 3,
+            "infra_scene": "res://actors/output/OutputNode.tscn",
+            "infra_texture": "res://sprites/tilemaps/OutputNode.png",
+            "is_final": true,
+            "direction": 4,
+            "connections": {},
+            "spawn_interval": 0,
+            "spawn_resource": ""
+        }
+    ]
+}

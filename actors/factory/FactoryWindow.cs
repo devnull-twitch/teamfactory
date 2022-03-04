@@ -31,6 +31,13 @@ namespace TeamFactory.Factory
             outputSelector = GetNode<OptionButton>("VBoxContainer/HBoxContainer2/OptionButton");
             GetNode<Button>("VBoxContainer/HBoxContainer2/ConnectButton").Connect("pressed", this, nameof(OnConnectStart));
             
+            Godot.Collections.Array<string> unlockedItems = GetNode<MapNode>("/root/Game/GridManager").UnlockedItems;
+            outputSelector.Clear();
+            foreach(string option in unlockedItems)
+            {
+                outputSelector.AddItem(option);
+            }
+
             outputSelector.Connect("item_selected", this, nameof(OnSelectOutputResource));
         }
 

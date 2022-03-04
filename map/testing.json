@@ -9,13 +9,7 @@
             "infra_texture": "res://sprites/tilemaps/InputNode.png",
             "is_final": false,
             "direction": 4,
-            "connections": {
-                "4": {
-                    "target_direction": 3,
-                    "target_coords_x": 5,
-                    "target_coords_y": 3
-                }
-            },
+            "connections": {},
             "spawn_interval": 1.5,
             "spawn_resource": "res://actors/items/ironore/Ironore.tres"
         },
@@ -62,13 +56,7 @@
             "is_final": false,
             "direction": 3,
             "inputs": [3],
-            "connections": {
-                "4": {
-                    "target_direction": 3,
-                    "target_coords_x": 10,
-                    "target_coords_y": 10
-                }
-            },
+            "connections": {},
             "spawn_interval": 0.5,
             "spawn_resource": "res://actors/items/copperbar/Copperbar.tres"
         },

@@ -31,12 +31,12 @@ namespace TeamFactory.Map
 
         private Dictionary<int, InfraSprite> infraCache = new Dictionary<int, InfraSprite>();
 
-        private Parser parser;
+        public Parser Parser;
 
         public GridManager(Node2D mapNode, Parser parser)
         {
             this.mapNode = mapNode;
-            this.parser = parser;
+            this.Parser = parser;
 
             infraMap = new AStar2D();
         }
@@ -81,13 +81,33 @@ namespace TeamFactory.Map
             return true;
         }
 
-        public void AddPlayerZone(int ownerNetID)
+        public void Cleanup()
         {
-            MapResource map = parser.CreateMapData();
+            infraMap = new AStar2D();
+            infraCache = new Dictionary<int, InfraSprite>();
+
+            foreach(Node n in mapNode.GetChildren())
+            {
+                n.QueueFree();
+            }
+
+            TileMap floor = mapNode.GetNode<TileMap>("../Floor");
+            floor.Clear();
+        }
+
+        public void AddPlayerZone(int ownerNetID, string color = "#EEEEEE")
+        {
+            MapResource map = Parser.CreateMapData();
             mapWidth = map.Width;
             mapHeight = map.Height;
 
-            addPlayerFloor(map);
+            addPlayerFloor(map, color);
+
+            // moving player to factory
+            int relSpawnPosIndex = MapToIndex(map.SpawnPosition);
+            int absoluteSpawnPosIndex = offset + relSpawnPosIndex;
+            Vector2 spawnPos = IndexToWorld(absoluteSpawnPosIndex);
+            mapNode.GetNode<Node2D>($"../Players/{ownerNetID}").Position = spawnPos;
 
             int relMaxIndex = mapWidth * mapHeight;
             for (int i = 0; i < relMaxIndex; i++)
@@ -143,13 +163,14 @@ namespace TeamFactory.Map
             offset += mapWidth * (mapHeight + 1);
         }
 
-        private void addPlayerFloor(MapResource map)
+        private void addPlayerFloor(MapResource map, string color)
         {
-            TileMap floor = mapNode.GetNode<TileMap>("/root/Game/Floor");
+            TileMap floor = mapNode.GetNode<TileMap>("../Floor");
             int newTileID = floor.TileSet.GetLastUnusedTileId();
             Texture floorTexture = GD.Load<Texture>("res://actors/floor/BaseGround.png");
             ShaderMaterial shaderMaterial = GD.Load<ShaderMaterial>("res://materials/FloorA.tres");
-            shaderMaterial.SetShaderParam("TeamColor", new Color(255 % newTileID, 0, 255 % newTileID));
+            shaderMaterial = (ShaderMaterial)shaderMaterial.Duplicate();
+            shaderMaterial.SetShaderParam("TeamColor", new Color(color));
 
             floor.TileSet.CreateTile(newTileID);
             floor.TileSet.TileSetTexture(newTileID, floorTexture);

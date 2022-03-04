@@ -13,6 +13,14 @@ namespace TeamFactory.Map
         public int Height;
 
         [Export]
+        public int Time;
+        
+        public Vector2 SpawnPosition;
+
+        [Export]
+        public Array<string> UnlockedItems;
+
+        [Export]
         public Array<TileResource> Tiles;
     }
 }

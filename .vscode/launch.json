@@ -28,7 +28,8 @@
                 "--path",
                 "${workspaceRoot}",
                 "scenes/Lobby.tscn",
-                "--server"
+                "--server",
+                "50127"
             ]
         }
     ]
