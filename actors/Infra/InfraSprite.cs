@@ -1,5 +1,5 @@
 using Godot;
-using System;
+using Godot.Collections;
 using TeamFactory.Map;
 using TeamFactory.Items;
 
@@ -12,6 +12,14 @@ namespace TeamFactory.Infra
         public InfraSprite Target;
 
         public TileResource TileRes;
+
+        public Dictionary<string, int> Storage = new Dictionary<string, int>();
+
+        public ItemResource SpawnResource {
+            get {
+                return TileRes.SpawnResource;
+            }
+        }
 
         public void RotateFromDirection(GridManager.Direction direction)
         {

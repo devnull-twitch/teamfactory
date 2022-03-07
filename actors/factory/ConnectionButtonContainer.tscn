@@ -1,0 +1,27 @@
+[gd_scene format=2]
+
+[node name="ConnectionContainer" type="HBoxContainer"]
+margin_right = 395.0
+margin_bottom = 20.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label" type="Label" parent="."]
+margin_top = 3.0
+margin_right = 150.0
+margin_bottom = 17.0
+rect_min_size = Vector2( 150, 0 )
+text = "Left output"
+
+[node name="ConnectBtn" type="Button" parent="."]
+margin_left = 154.0
+margin_right = 218.0
+margin_bottom = 20.0
+text = "Connect"
+
+[node name="DisconnectBtn" type="Button" parent="."]
+margin_left = 222.0
+margin_right = 306.0
+margin_bottom = 20.0
+text = "Disconnect"

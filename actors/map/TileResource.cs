@@ -31,6 +31,8 @@ namespace TeamFactory.Map
 
         public Array<GridManager.Direction> Inputs;
 
+        public Array<GridManager.Direction> Outputs;
+
         [Export]
         public float SpawnInterval;
 

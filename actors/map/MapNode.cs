@@ -39,7 +39,8 @@ namespace TeamFactory.Map
         public override void _Ready()
         {
             File testJson = new File();
-            testJson.Open($"res://map/round_{currentRound}.json", File.ModeFlags.Read);
+            //testJson.Open($"res://map/round_{currentRound}.json", File.ModeFlags.Read);
+            testJson.Open($"res://map/testing.json", File.ModeFlags.Read);
 
             Parser parser = new Parser(testJson.GetAsText());
 
@@ -61,7 +62,7 @@ namespace TeamFactory.Map
         {
             currentRound++;
             File testJson = new File();
-            testJson.Open($"res://map/round_{currentRound}.json", File.ModeFlags.Read);
+            testJson.Open($"res://map/round_{currentRound}.json", File.ModeFlags.Read);  
 
             Parser parser = new Parser(testJson.GetAsText());
 

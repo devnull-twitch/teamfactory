@@ -4,10 +4,10 @@
 [ext_resource path="res://actors/items/ironbar/IronBar.png" type="Texture" id=2]
 
 [node name="Panel" type="WindowDialog"]
-visible = true
 margin_right = 405.0
 margin_bottom = 215.0
 mouse_default_cursor_shape = 4
+popup_exclusive = true
 script = ExtResource( 1 )
 __meta__ = {
 "_edit_use_anchors_": false
@@ -61,21 +61,25 @@ text = "Currently producing: "
 
 [node name="OptionButton" type="OptionButton" parent="VBoxContainer/HBoxContainer2"]
 margin_left = 137.0
-margin_right = 327.0
+margin_right = 395.0
 margin_bottom = 20.0
 size_flags_horizontal = 3
 text = "Ironbar"
 items = [ "Ironbar", null, false, 0, null, "Copperbar", null, false, 1, null ]
 selected = 0
 
-[node name="ConnectButton" type="Button" parent="VBoxContainer/HBoxContainer2"]
-margin_left = 331.0
-margin_right = 395.0
-margin_bottom = 20.0
-text = "Connect"
-
-[node name="GridContainer" type="GridContainer" parent="VBoxContainer"]
+[node name="HSeparator" type="HSeparator" parent="VBoxContainer"]
 margin_top = 92.0
 margin_right = 395.0
-margin_bottom = 92.0
+margin_bottom = 96.0
+
+[node name="Connections" type="VBoxContainer" parent="VBoxContainer"]
+margin_top = 100.0
+margin_right = 395.0
+margin_bottom = 100.0
+
+[node name="GridContainer" type="GridContainer" parent="VBoxContainer"]
+margin_top = 104.0
+margin_right = 395.0
+margin_bottom = 104.0
 columns = 3

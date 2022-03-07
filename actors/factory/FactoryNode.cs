@@ -1,6 +1,4 @@
 using Godot;
-using Godot.Collections;
-using TeamFactory.Map;
 using TeamFactory.Infra;
 using TeamFactory.Items;
 using TeamFactory.Lib.Multiplayer;
@@ -9,8 +7,6 @@ namespace TeamFactory.Factory
 {
     public class FactoryNode : InfraSprite, IServerProvider
     {
-        public Dictionary<string, int> Storage = new Dictionary<string, int>();
-
         public FactoryServer Server;
 
         public bool IsMulti;

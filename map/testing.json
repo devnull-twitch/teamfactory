@@ -1,6 +1,14 @@
 {
     "width": 15,
     "height": 13,
+    "time": 9999,
+    "spwan_position": {
+        "x": 1,
+        "y": 3
+    },
+    "unlocked_items": [
+        "Ironbar", "Copperbar", "Chip"
+    ],
     "infras": [
         {
             "x": 0,
@@ -9,6 +17,7 @@
             "infra_texture": "res://sprites/tilemaps/InputNode.png",
             "is_final": false,
             "direction": 4,
+            "outputs": [4],
             "connections": {},
             "spawn_interval": 1.5,
             "spawn_resource": "res://actors/items/ironore/Ironore.tres"
@@ -20,6 +29,7 @@
             "infra_texture": "res://sprites/tilemaps/InputNode.png",
             "is_final": false,
             "direction": 4,
+            "outputs": [4],
             "connections": {
                 "4": {
                     "target_direction": 3,
@@ -38,6 +48,7 @@
             "is_final": false,
             "direction": 3,
             "inputs": [3],
+            "outputs": [4],
             "connections": {
                 "4": {
                     "target_direction": 1,
@@ -56,6 +67,7 @@
             "is_final": false,
             "direction": 3,
             "inputs": [3],
+            "outputs": [4],
             "connections": {},
             "spawn_interval": 0.5,
             "spawn_resource": "res://actors/items/copperbar/Copperbar.tres"
@@ -82,6 +94,7 @@
                 "is_multi": "1"
             },
             "inputs": [3, 1, 2],
+            "outputs": [4],
             "direction": 3,
             "connections": {
                 "4": {
@@ -92,6 +105,19 @@
             },
             "spawn_interval": 0.5,
             "spawn_resource": "res://actors/items/chip/Chip.tres"
+        },
+        {
+            "x": 3,
+            "y": 10,
+            "infra_scene": "res://actors/splitter/SplitterNode.tscn",
+            "infra_texture": "res://actors/splitter/Splitter.png",
+            "is_final": false,
+            "inputs": [3],
+            "outputs": [1,2,4],
+            "direction": 3,
+            "connections": {},
+            "spawn_interval": 0,
+            "spawn_resource": ""
         }
     ]
 }

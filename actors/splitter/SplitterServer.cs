@@ -6,6 +6,8 @@ using SysGen = System.Collections.Generic;
 
 namespace TeamFactory.Splitter
 {
+    // TODO: splitter should have a storage for the case that an item arrives but no valid connection exists.
+    
     public class SplitterServer : Node, IItemReceiver
     {
         public SplitterNode Node;
@@ -21,6 +23,11 @@ namespace TeamFactory.Splitter
 
         public void ItemArrived(ItemNode itemNode)
         {
+            if (Node.TileRes.Connections.Count <= 0)
+            {
+                return;
+            }
+
             PackedScene packedItemNode = GD.Load<PackedScene>("res://actors/items/Item.tscn");
             ItemNode newItemNode = packedItemNode.Instance<ItemNode>();
             newItemNode.Item = itemNode.Item;
@@ -50,6 +57,11 @@ namespace TeamFactory.Splitter
 
         private void setNextTarget()
         {
+            if (Node.TileRes.Connections.Count <= 0)
+            {
+                return;
+            }
+
             SysGen.IList<GridManager.Direction> keyList = SplitterServer.ConvertKeyCollection(Node.TileRes.Connections.Keys);
             Vector2 targetCoords = Node.TileRes.Connections[keyList[currentTargetIndex]].TargetCoords;
             int targetIndex = Node.GridManager.MapToIndex(targetCoords);
