@@ -19,7 +19,7 @@ namespace TeamFactory.Factory
                 return;
             }
 
-            if (Node.TileRes.Connections.Count <= 0)
+            if (Node.OutConnections.Count <= 0)
             {
                 return;
             }
@@ -28,7 +28,7 @@ namespace TeamFactory.Factory
             if (cooldown <= 0 && RequiredmentsCheck())
             {
                 PopFromStorage();
-                cooldown = Node.TileRes.SpawnInterval;
+                cooldown = Node.SpawnInterval;
 
                 NetState.Rpc(this, "SpawnItem");
             }
@@ -36,12 +36,12 @@ namespace TeamFactory.Factory
 
         private bool RequiredmentsCheck()
         {
-            if (Node.TileRes == null)
+            if (Node.SpawnResource == null)
             {
                 return false;
             }
 
-            foreach(System.Collections.Generic.KeyValuePair<string, int> tuple in Node.TileRes.SpawnResource.Requirements)
+            foreach(System.Collections.Generic.KeyValuePair<string, int> tuple in Node.SpawnResource.Requirements)
             {
                 if (!Node.Storage.ContainsKey(tuple.Key))
                 {
@@ -59,7 +59,7 @@ namespace TeamFactory.Factory
 
         private void PopFromStorage()
         {
-            foreach(System.Collections.Generic.KeyValuePair<string, int> tuple in Node.TileRes.SpawnResource.Requirements)
+            foreach(System.Collections.Generic.KeyValuePair<string, int> tuple in Node.SpawnResource.Requirements)
             {
                 NetState.Rpc(this, "StorageUpdate", tuple.Key, Node.Storage[tuple.Key] - tuple.Value);
             }
@@ -83,18 +83,22 @@ namespace TeamFactory.Factory
         [RemoteSync]
         public void SpawnItem()
         {
+            int targetIndex = GetTargetIndex();
+            if (targetIndex == -1)
+                return;
+
+            InfraSprite targetNode = Node.GridManager.GetInfraAtIndex(targetIndex);
             PackedScene packedItemNode = GD.Load<PackedScene>("res://actors/items/Item.tscn");
             ItemNode newItemNode = packedItemNode.Instance<ItemNode>();
-            newItemNode.Item = Node.TileRes.SpawnResource;
-            newItemNode.Path = Node.GridManager.IndicesToWorld(Node.TileRes.PathToTarget[GetTargetIndex()]);
-            newItemNode.Target = Node.Target;
+            newItemNode.Item = Node.SpawnResource;
+            newItemNode.Target = targetNode;
             AddChild(newItemNode);
             newItemNode.GlobalPosition = Node.GlobalPosition;
         }
 
         public int GetTargetIndex()
         {
-            foreach(System.Collections.Generic.KeyValuePair<GridManager.Direction, ConnectionTarget> tuple in Node.TileRes.Connections)
+            foreach(System.Collections.Generic.KeyValuePair<GridManager.Direction, ConnectionTarget> tuple in Node.OutConnections)
             {
                 return Node.GridManager.MapToIndex(tuple.Value.TargetCoords);
             }

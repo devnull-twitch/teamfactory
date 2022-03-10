@@ -9,18 +9,22 @@ public class MergerServer : Node, IItemReceiver
 
     public void ItemArrived(ItemNode itemNode)
     {
+        int targetIndex = GetTargetIndex();
+        if (targetIndex == -1)
+            return;
+
+        InfraSprite targetNode = Node.GridManager.GetInfraAtIndex(targetIndex);
         PackedScene packedItemNode = GD.Load<PackedScene>("res://actors/items/Item.tscn");
         ItemNode newItemNode = packedItemNode.Instance<ItemNode>();
         newItemNode.Item = itemNode.Item;
-        newItemNode.Path = Node.GridManager.IndicesToWorld(Node.TileRes.PathToTarget[GetTargetIndex()]);
-        newItemNode.Target = Node.Target;
+        newItemNode.Target = targetNode;
         AddChild(newItemNode);
         newItemNode.GlobalPosition = Node.GlobalPosition;
     }
 
     public int GetTargetIndex()
         {
-            foreach(System.Collections.Generic.KeyValuePair<GridManager.Direction, ConnectionTarget> tuple in Node.TileRes.Connections)
+            foreach(System.Collections.Generic.KeyValuePair<GridManager.Direction, ConnectionTarget> tuple in Node.OutConnections)
             {
                 return Node.GridManager.MapToIndex(tuple.Value.TargetCoords);
             }

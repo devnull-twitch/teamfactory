@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/InputNode.png-cb8430493945378cd3f55b6f92209ef8.stex"
+path="res://.import/SimpleFactory.png-03e600f7fc4da23d2fc0b731f7ecaa89.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://sprites/tilemaps/InputNode.png"
-dest_files=[ "res://.import/InputNode.png-cb8430493945378cd3f55b6f92209ef8.stex" ]
+source_file="res://actors/factory/SimpleFactory.png"
+dest_files=[ "res://.import/SimpleFactory.png-03e600f7fc4da23d2fc0b731f7ecaa89.stex" ]
 
 [params]
 

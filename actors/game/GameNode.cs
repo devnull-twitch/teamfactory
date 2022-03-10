@@ -40,7 +40,7 @@ namespace TeamFactory.Game
             if (NetState.Mode == Mode.NET_CLIENT)
             {
                 GameServer gsNode = GetNode<GameServer>("GameServer");
-                NetState.RpcId(gsNode, 1, "requestClientInit");
+                NetState.RpcId(gsNode, 1, "RequestClientInit");
                 GD.Print("requesting players");
             }
         }
@@ -86,7 +86,6 @@ namespace TeamFactory.Game
             newPlayerNode.Name = $"{ownerID}";
 
             GetNode<Node>("Players").AddChild(newPlayerNode);
-            GetNode<MapNode>("GridManager").CreatePlayerZone(ownerID);
         }
     }
 }

@@ -5,7 +5,7 @@
 [ext_resource path="res://actors/gui/ScoreGrid.cs" type="Script" id=3]
 [ext_resource path="res://actors/game/GameServer.cs" type="Script" id=4]
 [ext_resource path="res://actors/gui/Hud.cs" type="Script" id=6]
-[ext_resource path="res://sprites/tilemaps/TransformNode.png" type="Texture" id=7]
+[ext_resource path="res://actors/factory/SimpleFactory.png" type="Texture" id=7]
 [ext_resource path="res://actors/gui/BuildButton.cs" type="Script" id=8]
 [ext_resource path="res://actors/map/MapNode.cs" type="Script" id=14]
 
@@ -18,7 +18,7 @@ script = ExtResource( 4 )
 [node name="Floor" parent="." instance=ExtResource( 1 )]
 tile_data = PoolIntArray( 8, 2, 0, 9, 2, 0, 10, 2, 0, 11, 2, 0, 12, 2, 0, 13, 2, 0, 131081, 2, 0, 131082, 2, 0, 131083, 2, 0, 131084, 2, 0, 131085, 2, 0, 131086, 2, 0, 196618, 2, 0, 196619, 2, 0, 196620, 2, 0, 196621, 2, 0, 196622, 2, 0, 262154, 2, 0, 262155, 2, 0, 262156, 2, 0, 262157, 2, 0, 262158, 2, 0, 327690, 2, 0, 327691, 2, 0, 327692, 2, 0, 327693, 2, 0, 327694, 2, 0, 393227, 2, 0, 393228, 2, 0, 393229, 2, 0, 393230, 2, 0, 458764, 2, 0, 458765, 2, 0, 458766, 2, 0, 524296, 2, 0, 524297, 2, 0, 524298, 2, 0, 524299, 2, 0, 524300, 2, 0, 524301, 2, 0, 524302, 2, 0, 589835, 2, 0, 589836, 2, 0, 589837, 2, 0, 589838, 2, 0, 655373, 2, 0, 655374, 2, 0, 720906, 2, 0, 720907, 2, 0, 720908, 2, 0, 720909, 2, 0, 720910, 2, 0 )
 
-[node name="GridManager" type="Node2D" parent="."]
+[node name="GridManager" type="Node2D" parent="." groups=["spawners"]]
 script = ExtResource( 14 )
 
 [node name="Players" type="Node" parent="."]

@@ -14,13 +14,22 @@ namespace TeamFactory.Game
 
         protected Dictionary<int, int> UserPoints = new Dictionary<int, int>();
 
+        private Dictionary<int, bool> playersLoaded = new Dictionary<int, bool>();
+
         private PackedScene playerPackaged;
+
+        private bool gameRunning = false;
 
         public float TimeTillNextRound;
 
         public override void _Process(float delta)
         {
             if (NetState.Mode != Mode.NET_SERVER)
+            {
+                return;
+            }
+
+            if (!gameRunning)
             {
                 return;
             }
@@ -65,7 +74,7 @@ namespace TeamFactory.Game
         }
 
         [Remote]
-        public void requestClientInit()
+        public void RequestClientInit()
         {
             if (node == null)
             {
@@ -75,6 +84,13 @@ namespace TeamFactory.Game
             foreach(int netID in players.Keys)
             {
                 NetState.RpcId(node, NetState.NetworkSenderId(this), "AddPlayer", netID, players[netID]);
+            }
+
+            playersLoaded[NetState.NetworkSenderId(this)] = true;
+            if (playersLoaded.Count == players.Count)
+            {
+                GetTree().CallGroup("spawners", "PlayersLoaded");
+                gameRunning = true;
             }
         }
 

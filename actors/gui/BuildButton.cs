@@ -5,7 +5,7 @@ using TeamFactory.Map;
 public class BuildButton : TextureButton
 {
     [Export]
-    public TileResource InfraToBuild;
+    public InfraType.TypeIdentifier InfraToBuild;
 
     private bool inProcess;
 
@@ -25,13 +25,8 @@ public class BuildButton : TextureButton
                 MapNode mapNode = GetNode<MapNode>("/root/Game/GridManager");
                 int mapIndex = mapNode.Manager.WorldToIndex(ghostSprite.GlobalPosition);
 
-                TileResource newTR = new TileResource();
-                newTR.Infra = InfraToBuild.Infra;
-                // TODO get current player team ID from NetState
-                newTR.OwnerID = 1337;
-                newTR.SpawnResource = InfraToBuild.SpawnResource;
-                newTR.SpawnInterval = 2;
-                mapNode.Manager.AddTileResouce(newTR, mapIndex);
+                // TODO make rpc call to mapnode server to spawn new InfraSprite node
+                
                 inProcess = false;
                 ghostSprite.QueueFree();
                 return;
@@ -50,12 +45,12 @@ public class BuildButton : TextureButton
     public void OnClick()
     {
         if (inProcess)
-        {
             return;
-        }
+        
+        InfraType it = InfraType.GetByIdentifier(InfraToBuild);
 
         ghostSprite = new Sprite();
-        ghostSprite.Texture = InfraToBuild.InfraTexture;
+        ghostSprite.Texture = it.Texture;
         ghostSprite.Material = GD.Load<ShaderMaterial>("res://materials/FactoryBtn.tres");
         GetNode<Node2D>("/root/Game").AddChild(ghostSprite);
         inProcess = true;

@@ -6,8 +6,6 @@ using SysGen = System.Collections.Generic;
 
 namespace TeamFactory.Splitter
 {
-    // TODO: splitter should have a storage for the case that an item arrives but no valid connection exists.
-    
     public class SplitterServer : Node, IItemReceiver
     {
         public SplitterNode Node;
@@ -16,6 +14,8 @@ namespace TeamFactory.Splitter
 
         private int currentTargetMapIndex;
 
+        private InfraSprite targetNode;
+
         public override void _Ready()
         {
             setNextTarget();
@@ -23,7 +23,7 @@ namespace TeamFactory.Splitter
 
         public void ItemArrived(ItemNode itemNode)
         {
-            if (Node.TileRes.Connections.Count <= 0)
+            if (targetNode == null)
             {
                 return;
             }
@@ -31,17 +31,10 @@ namespace TeamFactory.Splitter
             PackedScene packedItemNode = GD.Load<PackedScene>("res://actors/items/Item.tscn");
             ItemNode newItemNode = packedItemNode.Instance<ItemNode>();
             newItemNode.Item = itemNode.Item;
-            newItemNode.Path = Node.GridManager.IndicesToWorld(Node.TileRes.PathToTarget[currentTargetMapIndex]);
-            newItemNode.Target = Node.Target;
+            newItemNode.Target = targetNode;
             AddChild(newItemNode);
             newItemNode.GlobalPosition = Node.GlobalPosition;
 
-            currentTargetIndex++;
-            if (currentTargetIndex >= Node.TileRes.Connections.Count)
-            {
-                currentTargetIndex = 0;
-            }
-            
             setNextTarget();
         }
 
@@ -57,16 +50,22 @@ namespace TeamFactory.Splitter
 
         private void setNextTarget()
         {
-            if (Node.TileRes.Connections.Count <= 0)
-            {
-                return;
-            }
+            targetNode = null;
 
-            SysGen.IList<GridManager.Direction> keyList = SplitterServer.ConvertKeyCollection(Node.TileRes.Connections.Keys);
-            Vector2 targetCoords = Node.TileRes.Connections[keyList[currentTargetIndex]].TargetCoords;
+            if (Node.OutConnections.Count <= 0)
+                return;
+            
+            SysGen.IList<GridManager.Direction> keyList = SplitterServer.ConvertKeyCollection(Node.OutConnections.Keys);
+            Vector2 targetCoords = Node.OutConnections[keyList[currentTargetIndex]].TargetCoords;
             int targetIndex = Node.GridManager.MapToIndex(targetCoords);
             currentTargetMapIndex = targetIndex;
-            Node.Target = Node.GridManager.GetInfraAtIndex(targetIndex);
+            targetNode = Node.GridManager.GetInfraAtIndex(targetIndex);
+
+            currentTargetIndex++;
+            if (currentTargetIndex >= Node.OutConnections.Count)
+            {
+                currentTargetIndex = 0;
+            }
         }
     }
 }

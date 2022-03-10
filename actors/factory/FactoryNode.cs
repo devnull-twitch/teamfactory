@@ -21,6 +21,7 @@ namespace TeamFactory.Factory
         {
             Server = new FactoryServer();
             Server.Node = this;
+            Server.Name = "FactoryServer";
             AddChild(Server);
 
             if (IsMulti)
@@ -47,11 +48,11 @@ namespace TeamFactory.Factory
                     return;
                 }
 
-                PackedScene packedPanel = GD.Load<PackedScene>("res://actors/factory/FactoryWindow.tscn");
-                FactoryWindow factoryWindow = packedPanel.Instance<FactoryWindow>();
-                GetNode<CanvasLayer>("/root/Game/HUD").AddChild(factoryWindow);
-                factoryWindow.FactoryNode = this;
-                factoryWindow.Popup_();
+                PackedScene packedPanel = GD.Load<PackedScene>("res://actors/Infra/InfraWindow.tscn");
+                InfraWindow infraWindow = packedPanel.Instance<InfraWindow>();
+                GetNode<CanvasLayer>("/root/Game/HUD").AddChild(infraWindow);
+                infraWindow.InfraNode = this;
+                infraWindow.Popup_();
                 return;
             }
 
@@ -62,7 +63,7 @@ namespace TeamFactory.Factory
         public void RequestSpawnResourceChange(string itemName)
         {
             ItemDB itemDB = GD.Load<ItemDB>("res://actors/items/ItemDB.tres");
-            TileRes.SpawnResource = itemDB.Database[itemName];
+            SpawnResource = itemDB.Database[itemName];
             NetState.Rpc(this, "SpawnResourceChange", itemName);
         }
 
@@ -70,7 +71,7 @@ namespace TeamFactory.Factory
         public void SpawnResourceChange(string itemName)
         {
             ItemDB itemDB = GD.Load<ItemDB>("res://actors/items/ItemDB.tres");
-            TileRes.SpawnResource = itemDB.Database[itemName];
+            SpawnResource = itemDB.Database[itemName];
         }
     }
 }

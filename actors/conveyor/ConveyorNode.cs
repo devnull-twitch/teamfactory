@@ -87,5 +87,11 @@ namespace TeamFactory.Conveyor
                 RotationDegrees = 270;
             }
         }
+
+        [RemoteSync]
+        public void TriggereDeleteion()
+        {
+            QueueFree();
+        }
     }
 }

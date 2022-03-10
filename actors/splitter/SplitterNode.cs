@@ -21,6 +21,7 @@ namespace TeamFactory.Splitter
         {
             Server = new SplitterServer();
             Server.Node = this;
+            Server.Name = "SplitterServer";
             AddChild(Server);
         }
     }

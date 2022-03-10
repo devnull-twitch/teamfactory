@@ -1,4 +1,6 @@
 using Godot;
+using Godot.Collections;
+using TeamFactory.Map;
 using TeamFactory.Lib.Multiplayer;
 
 namespace TeamFactory.Items
@@ -9,22 +11,40 @@ namespace TeamFactory.Items
 
         public ItemNode Node;
 
+        private Vector2[] Path;
+
+        public override void _Ready()
+        {
+            if (NetState.Mode == Mode.NET_CLIENT)
+            {
+                return;
+            }
+
+            // !!!!!!!!!!!!!!!!!!!!!!  WRONG !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            GridManager gm = GetNode<MapNode>("/root/Game/GridManager").Manager;
+            int fromIndex = gm.WorldToIndex(Node.GlobalPosition); 
+            int targetIndex = gm.WorldToIndex(Node.Target.GlobalPosition);
+            int[] indexPath = gm.GetPathTo(fromIndex, targetIndex);
+            Path = gm.IndicesToWorld(indexPath);
+        }
+
         public override void _PhysicsProcess(float delta)
         {
-            if (Node.Path != null && Node.Path.Length > 0)
+            // TODO: check if node has target but Path is null and then calc path
+            if (Path != null && Path.Length > 0)
             {
-                float totalDistance = Node.GlobalPosition.DistanceTo(Node.Path[0]);
+                float totalDistance = Node.GlobalPosition.DistanceTo(Path[0]);
                 if(totalDistance < 2)
                 {
-                    if(Node.Path.Length > 1)
+                    if(Path.Length > 1)
                     {
-                        Node.Path = shiftArray(Node.Path);
+                        Path = shiftArray(Path);
                         return;
                     }
                     else
                     {
                         // end of path
-                        Node.Path = null;
+                        Path = null;
                         if (Node.Target is Infra.IServerProvider serverProviderNode)
                         {
                             Node serverNode = serverProviderNode.ServerNode;
@@ -38,7 +58,9 @@ namespace TeamFactory.Items
                     }
                 }
 
-                Vector2 newPosition = Node.GlobalPosition.MoveToward(Node.Path[0], 200 * delta);
+                Vector2 newPosition = Node.GlobalPosition.MoveToward(Path[0], 200 * delta);
+
+                // TODO: only sync next position not every move
                 NetState.Rpc(this, "Move", newPosition.x, newPosition.y);
             }
         }

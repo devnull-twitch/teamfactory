@@ -12,7 +12,7 @@ namespace TeamFactory.Output
         
         public void ItemArrived(ItemNode itemNode)
         {
-            GetNode<GameServer>("/root/Game/GameServer").AddPoints(Node.TileRes.OwnerID, itemNode.Item.PointValue);
+            GetNode<GameServer>("/root/Game/GameServer").AddPoints(Node.OwnerID, itemNode.Item.PointValue);
         }
     }
 }

@@ -11,12 +11,14 @@ namespace TeamFactory.Gui
 
         private VBoxContainer userList;
 
+        private LobbyServer server;
+
         // Called when the node enters the scene tree for the first time.
         public override void _Ready()
         {
             userList = GetNode<VBoxContainer>("/root/Lobby/CanvasLayer/UserList");
 
-            LobbyServer server = new LobbyServer();
+            server = new LobbyServer();
             server.Node = this;
             server.Name = "LobbyServer";
             AddChild(server);
@@ -78,6 +80,31 @@ namespace TeamFactory.Gui
             }
 
             GetTree().NetworkPeer = peer;
+
+            GetTree().Connect("connected_to_server", this, nameof(OnConnectedToServer));
+        }
+
+        public void OnConnectedToServer()
+        {
+            if (isQuickConnect())
+            {
+                NetState.RpcId(server, 1, "PlayerRequestStart");
+            }
+        }
+
+        private bool isQuickConnect()
+        {
+            string[] args = OS.GetCmdlineArgs(); 
+            for (int key = 0; key < args.Length; ++key)
+            {
+                string arg = args[key];
+                if (arg == "--quickconnect")
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }

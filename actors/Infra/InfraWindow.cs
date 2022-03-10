@@ -6,25 +6,24 @@ using TeamFactory.Lib.Multiplayer;
 using TeamFactory.Infra;
 using TeamFactory.Player;
 
-namespace TeamFactory.Factory
+namespace TeamFactory.Infra
 {
-    public class FactoryWindow : WindowDialog
+    public class InfraWindow : WindowDialog
     {
-        private TileResource tileResource;
-
         private InfraSprite infraNode;
 
         private OptionButton outputSelector;
 
         private bool isConnecting;
+
+        private GridManager.Direction connectionSourceDirection;
         
         private Line2D connectionLine;
 
-        public InfraSprite FactoryNode
+        public InfraSprite InfraNode
         {
             set {
                 infraNode = value;
-                tileResource = value.TileRes;
                 UpdateWindow();
             }
         }
@@ -50,11 +49,10 @@ namespace TeamFactory.Factory
                 InfraSprite target = mapNode.Manager.GetInfraAtIndex(targetIndex);
                 if (target != null)
                 {
-                    bool success = mapNode.Manager.ConnectTileResource(srcIndex, targetIndex, GridManager.Direction.Right);
                     isConnecting = false;
+                    NetState.RpcId(mapNode, 1, "RequestConnection", srcIndex, targetIndex, connectionSourceDirection);
                     GetTree().SetInputAsHandled();
                     connectionLine.QueueFree();
-                    GD.Print($"connection done {success}");
                     return;
                 }
                 else
@@ -95,7 +93,7 @@ namespace TeamFactory.Factory
                 updateSpawnResourceData();
             }
             
-            if (infraNode.TileRes.Outputs.Count > 0)
+            if (infraNode.Type.Outputs.Count > 0)
             {
                 updateOutputData();
             }
@@ -106,7 +104,7 @@ namespace TeamFactory.Factory
         public void UpdateStorage()
         {
             GridContainer storage = GetNode<GridContainer>("VBoxContainer/GridContainer");
-            PackedScene reqPacked = GD.Load<PackedScene>("res://actors/factory/Requirement.tscn");
+            PackedScene reqPacked = GD.Load<PackedScene>("res://actors/Infra/Requirement.tscn");
             ItemDB itemDB = GD.Load<ItemDB>("res://actors/items/ItemDB.tres");
 
             foreach(Control child in storage.GetChildren())
@@ -126,7 +124,7 @@ namespace TeamFactory.Factory
 
         public void OnConnectStart(GridManager.Direction dir)
         {
-            GD.Print(dir);
+            connectionSourceDirection = dir;
 
             isConnecting = true;
             connectionLine = new Line2D();
@@ -142,17 +140,16 @@ namespace TeamFactory.Factory
 
         public void OnDisconnect(GridManager.Direction dir)
         {
-            tileResource.Connections.Remove(dir);
-            GridManager gm = GetNode<MapNode>("/root/Game/GridManager").Manager;
-            int nodeIndex = gm.WorldToIndex(infraNode.GlobalPosition);
-            gm.DisconnectTileResource(nodeIndex, dir);
+            MapNode mapNode = GetNode<MapNode>("/root/Game/GridManager");
+            int nodeIndex = mapNode.Manager.WorldToIndex(infraNode.GlobalPosition);
+            NetState.RpcId(mapNode, 1, "RequestDisconnect", nodeIndex, dir);
         }
 
         private void updateSpawnResourceData()
         {
             // Production
             VBoxContainer reqBox = GetNode<VBoxContainer>("VBoxContainer/Production/Requirements");
-            PackedScene reqPacked = GD.Load<PackedScene>("res://actors/factory/Requirement.tscn");
+            PackedScene reqPacked = GD.Load<PackedScene>("res://actors/Infra/Requirement.tscn");
             ItemDB itemDB = GD.Load<ItemDB>("res://actors/items/ItemDB.tres");
             
             // Requirements
@@ -160,7 +157,7 @@ namespace TeamFactory.Factory
             {
                 child.QueueFree();
             }
-            foreach(KeyValuePair<string, int> tuple in tileResource.SpawnResource.Requirements)
+            foreach(KeyValuePair<string, int> tuple in infraNode.SpawnResource.Requirements)
             {
                 HBoxContainer req = reqPacked.Instance<HBoxContainer>();
                 req.GetNode<Label>("Amount").Text = $"{tuple.Value}x";
@@ -170,7 +167,7 @@ namespace TeamFactory.Factory
             }
 
             // output resource
-            GetNode<TextureRect>("VBoxContainer/Production/CenterContainer/Output").Texture = tileResource.SpawnResource.Texture;
+            GetNode<TextureRect>("VBoxContainer/Production/CenterContainer/Output").Texture = infraNode.SpawnResource.Texture;
 
             // Output dropdown
             outputSelector = GetNode<OptionButton>("VBoxContainer/HBoxContainer2/OptionButton");
@@ -186,8 +183,8 @@ namespace TeamFactory.Factory
         private void updateOutputData()
         {
             VBoxContainer connectionContainer = GetNode<VBoxContainer>("VBoxContainer/Connections");
-            PackedScene connectionPackaged = GD.Load<PackedScene>("res://actors/factory/ConnectionButtonContainer.tscn");
-            foreach (GridManager.Direction dir in tileResource.Outputs)
+            PackedScene connectionPackaged = GD.Load<PackedScene>("res://actors/Infra/ConnectionButtonContainer.tscn");
+            foreach (GridManager.Direction dir in infraNode.Type.Outputs)
             {
                 Node innerConnectionNode = connectionPackaged.Instance();
                 innerConnectionNode.GetNode<Label>("Label").Text = $"{dir.ToString()} output";
@@ -198,7 +195,7 @@ namespace TeamFactory.Factory
                 innerConnectionNode.GetNode<Button>("ConnectBtn").Connect("pressed", this, nameof(OnConnectStart), connectionBindings);
 
                 Button disconnectBtn = innerConnectionNode.GetNode<Button>("DisconnectBtn");
-                disconnectBtn.Visible = tileResource.Connections.ContainsKey(dir);
+                disconnectBtn.Visible = infraNode.OutConnections.ContainsKey(dir);
                 disconnectBtn.Connect("pressed", this, nameof(OnDisconnect), connectionBindings);
 
                 connectionContainer.AddChild(innerConnectionNode);

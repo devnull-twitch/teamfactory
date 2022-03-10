@@ -6,43 +6,22 @@ namespace TeamFactory.Map
 {
     public class TileResource : Resource
     {
-        [Export]
         public Vector2 Coords;
 
-        [Export]
         public int OwnerID;
 
-        [Export]
-        public PackedScene Infra;
-
-        [Export]
-        public Texture InfraTexture;
+        public InfraType.TypeIdentifier InfraTypeIdentifier;
 
         public Dictionary<string, string> InfraOptions;
 
-        [Export]
         public bool IsFinal;
+
+        public bool IsLocked;
         
-        [Export]
         public GridManager.Direction Direction;
 
-        [Export]
         public Dictionary<GridManager.Direction, ConnectionTarget> Connections;
 
-        public Array<GridManager.Direction> Inputs;
-
-        public Array<GridManager.Direction> Outputs;
-
-        [Export]
-        public float SpawnInterval;
-
-        public Dictionary<string, int> Storage = new Dictionary<string, int>();
-
-        public Dictionary<int, int[]> PathToTarget = new Dictionary<int, int[]>();
-
-        [Export]
         public ItemResource SpawnResource;
     }
-
-
 }

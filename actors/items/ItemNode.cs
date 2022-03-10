@@ -11,8 +11,6 @@ namespace TeamFactory.Items
 
         public Infra.InfraSprite Target;
 
-        public Vector2[] Path;
-
         private ItemServer server;
 
         // Called when the node enters the scene tree for the first time.

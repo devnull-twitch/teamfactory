@@ -16,6 +16,7 @@ public class MergerNode : InfraSprite, IServerProvider
     {
         Server = new MergerServer();
         Server.Node = this;
+        Server.Name = "MergerServer";
         AddChild(Server);
     }
 }

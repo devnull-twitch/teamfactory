@@ -15,6 +15,12 @@ namespace TeamFactory.Gui
             }
 
             Connect("pressed", this, nameof(OnJoin));
+
+            if (isQuickConnect())
+            {
+                GetNode<LineEdit>("../GameCodeInput").Text = "127.0.0.1:50127";
+                CallDeferred("OnJoin");
+            }
         }
 
         public void OnJoin()
@@ -37,6 +43,21 @@ namespace TeamFactory.Gui
             }
 
             GetTree().Root.AddChild(lobbyNode);
+        }
+
+        private bool isQuickConnect()
+        {
+            string[] args = OS.GetCmdlineArgs(); 
+            for (int key = 0; key < args.Length; ++key)
+            {
+                string arg = args[key];
+                if (arg == "--quickconnect")
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }

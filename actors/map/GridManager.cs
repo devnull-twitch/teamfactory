@@ -4,6 +4,7 @@ using TeamFactory.Infra;
 using TeamFactory.Factory;
 using Godot.Collections;
 using TeamFactory.Lib.JsonMap;
+using TeamFactory.Lib.Multiplayer;
 
 namespace TeamFactory.Map 
 {
@@ -29,9 +30,11 @@ namespace TeamFactory.Map
 
         private int offset;
 
-        private Dictionary<int, InfraSprite> infraCache = new Dictionary<int, InfraSprite>();
+        private Dictionary<int, string> infraCache = new Dictionary<int, string>();
 
-        private Dictionary<int, Dictionary<Direction, Array<ConveyorNode>>> conveyorCache = new Dictionary<int, Dictionary<Direction, Array<ConveyorNode>>>();
+        private Dictionary<int, Dictionary<Direction, Array<string>>> conveyorCache = new Dictionary<int, Dictionary<Direction, Array<string>>>();
+
+        private Dictionary<int, int> playersReady = new Dictionary<int, int>();
 
         public Parser Parser;
 
@@ -65,27 +68,45 @@ namespace TeamFactory.Map
                 return null;
             }
             
-            return infraCache[index];
+            return mapNode.GetNode<InfraSprite>(infraCache[index]);
         }
 
         public bool ConnectTileResource(int srcIndex, int target, Direction outputDir)
         {
-            if (!infraCache.ContainsKey(target))
-            {
-                GD.Print($"target unknown");
+            InfraSprite targetNode = GetInfraAtIndex(target); 
+            if (targetNode == null)
                 return false;
-            }
 
-            if (infraCache[target] == null)
+            InfraSprite sourceNode = GetInfraAtIndex(srcIndex);
+            // check that output isnt already connected
+            // TODO: maybe auto disconnect??
+            if (sourceNode.OutConnections.ContainsKey(outputDir))
+                return false;   
+
+            int startIndex = GetIndicesFromDirection(srcIndex, outputDir);
+            Direction bestInDir;
+            float currentBestPathCost = 0;
+            foreach (Direction inDir in targetNode.Type.Inputs)
             {
-                GD.Print($"target is empty {target}");
-                return false;
+                if (targetNode.InConnections.ContainsKey(inDir))
+                    continue;
+                
+                int endIndex = GetIndicesFromDirection(target, inDir);
+                float cost = infraMap._EstimateCost(srcIndex, endIndex);
+                if (currentBestPathCost == 0 || cost < currentBestPathCost)
+                {
+                    bestInDir = inDir;
+                    currentBestPathCost = cost;
+                }
             }
 
             Vector2 targetMapCoords = IndexToMap(target);
             ConnectionTarget conTarget = new ConnectionTarget(targetMapCoords, Direction.Left);
-            infraCache[srcIndex].TileRes.Connections[outputDir] = conTarget;
+            
+            sourceNode.OutConnections[outputDir] = conTarget;
             connectConnection(srcIndex, outputDir, conTarget);
+            NetState.Rpc(sourceNode, "UpdateOutConnection", outputDir, (int)targetMapCoords.x, (int)targetMapCoords.y, Direction.Left);
+
             return true;
         }
 
@@ -100,17 +121,18 @@ namespace TeamFactory.Map
                 throw new System.Exception("No connection found for output direction");
             }
 
-            foreach (ConveyorNode n in conveyorCache[srcIndex][outDirection])
+            foreach (string nodeName in conveyorCache[srcIndex][outDirection])
             {
-                n.QueueFree();
-                infraMap.SetPointWeightScale(WorldToIndex(n.GlobalPosition), 1f);
+                ConveyorNode conveyorNode = mapNode.GetNode<ConveyorNode>(nodeName);
+                NetState.Rpc(conveyorNode, "TriggereDeleteion");
+                infraMap.SetPointWeightScale(WorldToIndex(conveyorNode.GlobalPosition), 1f);
             }
         }
 
         public void Cleanup()
         {
             infraMap = new AStar2D();
-            infraCache = new Dictionary<int, InfraSprite>();
+            infraCache = new Dictionary<int, string>();
 
             foreach(Node n in mapNode.GetChildren())
             {
@@ -121,13 +143,20 @@ namespace TeamFactory.Map
             floor.Clear();
         }
 
+        public void ClientInit()
+        {
+            MapResource map = Parser.CreateMapData();
+            mapWidth = map.Width;
+            mapHeight = map.Height;
+        }
+
         public void AddPlayerZone(int ownerNetID, string color = "#EEEEEE")
         {
             MapResource map = Parser.CreateMapData();
             mapWidth = map.Width;
             mapHeight = map.Height;
 
-            addPlayerFloor(map, color);
+            NetState.Rpc(mapNode, "SetupPlayerFloor", color, offset);
 
             // moving player to factory
             int relSpawnPosIndex = MapToIndex(map.SpawnPosition);
@@ -186,10 +215,27 @@ namespace TeamFactory.Map
                 }
             }
 
+            playersReady[ownerNetID] = 0;
+            NetState.Rpc(mapNode, "AckReady", ownerNetID);
+
             offset += mapWidth * (mapHeight + 1);
         }
 
-        private void addPlayerFloor(MapResource map, string color)
+        public void IncAckPlayerReady(int playerID)
+        {
+            playersReady[playerID] += 1;
+
+            foreach (int readyCounts in playersReady.Values)
+            {
+                if (readyCounts != playersReady.Count)
+                    return;
+            }
+
+            Physics2DServer.SetActive(true);
+            GD.Print("Physics2DServer active!");
+        }
+
+        public void AddPlayerFloor(string color, int playerOffset)
         {
             TileMap floor = mapNode.GetNode<TileMap>("../Floor");
             int newTileID = floor.TileSet.GetLastUnusedTileId();
@@ -202,24 +248,24 @@ namespace TeamFactory.Map
             floor.TileSet.TileSetTexture(newTileID, floorTexture);
             floor.TileSet.TileSetMaterial(newTileID, shaderMaterial);
 
-            Vector2 offsetCoords = IndexToMap(offset);
+            Vector2 offsetCoords = IndexToMap(playerOffset);
 
-            for (int x = 0; x < map.Width; x++)
+            for (int x = 0; x < mapWidth; x++)
             {
                 floor.SetCell((int)offsetCoords.x + x, (int)offsetCoords.y - 1, 1, false, false, true);
-                for (int y = 0; y < map.Height; y++)
+                for (int y = 0; y < mapHeight; y++)
                 {
                     if (x == 0)
                     {
                         floor.SetCell((int)offsetCoords.x - 1, (int)offsetCoords.y + y, 1);
                     }
                     floor.SetCell((int)offsetCoords.x + x, (int)offsetCoords.y + y, newTileID);
-                    if (x == map.Width - 1)
+                    if (x == mapWidth - 1)
                     {
-                        floor.SetCell((int)offsetCoords.x + map.Width, (int)offsetCoords.y + y, 1);
+                        floor.SetCell((int)offsetCoords.x + mapWidth, (int)offsetCoords.y + y, 1);
                     }
                 }
-                floor.SetCell((int)offsetCoords.x + x, (int)offsetCoords.y + map.Height, 1, false, false, true);
+                floor.SetCell((int)offsetCoords.x + x, (int)offsetCoords.y + mapHeight, 1, false, false, true);
             }
         }
 
@@ -277,36 +323,39 @@ namespace TeamFactory.Map
 
         private void addInfraNode(TileResource tr, int index)
         {
-            InfraSprite infraNode = tr.Infra.Instance<InfraSprite>();
-            infraNode.Position = IndexToWorld(index);
-            infraNode.RotateFromDirection(tr.Direction);
-            infraNode.TileRes = tr;
-            infraNode.GridManager = this;
+            string infraNodeName = $"InfraNode_{index}";
+            string spawnResourceName  = "";
+            if (tr.SpawnResource != null)
+            {
+                spawnResourceName = tr.SpawnResource.Name;
+            }
+            
+            NetState.Rpc(
+                mapNode,
+                "CreateInfraNode",
+                infraNodeName,
+                tr.InfraTypeIdentifier,
+                index,
+                tr.Direction,
+                spawnResourceName
+            );
             infraMap.SetPointDisabled(index, true);
 
-            if (tr.InfraOptions != null)
-            {
-                if (infraNode is FactoryNode factoryNode && tr.InfraOptions.ContainsKey("is_multi") && tr.InfraOptions["is_multi"] == "1")
-                {
-                    factoryNode.IsMulti = true;
-                }
-            }
+            InfraType infraType = InfraType.GetByIdentifier(tr.InfraTypeIdentifier);
 
-            foreach(Direction inputDir in tr.Inputs)
+            foreach(Direction inputDir in infraType.Inputs)
             {
                 int inputIndex = GetIndicesFromDirection(index, inputDir);
                 infraMap.SetPointWeightScale(inputIndex, 3f);
             }
 
-            foreach(Direction outputDir in tr.Connections.Keys)
+            foreach(Direction outputDir in infraType.Outputs)
             {
                 int inputIndex = GetIndicesFromDirection(index, outputDir);
                 infraMap.SetPointWeightScale(inputIndex, 3f);
             }
 
-            mapNode.AddChild(infraNode);
-
-            infraCache[index] = infraNode;
+            infraCache[index] = infraNodeName;
         }
 
         private void connectNode(TileResource tr, int index)
@@ -320,9 +369,11 @@ namespace TeamFactory.Map
         private void connectConnection(int srcIndex, Direction outDirection, ConnectionTarget target)
         {
             int targetAbsIndex = MapToIndex(target.TargetCoords);
-            infraCache[srcIndex].Target = infraCache[targetAbsIndex];
+            InfraSprite srcNode = GetInfraAtIndex(srcIndex);
             int startIndex = GetIndicesFromDirection(srcIndex, outDirection);
             int endIndex = GetIndicesFromDirection(targetAbsIndex, target.Direction);
+
+            NetState.Rpc(mapNode, "SaveConnection", srcIndex, outDirection, targetAbsIndex, target.Direction);
 
             // make path without source and dest
             int[] path = infraMap.GetIdPath(startIndex, endIndex);
@@ -332,31 +383,21 @@ namespace TeamFactory.Map
             // add in source and dest ( blocked in a star because they are infra )
             completePath[completePath.Length - 1] = targetAbsIndex;
 
-            // save path in tile indices to target node
-            infraCache[srcIndex].TileRes.PathToTarget[targetAbsIndex] = completePath;
-
             if (!conveyorCache.ContainsKey(srcIndex))
             {
-                conveyorCache[srcIndex] = new Dictionary<Direction, Array<ConveyorNode>>();
+                conveyorCache[srcIndex] = new Dictionary<Direction, Array<string>>();
             }
 
-            Array<ConveyorNode> connectionConveyorList = new Array<ConveyorNode>();
-            PackedScene packedConveyor = GD.Load<PackedScene>("res://actors/conveyor/ConveyorNode.tscn");
+            Array<string> connectionConveyorList = new Array<string>();
             for(int j = 1; j < completePath.Length - 1; j++)
             {
-                int pathSegmentIndex = completePath[j];
-                int x = pathSegmentIndex % mapWidth;
-                int y = pathSegmentIndex / mapWidth;
-
-                ConveyorNode conveyorInstance = packedConveyor.Instance<ConveyorNode>();
-                conveyorInstance.Position = IndexToWorld(completePath[j]);
-                conveyorInstance.InputDir = GetDirectionFromIndices(completePath[j], completePath[j-1]);
-                conveyorInstance.OutputDir = GetDirectionFromIndices(completePath[j], completePath[j+1]);
+                string conveyorNodeName = $"Conveyor_{srcIndex}_{completePath[j]}";
+                Direction inputDir = GetDirectionFromIndices(completePath[j], completePath[j-1]);
+                Direction outputDir = GetDirectionFromIndices(completePath[j], completePath[j+1]);
+                NetState.Rpc(mapNode, "CreateConveyorNode", conveyorNodeName, completePath[j], inputDir, outputDir);
 
                 infraMap.SetPointWeightScale(completePath[j], 3f);
-
-                mapNode.AddChild(conveyorInstance);
-                connectionConveyorList.Add(conveyorInstance);
+                connectionConveyorList.Add(conveyorNodeName);
             }
 
             conveyorCache[srcIndex][outDirection] = connectionConveyorList;

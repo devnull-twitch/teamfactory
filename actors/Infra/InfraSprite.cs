@@ -9,17 +9,19 @@ namespace TeamFactory.Infra
     {
         public GridManager GridManager;
 
-        public InfraSprite Target;
-
-        public TileResource TileRes;
-
         public Dictionary<string, int> Storage = new Dictionary<string, int>();
 
-        public ItemResource SpawnResource {
-            get {
-                return TileRes.SpawnResource;
-            }
-        }
+        public Dictionary<GridManager.Direction, ConnectionTarget> InConnections;
+
+        public Dictionary<GridManager.Direction, ConnectionTarget> OutConnections;
+
+        public int OwnerID;
+
+        public InfraType Type;
+
+        public ItemResource SpawnResource;
+
+        public float SpawnInterval;
 
         public void RotateFromDirection(GridManager.Direction direction)
         {
@@ -38,6 +40,12 @@ namespace TeamFactory.Infra
                 RotationDegrees = 270;
                 return;
             }
+        }
+
+        [Remote]
+        public void UpdateOutConnection(GridManager.Direction output, int x, int y, GridManager.Direction targetInputDir)
+        {
+            OutConnections[output] = new ConnectionTarget(new Vector2(x, y), targetInputDir);
         }
     }
 }
