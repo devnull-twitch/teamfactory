@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using TeamFactory.Map;
+using TeamFactory.Lib.Multiplayer;
 
 public class BuildButton : TextureButton
 {
@@ -20,12 +21,14 @@ public class BuildButton : TextureButton
     {
         if (inProcess)
         {
+            MapNode mapNode = GetNode<MapNode>("/root/Game/GridManager");
+
             if (@event is InputEventMouseButton mouseEvent && mouseEvent.ButtonIndex == (int)ButtonList.Left &&  mouseEvent.Pressed)
             {
-                MapNode mapNode = GetNode<MapNode>("/root/Game/GridManager");
                 int mapIndex = mapNode.Manager.WorldToIndex(ghostSprite.GlobalPosition);
 
-                // TODO make rpc call to mapnode server to spawn new InfraSprite node
+                GridManager.Direction dir = DirectionFromRotationDegree(ghostSprite.RotationDegrees);
+                NetState.Rpc(mapNode, "RequestBuild", mapIndex, dir, InfraToBuild);
                 
                 inProcess = false;
                 ghostSprite.QueueFree();
@@ -38,7 +41,8 @@ public class BuildButton : TextureButton
             }
 
             Vector2 pos = ghostSprite.GetGlobalMousePosition();
-            ghostSprite.GlobalPosition = (pos / 128).Round() * 128 + (new Vector2(-64, -64));
+            Vector2 roundedPos = mapNode.Manager.IndexToWorld(mapNode.Manager.WorldToIndex(pos));
+            ghostSprite.GlobalPosition = roundedPos;
         }
     }
 
@@ -54,5 +58,20 @@ public class BuildButton : TextureButton
         ghostSprite.Material = GD.Load<ShaderMaterial>("res://materials/FactoryBtn.tres");
         GetNode<Node2D>("/root/Game").AddChild(ghostSprite);
         inProcess = true;
+    }
+
+    public GridManager.Direction DirectionFromRotationDegree(float degree)
+    {
+        float cappedDegree = degree % 360;
+        if (cappedDegree >= 0 && cappedDegree < 90)
+            return GridManager.Direction.Left;
+
+        if (cappedDegree >= 90 && cappedDegree < 180)
+            return GridManager.Direction.Up;
+
+        if (cappedDegree >= 180 && cappedDegree < 270)
+            return GridManager.Direction.Right;
+
+        return GridManager.Direction.Down;
     }
 }

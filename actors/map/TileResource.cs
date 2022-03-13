@@ -12,8 +12,6 @@ namespace TeamFactory.Map
 
         public InfraType.TypeIdentifier InfraTypeIdentifier;
 
-        public Dictionary<string, string> InfraOptions;
-
         public bool IsFinal;
 
         public bool IsLocked;

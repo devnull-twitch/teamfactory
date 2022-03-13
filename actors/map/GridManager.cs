@@ -146,6 +146,7 @@ namespace TeamFactory.Map
         {
             infraMap = new AStar2D();
             infraCache = new Dictionary<int, string>();
+            offset = 0;
 
             foreach(Node n in mapNode.GetChildren())
             {
@@ -176,10 +177,8 @@ namespace TeamFactory.Map
             int absoluteSpawnPosIndex = offset + relSpawnPosIndex;
             Vector2 spawnPos = IndexToWorld(absoluteSpawnPosIndex);
 
-            // grid manager should maybe call player node to change position and
-            // handle networking?? 
-            mapNode.GetNode<Node2D>($"../Players/{ownerNetID}").Position = spawnPos;
-            // TODO: sync new player position to all clients!
+            // place player on spawn position
+            NetState.Rpc(mapNode, "RelocatePlayer", ownerNetID, spawnPos.x, spawnPos.y);
 
             int relMaxIndex = mapWidth * mapHeight;
             for (int i = 0; i < relMaxIndex; i++)
@@ -246,6 +245,11 @@ namespace TeamFactory.Map
             {
                 if (readyCounts != playersReady.Count)
                     return;
+            }
+
+            foreach (int playerKey in playersReady.Keys)
+            {
+                playersReady[playerKey] = 0;
             }
 
             Physics2DServer.SetActive(true);

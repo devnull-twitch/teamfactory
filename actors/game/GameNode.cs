@@ -91,6 +91,12 @@ namespace TeamFactory.Game
 
             GetNode<Node>("Players").AddChild(newPlayerNode);
         }
+
+        [Remote]
+        public void UpdateTimeTillNextRound(float timeTillNextRound)
+        {
+            TimeTillNextRound = timeTillNextRound;
+        }
     }
 }
 

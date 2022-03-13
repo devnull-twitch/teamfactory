@@ -53,16 +53,17 @@ namespace TeamFactory.Map
             Physics2DServer.SetActive(false);
 
             File testJson = new File();
-            //testJson.Open($"res://map/round_{currentRound}.json", File.ModeFlags.Read);
-            testJson.Open("res://map/testing.json", File.ModeFlags.Read);
-            NetState.Rpc(this, "SetupManager", "res://map/testing.json");
+            testJson.Open($"res://map/round_{currentRound}.json", File.ModeFlags.Read);
+            //testJson.Open("res://map/testing.json", File.ModeFlags.Read);
+            NetState.Rpc(this, "SetupManager", $"res://map/round_{currentRound}.json");
 
             Parser parser = new Parser(testJson.GetAsText());
 
             MapResource template = parser.CreateMapData();
             UnlockedItems = template.UnlockedItems;
-            GetNode<GameNode>("../").TimeTillNextRound = template.Time;
             GetNode<GameServer>("../GameServer").TimeTillNextRound = template.Time;
+
+            NetState.Rpc(GetNode<GameNode>("../"), "UpdateTimeTillNextRound", template.Time);
 
             Manager = new GridManager(this, parser);
 
@@ -75,6 +76,14 @@ namespace TeamFactory.Map
         [Remote]
         public void SetupManager(string filePath)
         {
+            foreach(Node n in GetChildren())
+            {
+                n.QueueFree();
+            }
+
+            TileMap floor = GetNode<TileMap>("../Floor");
+            floor.Clear();
+
             File testJson = new File();
             testJson.Open(filePath, File.ModeFlags.Read);
 
@@ -92,19 +101,20 @@ namespace TeamFactory.Map
             Manager.AddPlayerFloor(color, offset);
         }
 
-        [RemoteSync]
         public void NextRound()
         {
             currentRound++;
             File testJson = new File();
-            testJson.Open($"res://map/round_{currentRound}.json", File.ModeFlags.Read);  
+            testJson.Open($"res://map/round_{currentRound}.json", File.ModeFlags.Read); 
+            NetState.Rpc(this, "SetupManager", $"res://map/round_{currentRound}.json");
 
             Parser parser = new Parser(testJson.GetAsText());
 
             MapResource template = parser.CreateMapData();
             UnlockedItems = template.UnlockedItems;
-            GetNode<GameNode>("../").TimeTillNextRound = template.Time;
+            
             GetNode<GameServer>("../GameServer").TimeTillNextRound = template.Time;
+            NetState.Rpc(GetNode<GameNode>("../"), "UpdateTimeTillNextRound", template.Time);
 
             Manager.Cleanup();
             Manager.Parser = parser;
@@ -129,6 +139,19 @@ namespace TeamFactory.Map
             Manager.DisconnectTileResource(srcIndex, outDirection);
         }
 
+        [Remote]
+        public void RequestBuild(int srcIndex, GridManager.Direction rotation, InfraType.TypeIdentifier infraTypeIdent)
+        {
+            TileResource tileResource = new TileResource();
+            tileResource.Connections = new Dictionary<GridManager.Direction, ConnectionTarget>();
+            tileResource.Coords = Manager.IndexToMap(srcIndex);
+            tileResource.Direction = rotation;
+            tileResource.InfraTypeIdentifier = infraTypeIdent;
+            tileResource.OwnerID = NetState.NetworkSenderId(this);
+            
+            Manager.AddTileResouce(tileResource, srcIndex);
+        }
+
         [RemoteSync]
         public void CreateConveyorNode(string nodeName, int conveyorIndex, GridManager.Direction inputDir, GridManager.Direction outputDir)
         {
@@ -139,6 +162,12 @@ namespace TeamFactory.Map
             conveyorInstance.OutputDir = outputDir;
 
             AddChild(conveyorInstance);
+        }
+
+        [RemoteSync]
+        public void RelocatePlayer(int ownerID, float x, float y)
+        {
+            GetNode<Node2D>($"../Players/{ownerID}").Position = new Vector2(x, y);
         }
 
         [RemoteSync]
@@ -153,7 +182,12 @@ namespace TeamFactory.Map
         {
             InfraType infraType = InfraType.GetByIdentifier(infraTypeIdent);
 
-            InfraSprite infraNode = infraType.Scene.Instance<InfraSprite>();
+            Node rawInfraNode = GD.Load<PackedScene>("res://actors/Infra/InfraNode.tscn").Instance();
+            ulong objId = rawInfraNode.GetInstanceId();
+            rawInfraNode.SetScript(infraType.Script);
+
+            InfraSprite infraNode = (InfraSprite)GD.InstanceFromId(objId);
+            infraNode.Texture = infraType.Texture;
             infraNode.Position = Manager.IndexToWorld(index);
             infraNode.RotateFromDirection(rotation);
             infraNode.GridManager = Manager;
@@ -168,6 +202,13 @@ namespace TeamFactory.Map
                 ItemDB itemDB = GD.Load<ItemDB>("res://actors/items/ItemDB.tres");
                 infraNode.SpawnResource = itemDB.Database[spawnResourceName];
                 // TODO add spawn timer to item resource
+                infraNode.SpawnInterval = 1f;
+            }
+
+            if (spawnResourceName == "" && infraType.isProducer)
+            {
+                ItemDB itemDB = GD.Load<ItemDB>("res://actors/items/ItemDB.tres");
+                infraNode.SpawnResource = itemDB.Database["Ironbar"];
                 infraNode.SpawnInterval = 1f;
             }
 

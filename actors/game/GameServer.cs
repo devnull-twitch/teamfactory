@@ -37,7 +37,7 @@ namespace TeamFactory.Game
             TimeTillNextRound -= delta;
             if (TimeTillNextRound <= 0)
             {
-                NetState.Rpc(GetNode<MapNode>("../GridManager"), "NextRound");
+                GetNode<MapNode>("../GridManager").NextRound();
             }
         }
 

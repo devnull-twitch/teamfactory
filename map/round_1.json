@@ -13,8 +13,7 @@
         {
             "x": 0,
             "y": 3,
-            "infra_scene": "res://actors/input/InputNode.tscn",
-            "infra_texture": "res://sprites/tilemaps/InputNode.png",
+            "type_identifier": 2,
             "is_final": false,
             "direction": 4,
             "connections": {},
@@ -24,8 +23,7 @@
         {
             "x": 9,
             "y": 3,
-            "infra_scene": "res://actors/output/OutputNode.tscn",
-            "infra_texture": "res://sprites/tilemaps/OutputNode.png",
+            "type_identifier": 3,
             "is_final": true,
             "direction": 4,
             "connections": {},
