@@ -18,6 +18,7 @@ namespace TeamFactory.Items
         {
             server = new ItemServer();
             server.Node = this;
+            server.Name = "ItemServer";
             AddChild(server);
 
             ZIndex = ZIndex + 5;

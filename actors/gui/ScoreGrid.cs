@@ -5,7 +5,7 @@ namespace TeamFactory.Gui
 {
     public class ScoreGrid : GridContainer
     {
-        private Dictionary<int, Label> pointLabelMap = new Dictionary<int, Label>();
+        private Dictionary<string, Label> pointLabelMap = new Dictionary<string, Label>();
 
         private PackedScene ScoreEntryScene;
 
@@ -14,17 +14,18 @@ namespace TeamFactory.Gui
             ScoreEntryScene = GD.Load<PackedScene>("res://actors/gui/ScoreEntry.tscn");
         }
 
-        public void SetScore(int ownerID, int points)
+        public void SetScore(string playerName, int points)
         {
-            if (!pointLabelMap.ContainsKey(ownerID)) 
+            if (!pointLabelMap.ContainsKey(playerName)) 
             {
-                AddChild(CreateWithText($"{ownerID}"));
+                AddChild(CreateWithText(playerName));
                 Control scoreContainer = CreateWithText($"{points}");
-                pointLabelMap[ownerID] = scoreContainer.GetNode<Label>("Label");
+                pointLabelMap[playerName] = scoreContainer.GetNode<Label>("Label");
+                AddChild(scoreContainer);
             }
             else
             {
-                pointLabelMap[ownerID].Text = $"{points}";
+                pointLabelMap[playerName].Text = $"{points}";
             }
         }
 

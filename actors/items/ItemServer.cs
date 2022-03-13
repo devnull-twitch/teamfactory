@@ -20,11 +20,10 @@ namespace TeamFactory.Items
                 return;
             }
 
-            // !!!!!!!!!!!!!!!!!!!!!!  WRONG !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             GridManager gm = GetNode<MapNode>("/root/Game/GridManager").Manager;
             int fromIndex = gm.WorldToIndex(Node.GlobalPosition); 
             int targetIndex = gm.WorldToIndex(Node.Target.GlobalPosition);
-            int[] indexPath = gm.GetPathTo(fromIndex, targetIndex);
+            int[] indexPath = gm.GetConnectionPath(fromIndex, targetIndex);
             Path = gm.IndicesToWorld(indexPath);
         }
 
@@ -53,7 +52,7 @@ namespace TeamFactory.Items
                                 itemReceiverNode.ItemArrived(Node);
                             }
                         }
-                        Node.QueueFree();
+                        NetState.Rpc(this, "Delete");
                         return;
                     }
                 }
@@ -82,6 +81,12 @@ namespace TeamFactory.Items
         public void Move(float x, float y)
         {
             Node.GlobalPosition = new Vector2(x, y);
+        }
+
+        [RemoteSync]
+        public void Delete()
+        {
+            Node.QueueFree();
         }
     }
 }

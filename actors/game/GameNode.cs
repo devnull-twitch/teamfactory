@@ -13,6 +13,8 @@ namespace TeamFactory.Game
 
         protected Dictionary<int, int> Scores = new Dictionary<int, int>();
 
+        private Dictionary<int, string> players = new Dictionary<int, string>();
+
         public float TimeTillNextRound = 300;
 
         private Label PointUi;
@@ -59,7 +61,7 @@ namespace TeamFactory.Game
             TtnrUi.Text = $"{minutes}:{seconds}";
         }
 
-        [RemoteSync]
+        [Remote]
         public void SetPoints(int ownerID, int points)
         {
             if (ownerID == NetState.NetworkId(this))
@@ -69,7 +71,7 @@ namespace TeamFactory.Game
             }
 
             Scores[ownerID] = points;
-            ScoresUi.SetScore(ownerID, points);
+            ScoresUi.SetScore(players[ownerID], points);
         }
 
         [Remote]
@@ -84,6 +86,8 @@ namespace TeamFactory.Game
             newPlayerNode.OwnerID = ownerID;
             newPlayerNode.PlayerName = name;
             newPlayerNode.Name = $"{ownerID}";
+
+            players[ownerID] = name;
 
             GetNode<Node>("Players").AddChild(newPlayerNode);
         }

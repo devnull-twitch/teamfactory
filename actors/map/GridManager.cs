@@ -36,6 +36,8 @@ namespace TeamFactory.Map
 
         private Dictionary<int, int> playersReady = new Dictionary<int, int>();
 
+        private Dictionary<string, int[]> connectionPathCache = new Dictionary<string, int[]>();
+
         public Parser Parser;
 
         public GridManager(Node2D mapNode, Parser parser)
@@ -84,7 +86,7 @@ namespace TeamFactory.Map
                 return false;   
 
             int startIndex = GetIndicesFromDirection(srcIndex, outputDir);
-            Direction bestInDir;
+            Direction bestInDir = Direction.Left;
             float currentBestPathCost = 0;
             foreach (Direction inDir in targetNode.Type.Inputs)
             {
@@ -92,7 +94,12 @@ namespace TeamFactory.Map
                     continue;
                 
                 int endIndex = GetIndicesFromDirection(target, inDir);
-                float cost = infraMap._EstimateCost(srcIndex, endIndex);
+                int[] path = infraMap.GetIdPath(startIndex, endIndex);
+                float cost = 0;
+                foreach(int pathPointID in path)
+                {
+                    cost += infraMap.GetPointWeightScale(pathPointID);
+                }
                 if (currentBestPathCost == 0 || cost < currentBestPathCost)
                 {
                     bestInDir = inDir;
@@ -100,12 +107,18 @@ namespace TeamFactory.Map
                 }
             }
 
+            if (currentBestPathCost == 0)
+            {
+                GD.Print("no available input found on target");
+                return false;
+            }
+
             Vector2 targetMapCoords = IndexToMap(target);
-            ConnectionTarget conTarget = new ConnectionTarget(targetMapCoords, Direction.Left);
+            ConnectionTarget conTarget = new ConnectionTarget(targetMapCoords, bestInDir);
             
             sourceNode.OutConnections[outputDir] = conTarget;
             connectConnection(srcIndex, outputDir, conTarget);
-            NetState.Rpc(sourceNode, "UpdateOutConnection", outputDir, (int)targetMapCoords.x, (int)targetMapCoords.y, Direction.Left);
+            NetState.Rpc(sourceNode, "UpdateOutConnection", outputDir, (int)targetMapCoords.x, (int)targetMapCoords.y, bestInDir);
 
             return true;
         }
@@ -162,7 +175,11 @@ namespace TeamFactory.Map
             int relSpawnPosIndex = MapToIndex(map.SpawnPosition);
             int absoluteSpawnPosIndex = offset + relSpawnPosIndex;
             Vector2 spawnPos = IndexToWorld(absoluteSpawnPosIndex);
+
+            // grid manager should maybe call player node to change position and
+            // handle networking?? 
             mapNode.GetNode<Node2D>($"../Players/{ownerNetID}").Position = spawnPos;
+            // TODO: sync new player position to all clients!
 
             int relMaxIndex = mapWidth * mapHeight;
             for (int i = 0; i < relMaxIndex; i++)
@@ -337,7 +354,8 @@ namespace TeamFactory.Map
                 tr.InfraTypeIdentifier,
                 index,
                 tr.Direction,
-                spawnResourceName
+                spawnResourceName,
+                tr.OwnerID
             );
             infraMap.SetPointDisabled(index, true);
 
@@ -383,6 +401,9 @@ namespace TeamFactory.Map
             // add in source and dest ( blocked in a star because they are infra )
             completePath[completePath.Length - 1] = targetAbsIndex;
 
+            string pathCacheKey = $"{srcIndex}_{targetAbsIndex}";
+            connectionPathCache[pathCacheKey] = completePath;
+
             if (!conveyorCache.ContainsKey(srcIndex))
             {
                 conveyorCache[srcIndex] = new Dictionary<Direction, Array<string>>();
@@ -401,6 +422,15 @@ namespace TeamFactory.Map
             }
 
             conveyorCache[srcIndex][outDirection] = connectionConveyorList;
+        }
+
+        public int[] GetConnectionPath(int srcIndex, int targetIndex)
+        {
+            string pathCacheKey = $"{srcIndex}_{targetIndex}";
+            if (!connectionPathCache.ContainsKey(pathCacheKey))
+                return new int[0];
+
+            return connectionPathCache[pathCacheKey];
         }
 
         public static Direction GetDirectionFromIndices(int selfIndex, int targetIndex)

@@ -41,6 +41,8 @@ namespace TeamFactory.Map
             }
         }
 
+        private Dictionary<int, InfraSprite> infraNodeCache = new Dictionary<int, InfraSprite>();
+
         public override void _Ready()
         {
             packedConveyor = GD.Load<PackedScene>("res://actors/conveyor/ConveyorNode.tscn");
@@ -79,6 +81,9 @@ namespace TeamFactory.Map
             Parser parser = new Parser(testJson.GetAsText());
             Manager = new GridManager(this, parser);
             Manager.ClientInit();
+
+            MapResource template = parser.CreateMapData();
+            UnlockedItems = template.UnlockedItems;
         }
 
         [Remote]
@@ -142,7 +147,8 @@ namespace TeamFactory.Map
             InfraType.TypeIdentifier infraTypeIdent,
             int index,
             GridManager.Direction rotation,
-            string spawnResourceName
+            string spawnResourceName,
+            int ownerID
         ) 
         {
             InfraType infraType = InfraType.GetByIdentifier(infraTypeIdent);
@@ -155,6 +161,7 @@ namespace TeamFactory.Map
             infraNode.Type = infraType;
             infraNode.OutConnections = new Dictionary<GridManager.Direction, ConnectionTarget>();
             infraNode.InConnections = new Dictionary<GridManager.Direction, ConnectionTarget>();
+            infraNode.OwnerID = ownerID;
 
             if (spawnResourceName != "")
             {
@@ -164,7 +171,14 @@ namespace TeamFactory.Map
                 infraNode.SpawnInterval = 1f;
             }
 
+            infraNodeCache[index] = infraNode;
+
             AddChild(infraNode);
+        }
+
+        public bool IndexHasNode(int index)
+        {
+            return infraNodeCache.ContainsKey(index);
         }
 
         [RemoteSync]

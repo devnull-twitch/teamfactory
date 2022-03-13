@@ -46,8 +46,10 @@ namespace TeamFactory.Infra
                 int targetIndex = mapNode.Manager.WorldToIndex(pos);
                 int srcIndex = mapNode.Manager.WorldToIndex(infraNode.GlobalPosition);
 
-                InfraSprite target = mapNode.Manager.GetInfraAtIndex(targetIndex);
-                if (target != null)
+                if (targetIndex == srcIndex)
+                    return;
+
+                if (mapNode.IndexHasNode(targetIndex))
                 {
                     isConnecting = false;
                     NetState.RpcId(mapNode, 1, "RequestConnection", srcIndex, targetIndex, connectionSourceDirection);

@@ -12,6 +12,8 @@ namespace TeamFactory.Factory
 
         public FactoryNode Node;
 
+        private int itemCount;
+
         public override void _PhysicsProcess(float delta)
         {
             if (NetState.Mode == Mode.NET_CLIENT)
@@ -30,7 +32,8 @@ namespace TeamFactory.Factory
                 PopFromStorage();
                 cooldown = Node.SpawnInterval;
 
-                NetState.Rpc(this, "SpawnItem");
+                NetState.Rpc(this, "SpawnItem", itemCount);
+                itemCount++;
             }
         }
 
@@ -81,7 +84,7 @@ namespace TeamFactory.Factory
         }
 
         [RemoteSync]
-        public void SpawnItem()
+        public void SpawnItem(int itemID)
         {
             int targetIndex = GetTargetIndex();
             if (targetIndex == -1)
@@ -92,8 +95,10 @@ namespace TeamFactory.Factory
             ItemNode newItemNode = packedItemNode.Instance<ItemNode>();
             newItemNode.Item = Node.SpawnResource;
             newItemNode.Target = targetNode;
-            AddChild(newItemNode);
+            newItemNode.Name = $"Item_{itemID}";
             newItemNode.GlobalPosition = Node.GlobalPosition;
+
+            AddChild(newItemNode);
         }
 
         public int GetTargetIndex()
