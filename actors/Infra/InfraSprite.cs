@@ -47,5 +47,11 @@ namespace TeamFactory.Infra
         {
             OutConnections[output] = new ConnectionTarget(new Vector2(x, y), targetInputDir);
         }
+
+        [Remote]
+        public void ClearOutConnection(GridManager.Direction output)
+        {
+            OutConnections.Remove(output);
+        }
     }
 }

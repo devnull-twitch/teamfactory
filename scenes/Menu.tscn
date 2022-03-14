@@ -1,8 +1,10 @@
-[gd_scene load_steps=7 format=2]
+[gd_scene load_steps=10 format=2]
 
 [ext_resource path="res://font/Comfortaa-Medium.ttf" type="DynamicFontData" id=1]
 [ext_resource path="res://actors/gui/JoinBtn.cs" type="Script" id=2]
 [ext_resource path="res://sprites/teamFactory3.png" type="Texture" id=3]
+[ext_resource path="res://font/Comfortaa-Bold.ttf" type="DynamicFontData" id=4]
+[ext_resource path="res://actors/gui/LogoAddition.cs" type="Script" id=5]
 
 [sub_resource type="DynamicFont" id=2]
 size = 18
@@ -15,6 +17,12 @@ font_data = ExtResource( 1 )
 [sub_resource type="DynamicFont" id=4]
 size = 18
 font_data = ExtResource( 1 )
+
+[sub_resource type="DynamicFont" id=5]
+size = 50
+outline_size = 1
+outline_color = Color( 0.72549, 0.0313726, 0.0313726, 1 )
+font_data = ExtResource( 4 )
 
 [node name="Menu" type="Node2D"]
 
@@ -108,3 +116,18 @@ margin_top = 39.0
 margin_right = 101.0
 margin_bottom = 59.0
 text = "Start game"
+
+[node name="LogoAddition" type="Label" parent="CanvasLayer"]
+margin_left = 35.0
+margin_top = 143.0
+margin_right = 302.0
+margin_bottom = 200.0
+rect_rotation = -28.4168
+custom_colors/font_color = Color( 0.72549, 0.0313726, 0.0313726, 1 )
+custom_fonts/font = SubResource( 5 )
+text = "It was"
+align = 2
+script = ExtResource( 5 )
+__meta__ = {
+"_edit_use_anchors_": false
+}

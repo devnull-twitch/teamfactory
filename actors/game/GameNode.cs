@@ -25,7 +25,7 @@ namespace TeamFactory.Game
 
         private PackedScene playerPackaged;
 
-        
+        public bool GameRunning = true;
 
         // Called when the node enters the scene tree for the first time.
         public override void _Ready()
@@ -39,6 +39,8 @@ namespace TeamFactory.Game
             PointUi = GetNode<Label>("/root/Game/HUD/TopUI/HBoxContainer/Points");
             ScoresUi = GetNode<ScoreGrid>("/root/Game/HUD/GridContainer");
 
+            GetNode<Button>("/root/Game/HUD/TopUI/HBoxContainer/Control/SabotageOptionsBtn").Connect("pressed", this, nameof(OpenSabotageOptionWindow));
+
             if (NetState.Mode == Mode.NET_CLIENT)
             {
                 GameServer gsNode = GetNode<GameServer>("GameServer");
@@ -49,6 +51,9 @@ namespace TeamFactory.Game
 
         public override void _Process(float delta)
         {
+            if (!GameRunning)
+                return;
+
             if (NetState.Mode == Mode.NET_SERVER)
             {
                 return;
@@ -59,6 +64,18 @@ namespace TeamFactory.Game
             int minutes = seconds / 60;
             seconds = seconds % 60;
             TtnrUi.Text = $"{minutes}:{seconds}";
+        }
+
+        public void OpenSabotageOptionWindow()
+        {
+            if (GetNodeOrNull<CanvasLayer>("/root/Game/HUD/SabotageOptionsPanel") != null)
+                return;
+
+            PackedScene packedSabotageWindow = GD.Load<PackedScene>("res://actors/game/SabotageWindow.tscn");
+            WindowDialog sabotageWindow = packedSabotageWindow.Instance<WindowDialog>();
+            
+            GetNode<CanvasLayer>("/root/Game/HUD").AddChild(sabotageWindow);
+            sabotageWindow.Popup_();
         }
 
         [Remote]

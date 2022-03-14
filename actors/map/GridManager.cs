@@ -134,6 +134,16 @@ namespace TeamFactory.Map
                 throw new System.Exception("No connection found for output direction");
             }
 
+            InfraSprite srcNode = mapNode.GetNode<InfraSprite>(infraCache[srcIndex]);
+            // clear input direction so we can reconnect to that
+            int targetIndex = MapToIndex(srcNode.OutConnections[outDirection].TargetCoords);
+            InfraSprite targetNode = mapNode.GetNode<InfraSprite>(infraCache[targetIndex]);
+            targetNode.InConnections.Remove(srcNode.OutConnections[outDirection].Direction);
+            // remove out connection on source node
+            srcNode.OutConnections.Remove(outDirection);
+            // inform client about cleared output state ( client does not care about input state; that is server only )
+            NetState.Rpc(srcNode, "ClearOutConnection", outDirection);
+
             foreach (string nodeName in conveyorCache[srcIndex][outDirection])
             {
                 ConveyorNode conveyorNode = mapNode.GetNode<ConveyorNode>(nodeName);

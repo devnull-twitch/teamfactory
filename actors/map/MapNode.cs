@@ -101,11 +101,14 @@ namespace TeamFactory.Map
             Manager.AddPlayerFloor(color, offset);
         }
 
-        public void NextRound()
+        public bool NextRound()
         {
             currentRound++;
             File testJson = new File();
-            testJson.Open($"res://map/round_{currentRound}.json", File.ModeFlags.Read); 
+            Error err = testJson.Open($"res://map/round_{currentRound}.json", File.ModeFlags.Read); 
+            if (err != Error.Ok)
+                return false;
+
             NetState.Rpc(this, "SetupManager", $"res://map/round_{currentRound}.json");
 
             Parser parser = new Parser(testJson.GetAsText());
@@ -125,6 +128,8 @@ namespace TeamFactory.Map
                 int playerNetID = int.Parse(playerNode.Name);
                 Manager.AddPlayerZone(playerNetID, NextPlayerColor);
             }
+
+            return true;
         }
 
         [Remote]

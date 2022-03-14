@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=2]
+[gd_scene load_steps=11 format=2]
 
 [ext_resource path="res://actors/floor/Floor.tscn" type="PackedScene" id=1]
 [ext_resource path="res://actors/game/GameNode.cs" type="Script" id=2]
@@ -8,6 +8,7 @@
 [ext_resource path="res://actors/gui/Hud.cs" type="Script" id=6]
 [ext_resource path="res://actors/factory/SimpleFactory.png" type="Texture" id=7]
 [ext_resource path="res://actors/gui/BuildButton.cs" type="Script" id=8]
+[ext_resource path="res://actors/gui/FinishGameBtn.cs" type="Script" id=9]
 [ext_resource path="res://actors/map/MapNode.cs" type="Script" id=14]
 
 [node name="Game" type="Node2D"]
@@ -91,25 +92,38 @@ text = "00:00"
 
 [node name="VSeparator" type="VSeparator" parent="HUD/TopUI/HBoxContainer"]
 margin_left = 170.0
-margin_right = 868.0
+margin_right = 795.0
 margin_bottom = 47.0
 size_flags_horizontal = 3
 
 [node name="PointsLabel" type="Label" parent="HUD/TopUI/HBoxContainer"]
-margin_left = 872.0
+margin_left = 799.0
 margin_top = 16.0
-margin_right = 948.0
+margin_right = 875.0
 margin_bottom = 30.0
 custom_colors/font_color = Color( 0, 0, 0, 1 )
 text = "Your Points:"
 
 [node name="Points" type="Label" parent="HUD/TopUI/HBoxContainer"]
-margin_left = 952.0
+margin_left = 879.0
 margin_top = 16.0
-margin_right = 984.0
+margin_right = 911.0
 margin_bottom = 30.0
 custom_colors/font_color = Color( 0, 0, 0, 1 )
 text = "0000"
+
+[node name="Control" type="Control" parent="HUD/TopUI/HBoxContainer"]
+margin_left = 915.0
+margin_right = 984.0
+margin_bottom = 47.0
+rect_min_size = Vector2( 69, 0 )
+
+[node name="SabotageOptionsBtn" type="Button" parent="HUD/TopUI/HBoxContainer/Control"]
+margin_top = 12.0
+text = "Sabotage"
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
 [node name="GridContainer" type="GridContainer" parent="HUD"]
 anchor_bottom = 1.0
@@ -123,3 +137,42 @@ script = ExtResource( 3 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
+
+[node name="GameEndDialog" type="PopupDialog" parent="HUD"]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -132.5
+margin_top = -38.5
+margin_right = 132.5
+margin_bottom = 38.5
+rect_min_size = Vector2( 219, 0 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="CenterContainer" type="CenterContainer" parent="HUD/GameEndDialog"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HUD/GameEndDialog/CenterContainer"]
+margin_left = 23.0
+margin_top = 19.0
+margin_right = 242.0
+margin_bottom = 57.0
+
+[node name="Label" type="Label" parent="HUD/GameEndDialog/CenterContainer/VBoxContainer"]
+margin_right = 219.0
+margin_bottom = 14.0
+text = "Game finished. Thanks for playing!"
+
+[node name="Button" type="Button" parent="HUD/GameEndDialog/CenterContainer/VBoxContainer"]
+margin_top = 18.0
+margin_right = 219.0
+margin_bottom = 38.0
+text = "Ok"
+script = ExtResource( 9 )
