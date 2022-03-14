@@ -85,7 +85,7 @@ namespace TeamFactory.Map
             if (sourceNode.OutConnections.ContainsKey(outputDir))
                 return false;   
 
-            int startIndex = GetIndicesFromDirection(srcIndex, outputDir);
+            int startIndex = GetIndicesFromDirection(mapWidth, srcIndex, outputDir);
             Direction bestInDir = Direction.Left;
             float currentBestPathCost = 0;
             foreach (Direction inDir in targetNode.Type.Inputs)
@@ -93,7 +93,7 @@ namespace TeamFactory.Map
                 if (targetNode.InConnections.ContainsKey(inDir))
                     continue;
                 
-                int endIndex = GetIndicesFromDirection(target, inDir);
+                int endIndex = GetIndicesFromDirection(mapWidth, target, inDir);
                 int[] path = infraMap.GetIdPath(startIndex, endIndex);
                 float cost = 0;
                 foreach(int pathPointID in path)
@@ -367,13 +367,13 @@ namespace TeamFactory.Map
 
             foreach(Direction inputDir in infraType.Inputs)
             {
-                int inputIndex = GetIndicesFromDirection(index, inputDir);
+                int inputIndex = GetIndicesFromDirection(mapWidth, index, inputDir);
                 infraMap.SetPointWeightScale(inputIndex, 3f);
             }
 
             foreach(Direction outputDir in infraType.Outputs)
             {
-                int inputIndex = GetIndicesFromDirection(index, outputDir);
+                int inputIndex = GetIndicesFromDirection(mapWidth, index, outputDir);
                 infraMap.SetPointWeightScale(inputIndex, 3f);
             }
 
@@ -392,8 +392,8 @@ namespace TeamFactory.Map
         {
             int targetAbsIndex = MapToIndex(target.TargetCoords);
             InfraSprite srcNode = GetInfraAtIndex(srcIndex);
-            int startIndex = GetIndicesFromDirection(srcIndex, outDirection);
-            int endIndex = GetIndicesFromDirection(targetAbsIndex, target.Direction);
+            int startIndex = GetIndicesFromDirection(mapWidth, srcIndex, outDirection);
+            int endIndex = GetIndicesFromDirection(mapWidth, targetAbsIndex, target.Direction);
 
             NetState.Rpc(mapNode, "SaveConnection", srcIndex, outDirection, targetAbsIndex, target.Direction);
 
@@ -417,8 +417,8 @@ namespace TeamFactory.Map
             for(int j = 1; j < completePath.Length - 1; j++)
             {
                 string conveyorNodeName = $"Conveyor_{srcIndex}_{completePath[j]}";
-                Direction inputDir = GetDirectionFromIndices(completePath[j], completePath[j-1]);
-                Direction outputDir = GetDirectionFromIndices(completePath[j], completePath[j+1]);
+                Direction inputDir = GetDirectionFromIndices(mapWidth, completePath[j], completePath[j-1]);
+                Direction outputDir = GetDirectionFromIndices(mapWidth, completePath[j], completePath[j+1]);
                 NetState.Rpc(mapNode, "CreateConveyorNode", conveyorNodeName, completePath[j], inputDir, outputDir);
 
                 infraMap.SetPointWeightScale(completePath[j], 3f);
@@ -437,25 +437,25 @@ namespace TeamFactory.Map
             return connectionPathCache[pathCacheKey];
         }
 
-        public static Direction GetDirectionFromIndices(int selfIndex, int targetIndex)
+        public static Direction GetDirectionFromIndices(int mapWidth, int selfIndex, int targetIndex)
         {
             int diff = targetIndex - selfIndex;
-            switch (diff)
-            {
-                case 1:
-                    return Direction.Right;
-                case -1:
-                    return Direction.Left;
-                case 15:
-                    return Direction.Down;
-                case -15:
-                    return Direction.Up;
-            }
+            if (diff == 1)
+                return Direction.Right;
+
+            if (diff == -1)
+                return Direction.Left;
+
+            if (diff == mapWidth)
+                return Direction.Down;
+
+            if (diff == -mapWidth)
+                return Direction.Up;
 
             throw new System.Exception($"target {targetIndex} is not next to self {selfIndex}");
         }
 
-        public static int GetIndicesFromDirection(int selfIndex, Direction dir)
+        public static int GetIndicesFromDirection(int mapWidth, int selfIndex, Direction dir)
         {
             switch (dir)
             {
@@ -464,9 +464,9 @@ namespace TeamFactory.Map
                 case Direction.Left:
                     return selfIndex - 1;
                 case Direction.Down:
-                    return selfIndex + 15;
+                    return selfIndex + mapWidth;
                 case Direction.Up:
-                    return selfIndex - 15;
+                    return selfIndex - mapWidth;
             }
 
             throw new System.Exception($"Invalid direction {dir}");

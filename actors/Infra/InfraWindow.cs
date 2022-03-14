@@ -163,7 +163,9 @@ namespace TeamFactory.Infra
             {
                 HBoxContainer req = reqPacked.Instance<HBoxContainer>();
                 req.GetNode<Label>("Amount").Text = $"{tuple.Value}x";
-                req.GetNode<TextureRect>("Input").Texture = itemDB.Database[tuple.Key].Texture;
+
+                ItemResource itemRes = itemDB.GetItemResource(tuple.Key);
+                req.GetNode<TextureRect>("Input").Texture = itemRes.Texture;
 
                 reqBox.AddChild(req);
             }

@@ -9,6 +9,4 @@ Name = "Copperore"
 PointValue = 10
 Texture = ExtResource( 2 )
 Requirements = {
-"Ironore": 2,
-"Nonexisting": 1
 }

@@ -55,7 +55,9 @@ public class BuildButton : TextureButton
 
         ghostSprite = new Sprite();
         ghostSprite.Texture = it.Texture;
-        ghostSprite.Material = GD.Load<ShaderMaterial>("res://materials/FactoryBtn.tres");
+        ShaderMaterial shaderMat = GD.Load<ShaderMaterial>("res://materials/FactoryBtn.tres");
+        shaderMat.SetShaderParam("ButtonTexture", it.Texture);
+        ghostSprite.Material = shaderMat;
         GetNode<Node2D>("/root/Game").AddChild(ghostSprite);
         inProcess = true;
     }

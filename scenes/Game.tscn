@@ -27,32 +27,36 @@ script = ExtResource( 14 )
 [node name="HUD" type="CanvasLayer" parent="."]
 script = ExtResource( 6 )
 
-[node name="BuildFactoryBtn" type="TextureButton" parent="HUD"]
+[node name="HBoxContainer" type="HBoxContainer" parent="HUD"]
 anchor_left = 1.0
+anchor_top = 1.0
 anchor_right = 1.0
-margin_left = -158.0
-margin_top = 455.0
-margin_right = -30.0
-margin_bottom = 583.0
-texture_normal = ExtResource( 7 )
-script = ExtResource( 8 )
+anchor_bottom = 1.0
+margin_left = -260.0
+margin_top = -128.0
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="BuildMultiFactoryBtn" type="TextureButton" parent="HUD"]
-anchor_left = 1.0
-anchor_right = 1.0
-margin_left = -310.0
-margin_top = 457.0
-margin_right = -182.0
-margin_bottom = 585.0
+[node name="BuildMultiFactoryBtn" type="TextureButton" parent="HUD/HBoxContainer"]
+margin_right = 128.0
+margin_bottom = 128.0
 texture_normal = ExtResource( 5 )
 script = ExtResource( 8 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
 InfraToBuild = 1
+
+[node name="BuildFactoryBtn" type="TextureButton" parent="HUD/HBoxContainer"]
+margin_left = 132.0
+margin_right = 260.0
+margin_bottom = 128.0
+texture_normal = ExtResource( 7 )
+script = ExtResource( 8 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
 [node name="TopUI" type="ColorRect" parent="HUD"]
 anchor_right = 1.0
