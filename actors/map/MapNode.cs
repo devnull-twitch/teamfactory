@@ -1,7 +1,7 @@
 using Godot;
 using Godot.Collections;
-using TeamFactory.Lib.Multiplayer;
-using TeamFactory.Lib.JsonMap;
+using TeamFactory.Util.Multiplayer;
+using TeamFactory.Util.JsonMap;
 using TeamFactory.Game;
 using TeamFactory.Conveyor;
 using TeamFactory.Infra;

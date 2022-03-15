@@ -2,7 +2,7 @@ using Godot;
 using System.Collections.Generic;
 using TeamFactory.Items;
 using TeamFactory.Map;
-using TeamFactory.Lib.Multiplayer;
+using TeamFactory.Util.Multiplayer;
 using TeamFactory.Infra;
 using TeamFactory.Player;
 

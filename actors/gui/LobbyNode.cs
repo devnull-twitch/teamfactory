@@ -1,5 +1,5 @@
 using Godot;
-using TeamFactory.Lib.Multiplayer;
+using TeamFactory.Util.Multiplayer;
 
 namespace TeamFactory.Gui
 {

@@ -2,7 +2,7 @@ using Godot;
 using TeamFactory.Map;
 using TeamFactory.Items;
 using TeamFactory.Infra;
-using TeamFactory.Lib.Multiplayer;
+using TeamFactory.Util.Multiplayer;
 
 namespace TeamFactory.Input
 {

@@ -1,5 +1,5 @@
 using Godot;
-using TeamFactory.Lib.Multiplayer;
+using TeamFactory.Util.Multiplayer;
 using TeamFactory.Map;
 using TeamFactory.Items;
 using TeamFactory.Infra;

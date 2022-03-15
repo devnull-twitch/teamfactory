@@ -3,8 +3,8 @@ using TeamFactory.Conveyor;
 using TeamFactory.Infra;
 using TeamFactory.Factory;
 using Godot.Collections;
-using TeamFactory.Lib.JsonMap;
-using TeamFactory.Lib.Multiplayer;
+using TeamFactory.Util.JsonMap;
+using TeamFactory.Util.Multiplayer;
 
 namespace TeamFactory.Map 
 {

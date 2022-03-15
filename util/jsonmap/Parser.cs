@@ -3,7 +3,7 @@ using Godot.Collections;
 using TeamFactory.Map;
 using TeamFactory.Items;
 
-namespace TeamFactory.Lib.JsonMap
+namespace TeamFactory.Util.JsonMap
 {
     public class Parser 
     {

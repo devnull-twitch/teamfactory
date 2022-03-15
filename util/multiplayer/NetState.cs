@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Reflection;
 
-namespace TeamFactory.Lib.Multiplayer
+namespace TeamFactory.Util.Multiplayer
 {
     public enum Mode
     {

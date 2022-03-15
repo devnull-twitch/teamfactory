@@ -1,6 +1,6 @@
 using Godot;
 using TeamFactory.Map;
-using TeamFactory.Lib.Multiplayer;
+using TeamFactory.Util.Multiplayer;
 
 namespace TeamFactory.Player 
 {

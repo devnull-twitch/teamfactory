@@ -1,7 +1,7 @@
 using Godot;
 using System;
 using TeamFactory.Map;
-using TeamFactory.Lib.Multiplayer;
+using TeamFactory.Util.Multiplayer;
 
 public class BuildButton : TextureButton
 {

@@ -1,7 +1,7 @@
 using Godot;
 using System;
 using TeamFactory.Infra;
-using TeamFactory.Lib.Multiplayer;
+using TeamFactory.Util.Multiplayer;
 
 namespace TeamFactory.Output
 {

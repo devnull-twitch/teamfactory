@@ -1,6 +1,6 @@
 using Godot;
 using Godot.Collections;
-using TeamFactory.Lib.Multiplayer;
+using TeamFactory.Util.Multiplayer;
 using TeamFactory.Map;
 using TeamFactory.Infra;
 
