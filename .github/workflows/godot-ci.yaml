@@ -1,0 +1,152 @@
+name: "godot-ci export"
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+env:
+  GODOT_VERSION: 3.4.2
+  EXPORT_NAME: TeamFactory
+
+jobs:
+  export-windows:
+    name: Windows Export
+    runs-on: ubuntu-latest
+    container:
+      image: barichello/godot-ci:mono-3.4.2
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          lfs: true
+      - name: Setup
+        run: |
+          mkdir -v -p build/linux build/windows build/linux-server ~/.local/share/godot/templates
+          mv /root/.local/share/godot/templates/${GODOT_VERSION}.stable.mono ~/.local/share/godot/templates/${GODOT_VERSION}.stable.mono
+      - name: Windows Build
+        run: godot -v --export-debug "Windows Desktop" build/windows/$EXPORT_NAME.exe
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v1
+        with:
+          name: windows
+          path: build/windows
+
+  export-linux:
+    name: Linux Export
+    runs-on: ubuntu-latest
+    container:
+      image: barichello/godot-ci:mono-3.4.2
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          lfs: true
+      - name: Setup
+        run: |
+          mkdir -v -p build/linux build/windows build/linux-server ~/.local/share/godot/templates
+          mv /root/.local/share/godot/templates/${GODOT_VERSION}.stable.mono ~/.local/share/godot/templates/${GODOT_VERSION}.stable.mono
+      - name: Linux Build
+        run: godot -v --export "Linux/X11" build/linux/$EXPORT_NAME.x86_64
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v1
+        with:
+          name: linux
+          path: build/linux
+
+  export-linux-server:
+    name: Linux Export
+    runs-on: ubuntu-latest
+    container:
+      image: barichello/godot-ci:mono-3.4.2
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          lfs: true
+      - name: Setup
+        run: |
+          mkdir -v -p build/linux build/windows build/linux-server ~/.local/share/godot/templates
+          mv /root/.local/share/godot/templates/${GODOT_VERSION}.stable.mono ~/.local/share/godot/templates/${GODOT_VERSION}.stable.mono
+          wget https://downloads.tuxfamily.org/godotengine/3.4.2/mono/Godot_v3.4.2-stable_mono_linux_server_64.zip
+          unzip Godot_v3.4.2-stable_mono_linux_server_64.zip && rm Godot_v3.4.2-stable_mono_linux_server_64.zip
+          cp Godot_v3.4.2-stable_mono_linux_server_64/Godot_v3.4.2-stable_mono_linux_server.64 ~/.local/share/godot/templates/${GODOT_VERSION}.stable.mono/linux_x11_64_debug
+          cp Godot_v3.4.2-stable_mono_linux_server_64/Godot_v3.4.2-stable_mono_linux_server.64 ~/.local/share/godot/templates/${GODOT_VERSION}.stable.mono/linux_x11_64_release
+      - name: Linux Build
+        run: godot -v --export "Linux/X11" build/linux-server/$EXPORT_NAME.server.x86_64
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v1
+        with:
+          name: linux-server
+          path: build/linux-server
+
+  build-server-image:
+    name: Build docker image
+    runs-on: ubuntu-latest
+    needs: export-linux-server
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v2
+      -
+        name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      -
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      -
+        name: Login to DockerHub
+        uses: docker/login-action@v1 
+        with:
+          registry: ghcr.io
+          username: ${{ secrets.GHCR_USERNAME }}
+          password: ${{ secrets.GHCR_TOKEN }}
+      - name: Download server build
+        uses: actions/download-artifact@v2
+        with:
+          name: linux-server
+          path: linux-server
+      -
+        name: Build and push
+        id: docker_build
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          context: .
+          labels: |
+            org.opencontainers.image.authors=${{ github.repository_owner }}
+            org.opencontainers.image.created=${{ github.event.release.created_at }}
+            org.opencontainers.image.ref.name=${{ env.GIT_REF }}
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.source=https://github.com/${{ github.repository }}
+            org.opencontainers.image.version=${{ github.event.release.tag_name }}
+          tags: ghcr.io/devnull-twitch/teamfactory-server:latest
+
+  release:
+    name: Make release
+    runs-on: ubuntu-latest
+    needs: [export-windows, export-linux]
+    steps:
+      - 
+        name: Download windows build
+        uses: actions/download-artifact@v2
+        with:
+          name: windows
+          path: windows-client
+      - 
+        name: Download linux build
+        uses: actions/download-artifact@v2
+        with:
+          name: linux
+          path: linux-client
+      -
+        name: Zip it
+        run: |
+          zip -o windows-client.zip windows-client/**
+          zip -o linux-client.zip linux-client/**
+      - 
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: "linux-client.zip,windows-client.zip"
+          omitBody: true
+          token: ${{ secrets.GHCR_TOKEN }}
