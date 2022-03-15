@@ -82,6 +82,7 @@ namespace TeamFactory.Gui
             GetTree().NetworkPeer = peer;
 
             GetTree().Connect("connected_to_server", this, nameof(OnConnectedToServer));
+            GetTree().Connect("connection_failed", this, nameof(OnFailedConnection));
         }
 
         public void OnConnectedToServer()
@@ -90,6 +91,16 @@ namespace TeamFactory.Gui
             {
                 NetState.RpcId(server, 1, "PlayerRequestStart");
             }
+        }
+
+        public void OnFailedConnection()
+        {
+            GD.Print("connection failed");
+
+            PackedScene menuPacked = GD.Load<PackedScene>("res://scenes/Menu.tscn");
+            GetNode<Node2D>("/root/Lobby").QueueFree();
+            Node menuNode = menuPacked.Instance();
+            GetTree().Root.AddChild(menuNode);
         }
 
         private bool isQuickConnect()
