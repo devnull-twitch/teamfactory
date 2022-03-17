@@ -1,10 +1,11 @@
-[gd_scene load_steps=10 format=2]
+[gd_scene load_steps=11 format=2]
 
 [ext_resource path="res://font/Comfortaa-Medium.ttf" type="DynamicFontData" id=1]
 [ext_resource path="res://actors/gui/JoinBtn.cs" type="Script" id=2]
 [ext_resource path="res://sprites/teamFactory3.png" type="Texture" id=3]
 [ext_resource path="res://font/Comfortaa-Bold.ttf" type="DynamicFontData" id=4]
 [ext_resource path="res://actors/gui/LogoAddition.cs" type="Script" id=5]
+[ext_resource path="res://actors/gui/HostBtn.cs" type="Script" id=6]
 
 [sub_resource type="DynamicFont" id=2]
 size = 18
@@ -91,6 +92,8 @@ margin_bottom = 108.0
 text = "Join"
 script = ExtResource( 2 )
 
+[node name="HTTPRequest" type="HTTPRequest" parent="CanvasLayer/HBoxContainer/JoinContainer/JoinBtn"]
+
 [node name="CreateContainer" type="VBoxContainer" parent="CanvasLayer/HBoxContainer"]
 margin_left = 179.0
 margin_right = 280.0
@@ -116,6 +119,9 @@ margin_top = 39.0
 margin_right = 101.0
 margin_bottom = 59.0
 text = "Start game"
+script = ExtResource( 6 )
+
+[node name="HTTPRequest" type="HTTPRequest" parent="CanvasLayer/HBoxContainer/CreateContainer/HostBtn"]
 
 [node name="LogoAddition" type="Label" parent="CanvasLayer"]
 margin_left = 35.0

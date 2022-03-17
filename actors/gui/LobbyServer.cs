@@ -71,6 +71,11 @@ namespace TeamFactory.Gui
 
         public void onNetworkPeerConnected(int id)
         {
+            foreach (string playerName in players.Values)
+            {
+                NetState.RpcId(Node, id, "AddPlayerName", playerName);
+            }
+
             string newPlayername = Usernames[playerIndex];
             playerIndex++;
 

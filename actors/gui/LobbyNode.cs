@@ -9,6 +9,8 @@ namespace TeamFactory.Gui
 
         public int ServerPort;
 
+        public string LobbyCode;
+
         private VBoxContainer userList;
 
         private LobbyServer server;
@@ -16,12 +18,14 @@ namespace TeamFactory.Gui
         // Called when the node enters the scene tree for the first time.
         public override void _Ready()
         {
-            userList = GetNode<VBoxContainer>("/root/Lobby/CanvasLayer/UserList");
+            userList = GetNode<VBoxContainer>("CanvasLayer/UserList");
 
             server = new LobbyServer();
             server.Node = this;
             server.Name = "LobbyServer";
             AddChild(server);
+
+            GetNode<Label>("CanvasLayer/VBoxContainer/HBoxContainer/LobbyCodeOut").Text = LobbyCode;
 
             if (NetState.Mode == Mode.NET_CLIENT)
             {
