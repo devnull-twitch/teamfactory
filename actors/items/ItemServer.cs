@@ -38,6 +38,14 @@ namespace TeamFactory.Items
                     if(Path.Length > 1)
                     {
                         Path = shiftArray(Path);
+                        NetState.Rpc(
+                            this,
+                            "SetupNextStep",
+                            Node.GlobalPosition.x,
+                            Node.GlobalPosition.y,
+                            Path[0].x,
+                            Path[0].y
+                        );
                         return;
                     }
                     else
@@ -57,10 +65,7 @@ namespace TeamFactory.Items
                     }
                 }
 
-                Vector2 newPosition = Node.GlobalPosition.MoveToward(Path[0], 200 * delta);
-
-                // TODO: only sync next position not every move
-                NetState.Rpc(this, "Move", newPosition.x, newPosition.y);
+                Node.GlobalPosition = Node.GlobalPosition.MoveToward(Path[0], 200 * delta);
             }
         }
 
@@ -82,6 +87,13 @@ namespace TeamFactory.Items
         {
             Node.GlobalPosition = new Vector2(x, y);
         }
+
+        [Remote]
+        public void SetupNextStep(float currentX, float currentY, float targetX, float targetY)
+        {
+            Node.GlobalPosition = new Vector2(currentX, currentY);
+            Node.NextStep = new Vector2(targetX, targetY);
+        } 
 
         [RemoteSync]
         public void Delete()

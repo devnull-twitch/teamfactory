@@ -13,6 +13,8 @@ namespace TeamFactory.Items
 
         private ItemServer server;
 
+        public Vector2? NextStep;
+
         // Called when the node enters the scene tree for the first time.
         public override void _Ready()
         {
@@ -33,6 +35,21 @@ namespace TeamFactory.Items
             get {
                 return item;
             }
+        }
+
+        public override void _PhysicsProcess(float delta)
+        {
+            if (NextStep == null)
+                return;
+
+            float totalDistance = GlobalPosition.DistanceTo((Vector2)NextStep);
+            if(totalDistance < 2)
+            {
+                NextStep = null;
+                return;
+            }
+
+            GlobalPosition = GlobalPosition.MoveToward((Vector2)NextStep, 200 * delta);
         }
     }
 }
