@@ -21,3 +21,7 @@ zoom = Vector2( 1.5, 1.5 )
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Picker"]
 shape = SubResource( 9 )
+
+[node name="Node" type="Node" parent="."]
+
+[node name="Path" type="Line2D" parent="Node"]

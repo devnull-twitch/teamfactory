@@ -1,7 +1,7 @@
 {
     "width": 10,
     "height": 5,
-    "time": 5,
+    "time": 999,
     "unlocked_items": [
         "Ironbar", "Copperbar"
     ],

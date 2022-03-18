@@ -89,6 +89,11 @@ namespace TeamFactory.Gui
         {
             NetState.Rpc(Node, "RemovePlayerName", players[id]);
             players.Remove(id);
+
+            if (players.Count <= 0) {
+                // quit when all players leave lobby to not have random unused lobbies around
+                GetTree().Quit();
+            }
         }
 
         [Remote]

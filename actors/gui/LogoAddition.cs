@@ -10,6 +10,8 @@ public class LogoAddition : Label
     {
         texts.Add("No");
         texts.Add("It was");
+        texts.Add("Working title");
+        texts.Add("RandTitle");
 
         RandomNumberGenerator randGen = new RandomNumberGenerator();
         randGen.Seed = (ulong)(DateTime.Now.Ticks);
