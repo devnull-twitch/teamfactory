@@ -6,7 +6,7 @@
 [resource]
 script = ExtResource( 1 )
 Name = "Copperore"
-PointValue = 10
+PointValue = 1
 Texture = ExtResource( 2 )
 Requirements = {
 }

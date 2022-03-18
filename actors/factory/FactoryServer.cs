@@ -81,6 +81,10 @@ namespace TeamFactory.Factory
         public void StorageUpdate(string itemName, int newValue)
         {
             Node.Storage[itemName] = newValue;
+
+            InfraWindow window = GetNodeOrNull<InfraWindow>("/root/Game/HUD/Panel");
+            if (window != null && window.InfraNode == Node)
+                window.UpdateWindow();
         }
 
         [RemoteSync]

@@ -67,11 +67,15 @@ namespace TeamFactory.Factory
             NetState.Rpc(this, "SpawnResourceChange", itemName);
         }
 
-        [RemoteSync]
+        [Remote]
         public void SpawnResourceChange(string itemName)
         {
             ItemDB itemDB = GD.Load<ItemDB>("res://actors/items/ItemDB.tres");
             SpawnResource = itemDB.Database[itemName];
+
+            InfraWindow window = GetNodeOrNull<InfraWindow>("/root/Game/HUD/Panel");
+            if (window != null && window.InfraNode == this)
+                window.UpdateWindow();
         }
     }
 }

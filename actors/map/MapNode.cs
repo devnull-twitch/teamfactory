@@ -13,8 +13,6 @@ namespace TeamFactory.Map
     {
         public GridManager Manager;
 
-        public Array<string> UnlockedItems;
-
         private string[] availableColors = new string[] {
             "#FF0000",
             "#00FF00",
@@ -48,6 +46,7 @@ namespace TeamFactory.Map
             packedConveyor = GD.Load<PackedScene>("res://actors/conveyor/ConveyorNode.tscn");
         }
 
+        // Server side only
         public void PlayersLoaded()
         {
             Physics2DServer.SetActive(false);
@@ -60,8 +59,9 @@ namespace TeamFactory.Map
             Parser parser = new Parser(testJson.GetAsText());
 
             MapResource template = parser.CreateMapData();
-            UnlockedItems = template.UnlockedItems;
-            GetNode<GameServer>("../GameServer").TimeTillNextRound = template.Time;
+            GameServer gs = GetNode<GameServer>("../GameServer");
+            gs.UnlockForAll(template.UnlockedItems);
+            gs.TimeTillNextRound = template.Time;
 
             NetState.Rpc(GetNode<GameNode>("../"), "UpdateTimeTillNextRound", template.Time);
 
@@ -90,9 +90,6 @@ namespace TeamFactory.Map
             Parser parser = new Parser(testJson.GetAsText());
             Manager = new GridManager(this, parser);
             Manager.ClientInit();
-
-            MapResource template = parser.CreateMapData();
-            UnlockedItems = template.UnlockedItems;
         }
 
         [Remote]
@@ -114,9 +111,11 @@ namespace TeamFactory.Map
             Parser parser = new Parser(testJson.GetAsText());
 
             MapResource template = parser.CreateMapData();
-            UnlockedItems = template.UnlockedItems;
             
-            GetNode<GameServer>("../GameServer").TimeTillNextRound = template.Time;
+            GameServer gs = GetNode<GameServer>("../GameServer");
+            gs.UnlockForAll(template.UnlockedItems);
+            gs.TimeTillNextRound = template.Time;
+            
             NetState.Rpc(GetNode<GameNode>("../"), "UpdateTimeTillNextRound", template.Time);
 
             Manager.Cleanup();

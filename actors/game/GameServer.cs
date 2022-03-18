@@ -4,6 +4,7 @@ using Godot.Collections;
 using TeamFactory.Util.Multiplayer;
 using TeamFactory.Player;
 using TeamFactory.Map;
+using TeamFactory.Items;
 
 namespace TeamFactory.Game
 {
@@ -16,6 +17,8 @@ namespace TeamFactory.Game
         protected Dictionary<int, int> UserPoints = new Dictionary<int, int>();
 
         private Dictionary<int, bool> playersLoaded = new Dictionary<int, bool>();
+
+        private Dictionary<int, Array<string>> playerUnlocks = new Dictionary<int, Array<string>>();
 
         public RandomNumberGenerator Rng = new RandomNumberGenerator();
 
@@ -140,6 +143,36 @@ namespace TeamFactory.Game
             UserPoints[NetState.NetworkSenderId(this)] -= sabotageObj.PointsCost;
             NetState.Rpc(node, "SetPoints", NetState.NetworkSenderId(this), UserPoints[NetState.NetworkSenderId(this)]);
             sabotageObj.Execute(possibleTagetPlayerIDs[victomIndex]);
+        }
+
+        public void UnlockForAll(Array<string> itemNames)
+        {
+            foreach(int netID in players.Keys)
+            {
+                if (!playerUnlocks.ContainsKey(netID))
+                    playerUnlocks[netID] = new Array<string>();
+
+                foreach(string itemName in itemNames)
+                {
+                    playerUnlocks[netID].Add(itemName);
+                    NetState.RpcId(node, netID, "AddPlayerUnlock", itemName);
+                }
+            }
+        }
+
+        [Remote]
+        public void RequestUnlock(string itemName)
+        {
+            ItemDB itemDB = GD.Load<ItemDB>("res://actors/items/ItemDB.tres");
+            ItemResource unlockItem = itemDB.Database[itemName];
+
+            if (!UserPoints.ContainsKey(NetState.NetworkSenderId(this)))
+                return;
+            if (UserPoints[NetState.NetworkSenderId(this)] < unlockItem.UnlockCost)
+                return;
+
+            playerUnlocks[NetState.NetworkSenderId(this)].Add(itemName);
+            NetState.RpcId(node, NetState.NetworkSenderId(this), "AddPlayerUnlock", itemName);
         }
 
         public System.Collections.Generic.ICollection<int> GetPlayerIDs()

@@ -1,6 +1,6 @@
 using Godot;
-using System;
 using TeamFactory.Infra;
+using TeamFactory.Items;
 using TeamFactory.Util.Multiplayer;
 
 namespace TeamFactory.Input
@@ -39,6 +39,25 @@ namespace TeamFactory.Input
             }
 
             GetNode<Area2D>("Picker")._InputEvent(viewport, e, shape_idx);
+        }
+
+        [Remote]
+        public void RequestSpawnResourceChange(string itemName)
+        {
+            ItemDB itemDB = GD.Load<ItemDB>("res://actors/items/ItemDB.tres");
+            SpawnResource = itemDB.Database[itemName];
+            NetState.Rpc(this, "SpawnResourceChange", itemName);
+        }
+
+        [Remote]
+        public void SpawnResourceChange(string itemName)
+        {
+            ItemDB itemDB = GD.Load<ItemDB>("res://actors/items/ItemDB.tres");
+            SpawnResource = itemDB.Database[itemName];
+
+            InfraWindow window = GetNodeOrNull<InfraWindow>("/root/Game/HUD/Panel");
+            if (window != null && window.InfraNode == this)
+                window.UpdateWindow();
         }
     }
 }

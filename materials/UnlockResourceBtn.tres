@@ -1,0 +1,9 @@
+[gd_resource type="ShaderMaterial" load_steps=3 format=2]
+
+[ext_resource path="res://materials/UnlockResourceShader.tres" type="Shader" id=1]
+[ext_resource path="res://actors/items/glass/Glass.png" type="Texture" id=2]
+
+[resource]
+shader = ExtResource( 1 )
+shader_param/Unlocked = 0.0
+shader_param/ButtonTexture = ExtResource( 2 )

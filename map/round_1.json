@@ -3,7 +3,7 @@
     "height": 5,
     "time": 999,
     "unlocked_items": [
-        "Ironbar", "Copperbar"
+        "Ironbar", "Copperbar", "Ironore", "Copperore", "Sand", "Chip"
     ],
     "spwan_position": {
         "x": 1,

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using TeamFactory.Items;
 using TeamFactory.Map;
 using TeamFactory.Util.Multiplayer;
-using TeamFactory.Infra;
+using TeamFactory.Game;
 using TeamFactory.Player;
 
 namespace TeamFactory.Infra
@@ -22,6 +22,9 @@ namespace TeamFactory.Infra
 
         public InfraSprite InfraNode
         {
+            get {
+                return infraNode;
+            }
             set {
                 infraNode = value;
                 UpdateWindow();
@@ -31,6 +34,9 @@ namespace TeamFactory.Infra
         public override void _Ready()
         {
             Connect("popup_hide", this, nameof(OnHide));
+
+            OptionButton outputSelector = GetNode<OptionButton>("VBoxContainer/HBoxContainer2/OptionButton");
+            outputSelector.Connect("item_selected", this, nameof(OnSelectOutputResource));
         }
 
         public override void _Input(InputEvent @event)
@@ -88,12 +94,9 @@ namespace TeamFactory.Infra
             NetState.RpcId(infraNode, 1, "RequestSpawnResourceChange", itemName);
         }
 
-        private void UpdateWindow()
+        public void UpdateWindow()
         {
-            if (infraNode.SpawnResource != null)
-            {
-                updateSpawnResourceData();
-            }
+            updateSpawnResourceData();
             
             if (infraNode.Type.Outputs.Count > 0)
             {
@@ -147,7 +150,7 @@ namespace TeamFactory.Infra
             NetState.RpcId(mapNode, 1, "RequestDisconnect", nodeIndex, dir);
         }
 
-        private void updateSpawnResourceData()
+        private async void updateSpawnResourceData()
         {
             // Production
             VBoxContainer reqBox = GetNode<VBoxContainer>("VBoxContainer/Production/Requirements");
@@ -175,18 +178,40 @@ namespace TeamFactory.Infra
 
             // Output dropdown
             outputSelector = GetNode<OptionButton>("VBoxContainer/HBoxContainer2/OptionButton");
-            Godot.Collections.Array<string> unlockedItems = GetNode<MapNode>("/root/Game/GridManager").UnlockedItems;
+            Godot.Collections.Array<string> unlockedItems = GetNode<GameNode>("/root/Game").PlayerUnlocks;
             outputSelector.Clear();
+
+            int selected = 0;
+            int i = 0;
             foreach(string option in unlockedItems)
             {
-                outputSelector.AddItem(option);
+                if (option == infraNode.SpawnResource.Name)
+                {
+                    selected = i;
+                }
+
+                ItemResource item = itemDB.Database[option];
+                if (item.Requirements.Count > 0 && infraNode.Type.isProducer)
+                {
+                    outputSelector.AddItem(option);
+                    i++;
+                }
+
+                if (item.Requirements.Count <= 0 && !infraNode.Type.isProducer)
+                {
+                    outputSelector.AddItem(option);
+                    i++;
+                }
             }
-            outputSelector.Connect("item_selected", this, nameof(OnSelectOutputResource));
+            outputSelector.Selected = selected;
         }
 
         private void updateOutputData()
         {
             VBoxContainer connectionContainer = GetNode<VBoxContainer>("VBoxContainer/Connections");
+            foreach(Node childNode in connectionContainer.GetChildren())
+                childNode.QueueFree();
+
             PackedScene connectionPackaged = GD.Load<PackedScene>("res://actors/Infra/ConnectionButtonContainer.tscn");
             foreach (GridManager.Direction dir in infraNode.Type.Outputs)
             {

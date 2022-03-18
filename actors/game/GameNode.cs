@@ -25,6 +25,8 @@ namespace TeamFactory.Game
 
         private PackedScene playerPackaged;
 
+        public Array<string> PlayerUnlocks;
+
         public bool GameRunning = true;
 
         // Called when the node enters the scene tree for the first time.
@@ -35,11 +37,14 @@ namespace TeamFactory.Game
                 return;
             }
 
+            PlayerUnlocks = new Array<string>();
+
             TtnrUi = GetNode<Label>("/root/Game/HUD/TopUI/HBoxContainer/RoundTime");
             PointUi = GetNode<Label>("/root/Game/HUD/TopUI/HBoxContainer/Points");
             ScoresUi = GetNode<ScoreGrid>("/root/Game/HUD/GridContainer");
 
             GetNode<Button>("/root/Game/HUD/TopUI/HBoxContainer/Control/SabotageOptionsBtn").Connect("pressed", this, nameof(OpenSabotageOptionWindow));
+            GetNode<Button>("/root/Game/HUD/TopUI/HBoxContainer/Control/UnlockOpenBtn").Connect("pressed", this, nameof(OpenUnlockWindow));
 
             if (NetState.Mode == Mode.NET_CLIENT)
             {
@@ -78,6 +83,11 @@ namespace TeamFactory.Game
             sabotageWindow.Popup_();
         }
 
+        public void OpenUnlockWindow()
+        {
+            GetNode<WindowDialog>("/root/Game/HUD/UnlockWindow").Popup_();
+        }
+
         [Remote]
         public void SetPoints(int ownerID, int points)
         {
@@ -105,6 +115,7 @@ namespace TeamFactory.Game
             newPlayerNode.Name = $"{ownerID}";
 
             players[ownerID] = name;
+            ScoresUi.SetScore(name, 0);
 
             GetNode<Node>("Players").AddChild(newPlayerNode);
         }
@@ -113,6 +124,12 @@ namespace TeamFactory.Game
         public void UpdateTimeTillNextRound(float timeTillNextRound)
         {
             TimeTillNextRound = timeTillNextRound;
+        }
+
+        [Remote]
+        public void AddPlayerUnlock(string itemName)
+        {
+            PlayerUnlocks.Add(itemName);
         }
     }
 }

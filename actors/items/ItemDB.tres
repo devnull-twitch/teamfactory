@@ -1,4 +1,4 @@
-[gd_resource type="Resource" load_steps=7 format=2]
+[gd_resource type="Resource" load_steps=12 format=2]
 
 [ext_resource path="res://actors/items/ItemDB.cs" type="Script" id=1]
 [ext_resource path="res://actors/items/ironbar/Ironbar.tres" type="Resource" id=2]
@@ -6,13 +6,23 @@
 [ext_resource path="res://actors/items/copperbar/Copperbar.tres" type="Resource" id=4]
 [ext_resource path="res://actors/items/copperore/Copperore.tres" type="Resource" id=5]
 [ext_resource path="res://actors/items/chip/Chip.tres" type="Resource" id=6]
+[ext_resource path="res://actors/items/coal/Coal.tres" type="Resource" id=7]
+[ext_resource path="res://actors/items/sand/Sand.tres" type="Resource" id=8]
+[ext_resource path="res://actors/items/wood/Wood.tres" type="Resource" id=9]
+[ext_resource path="res://actors/items/glass/Glass.tres" type="Resource" id=10]
+[ext_resource path="res://actors/items/silicon/Silicon.tres" type="Resource" id=11]
 
 [resource]
 script = ExtResource( 1 )
 Database = {
 "Chip": ExtResource( 6 ),
+"Coal": ExtResource( 7 ),
 "Copperbar": ExtResource( 4 ),
 "Copperore": ExtResource( 5 ),
+"Glass": ExtResource( 10 ),
 "Ironbar": ExtResource( 2 ),
-"Ironore": ExtResource( 3 )
+"Ironore": ExtResource( 3 ),
+"Sand": ExtResource( 8 ),
+"Silicon": ExtResource( 11 ),
+"Wood": ExtResource( 9 )
 }

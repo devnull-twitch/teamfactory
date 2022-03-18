@@ -1,5 +1,6 @@
 using Godot;
 using TeamFactory.Util.Multiplayer;
+using TeamFactory.Game;
 
 namespace TeamFactory.Gui
 {
@@ -66,7 +67,8 @@ namespace TeamFactory.Gui
             PackedScene gamePacked = GD.Load<PackedScene>("res://scenes/Game.tscn");
             GetNode<Node2D>("/root/Lobby").QueueFree();
 
-            Node gameNode = gamePacked.Instance();
+            GameNode gameNode = gamePacked.Instance<GameNode>();
+
             // copy over player ID to name dictionary
             GetTree().Root.AddChild(gameNode);
         }
