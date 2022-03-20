@@ -1,0 +1,125 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://actors/gui/UnlockItemContainer.tscn" type="PackedScene" id=1]
+[ext_resource path="res://font/Comfortaa-Bold.ttf" type="DynamicFontData" id=2]
+
+[sub_resource type="DynamicFont" id=1]
+size = 21
+font_data = ExtResource( 2 )
+
+[node name="Control" type="Control"]
+margin_right = 763.0
+margin_bottom = 1351.0
+rect_min_size = Vector2( 0, 1351 )
+size_flags_horizontal = 3
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label" type="Label" parent="."]
+anchor_left = 0.5
+anchor_right = 0.5
+margin_left = -44.0
+margin_top = 10.0
+margin_right = 44.0
+margin_bottom = 24.0
+custom_fonts/font = SubResource( 1 )
+text = "Unlocks"
+align = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="SandContainer" parent="." instance=ExtResource( 1 )]
+margin_left = 34.0
+margin_top = 612.0
+margin_right = 111.0
+margin_bottom = 739.0
+
+[node name="IronoreContainer" parent="." instance=ExtResource( 1 )]
+margin_left = 31.0
+margin_top = 115.0
+margin_right = 108.0
+margin_bottom = 242.0
+
+[node name="IronbarContainer" parent="." instance=ExtResource( 1 )]
+margin_left = 229.0
+margin_top = 122.0
+margin_right = 306.0
+margin_bottom = 249.0
+
+[node name="ChipContainer" parent="." instance=ExtResource( 1 )]
+margin_left = 431.0
+margin_top = 353.0
+margin_right = 508.0
+margin_bottom = 480.0
+
+[node name="CopperoreContainer" parent="." instance=ExtResource( 1 )]
+margin_left = 41.0
+margin_top = 347.0
+margin_right = 118.0
+margin_bottom = 474.0
+
+[node name="CopperbarContainer" parent="." instance=ExtResource( 1 )]
+margin_left = 235.0
+margin_top = 335.0
+margin_right = 312.0
+margin_bottom = 462.0
+
+[node name="SiliconContainer" parent="." instance=ExtResource( 1 )]
+margin_left = 239.0
+margin_top = 545.0
+margin_right = 316.0
+margin_bottom = 672.0
+
+[node name="GlassContainer" parent="." instance=ExtResource( 1 )]
+margin_left = 242.0
+margin_top = 744.0
+margin_right = 319.0
+margin_bottom = 871.0
+
+[node name="WoodContainer" parent="." instance=ExtResource( 1 )]
+margin_left = 41.0
+margin_top = 906.0
+margin_right = 118.0
+margin_bottom = 1033.0
+
+[node name="CoalContainer" parent="." instance=ExtResource( 1 )]
+margin_left = 41.0
+margin_top = 1131.0
+margin_right = 118.0
+margin_bottom = 1258.0
+
+[node name="Line2D" type="Line2D" parent="."]
+points = PoolVector2Array( 116, 399, 227, 392 )
+width = 3.0
+
+[node name="Line2D2" type="Line2D" parent="."]
+position = Vector2( -159, -52 )
+points = PoolVector2Array( 267, 228, 377, 226 )
+width = 3.0
+
+[node name="Line2D3" type="Line2D" parent="."]
+position = Vector2( -159, -52 )
+points = PoolVector2Array( 264, 723, 392, 650 )
+width = 3.0
+
+[node name="Line2D4" type="Line2D" parent="."]
+position = Vector2( -159, -52 )
+points = PoolVector2Array( 262, 730, 394, 856 )
+width = 3.0
+
+[node name="Line2D5" type="Line2D" parent="."]
+position = Vector2( -159, -52 )
+points = PoolVector2Array( 590, 467, 466, 652 )
+width = 3.0
+
+[node name="Line2D6" type="Line2D" parent="."]
+position = Vector2( -159, -52 )
+points = PoolVector2Array( 590, 467, 464, 436 )
+width = 3.0
+
+[node name="Line2D7" type="Line2D" parent="."]
+position = Vector2( -159, -52 )
+points = PoolVector2Array( 590, 467, 457, 228 )
+width = 3.0

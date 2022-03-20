@@ -10,4 +10,5 @@ PointValue = 10
 UnlockCost = 0
 Texture = ExtResource( 2 )
 Requirements = {
+"Sand": 2
 }

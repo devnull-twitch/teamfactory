@@ -167,7 +167,8 @@ namespace TeamFactory.Game
             ItemResource unlockItem = itemDB.Database[itemName];
 
             if (!UserPoints.ContainsKey(NetState.NetworkSenderId(this)))
-                return;
+                UserPoints[NetState.NetworkSenderId(this)] = 0;
+
             if (UserPoints[NetState.NetworkSenderId(this)] < unlockItem.UnlockCost)
                 return;
 

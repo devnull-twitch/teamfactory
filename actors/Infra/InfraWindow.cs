@@ -1,5 +1,6 @@
 using Godot;
 using System.Collections.Generic;
+using GodotCol = Godot.Collections;
 using TeamFactory.Items;
 using TeamFactory.Map;
 using TeamFactory.Util.Multiplayer;
@@ -178,13 +179,16 @@ namespace TeamFactory.Infra
 
             // Output dropdown
             outputSelector = GetNode<OptionButton>("VBoxContainer/HBoxContainer2/OptionButton");
-            Godot.Collections.Array<string> unlockedItems = GetNode<GameNode>("/root/Game").PlayerUnlocks;
+            GodotCol.Dictionary<string, bool> unlockedItems = GetNode<GameNode>("/root/Game").PlayerUnlocks;
             outputSelector.Clear();
 
             int selected = 0;
             int i = 0;
-            foreach(string option in unlockedItems)
+            foreach(string option in unlockedItems.Keys)
             {
+                if (!unlockedItems[option])
+                    continue;
+                
                 if (option == infraNode.SpawnResource.Name)
                 {
                     selected = i;

@@ -8,6 +8,7 @@ margin_right = 405.0
 margin_bottom = 215.0
 mouse_default_cursor_shape = 4
 popup_exclusive = true
+resizable = true
 script = ExtResource( 1 )
 __meta__ = {
 "_edit_use_anchors_": false

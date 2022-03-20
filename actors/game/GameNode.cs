@@ -25,7 +25,7 @@ namespace TeamFactory.Game
 
         private PackedScene playerPackaged;
 
-        public Array<string> PlayerUnlocks;
+        public Dictionary<string, bool> PlayerUnlocks;
 
         public bool GameRunning = true;
 
@@ -37,7 +37,7 @@ namespace TeamFactory.Game
                 return;
             }
 
-            PlayerUnlocks = new Array<string>();
+            PlayerUnlocks = new Dictionary<string, bool>();
 
             TtnrUi = GetNode<Label>("/root/Game/HUD/TopUI/HBoxContainer/RoundTime");
             PointUi = GetNode<Label>("/root/Game/HUD/TopUI/HBoxContainer/Points");
@@ -129,7 +129,10 @@ namespace TeamFactory.Game
         [Remote]
         public void AddPlayerUnlock(string itemName)
         {
-            PlayerUnlocks.Add(itemName);
+            PlayerUnlocks[itemName] = true;
+            UnlockWindow unlockWin = GetNode<UnlockWindow>("/root/Game/HUD/UnlockWindow");
+            if (unlockWin.Visible)
+                unlockWin.OnShow();
         }
     }
 }
