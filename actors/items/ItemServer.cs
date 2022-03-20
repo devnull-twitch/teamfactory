@@ -1,7 +1,9 @@
+using SysGen = System.Collections.Generic;
 using Godot;
 using Godot.Collections;
 using TeamFactory.Map;
 using TeamFactory.Util.Multiplayer;
+using TeamFactory.Util.Metrics;
 
 namespace TeamFactory.Items
 {
@@ -25,6 +27,10 @@ namespace TeamFactory.Items
             int targetIndex = gm.WorldToIndex(Node.Target.GlobalPosition);
             int[] indexPath = gm.GetConnectionPath(fromIndex, targetIndex);
             Path = gm.IndicesToWorld(indexPath);
+
+            SysGen.Dictionary<string, string> metricAttrib = new SysGen.Dictionary<string, string>();
+            metricAttrib["item"] = Node.Item.Name;
+            Handler.Inc("devnull.teamfactory.item.spawn", metricAttrib);
         }
 
         public override void _PhysicsProcess(float delta)

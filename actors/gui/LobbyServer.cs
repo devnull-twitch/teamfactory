@@ -2,6 +2,7 @@ using Godot;
 using Godot.Collections;
 using TeamFactory.Util.Multiplayer;
 using TeamFactory.Game;
+using TeamFactory.Util.Metrics;
 
 namespace TeamFactory.Gui
 {
@@ -45,7 +46,10 @@ namespace TeamFactory.Gui
                     NetState.Mode = Mode.NET_SERVER;
                     int port = int.Parse(args[key+1]);
                     startServer(port);
-                    return;
+                }
+                if (arg == "--metric")
+                {
+                    Handler.StartWorker(args[key+1]);
                 }
             }
         }

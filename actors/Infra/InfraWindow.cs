@@ -150,7 +150,7 @@ namespace TeamFactory.Infra
             NetState.RpcId(mapNode, 1, "RequestDisconnect", nodeIndex, dir);
         }
 
-        private async void updateSpawnResourceData()
+        private void updateSpawnResourceData()
         {
             // Production
             VBoxContainer reqBox = GetNode<VBoxContainer>("VBoxContainer/Production/Requirements");
