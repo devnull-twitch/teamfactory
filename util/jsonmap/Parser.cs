@@ -24,6 +24,7 @@ namespace TeamFactory.Util.JsonMap
             mapResource.Tiles = new Array<TileResource>();
 
             mapResource.Time = (int)((System.Single)mapData["time"]);
+            mapResource.ScoreLimit = (int)((System.Single)mapData["score_limit"]);
 
             Array unlockedItems = (Array)mapData["unlocked_items"];
             mapResource.UnlockedItems = new Array<string>();

@@ -1,7 +1,8 @@
 {
     "width": 10,
     "height": 5,
-    "time": 999,
+    "time": 1500,
+    "score_limit": 100,
     "unlocked_items": [
         "Ironbar", "Copperbar", "Ironore", "Copperore"
     ],

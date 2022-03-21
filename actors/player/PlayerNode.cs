@@ -15,6 +15,26 @@ namespace TeamFactory.Player
         public Vector2? NextStep;
 
         public Vector2[] Path;
+
+        private bool isCameraFreeMode = false;
+
+        private bool CameraFreeMode
+        {
+            get {
+                return isCameraFreeMode;
+            }
+            set {
+                isCameraFreeMode = value;
+                TextureRect indicator = GetNode<TextureRect>("/root/Game/HUD/TopUI/HBoxContainer/CameraModeIndicator");
+                if (!value)
+                {
+                    GetNode<Camera2D>("Camera2D").Position = new Vector2(0, 0);
+                    indicator.Texture = GD.Load<Texture>("res://actors/gui/LockedCamera.png");
+                }
+                else
+                    indicator.Texture = GD.Load<Texture>("res://actors/gui/FreeCamera.png");
+            }
+        }
     
         public override void _Ready()
         {
@@ -33,6 +53,21 @@ namespace TeamFactory.Player
 
         public override void _PhysicsProcess(float delta)
         {
+            if (isCameraFreeMode)
+            {
+                if (Godot.Input.IsActionPressed("ui_left"))
+                    GetNode<Camera2D>("Camera2D").MoveLocalX(-5);
+
+                if (Godot.Input.IsActionPressed("ui_right"))
+                    GetNode<Camera2D>("Camera2D").MoveLocalX(5);
+
+                if (Godot.Input.IsActionPressed("ui_up"))
+                    GetNode<Camera2D>("Camera2D").MoveLocalY(-5);
+
+                if (Godot.Input.IsActionPressed("ui_down"))
+                    GetNode<Camera2D>("Camera2D").MoveLocalY(5);
+            }
+
             if (NextStep == null)
                 return;
 
@@ -67,12 +102,22 @@ namespace TeamFactory.Player
                     MapNode mapNode = GetNode<MapNode>("../../GridManager");
                     int movementTargetIndex = mapNode.Manager.WorldToIndex(GetGlobalMousePosition());
                     NetState.RpcId(this, 1, "RequestMoveTo", movementTargetIndex);
+                    CameraFreeMode = false;
                 }
                 catch (OutOfMapException)
                 {
                     GD.Print("clicked out of map?");
                     return;
                 }
+            }
+        }
+
+        public override void _Input(InputEvent @event)
+        {
+            if (Godot.Input.IsActionJustReleased("camera_mode_toggle"))
+            {
+                CameraFreeMode = !CameraFreeMode;
+                GD.Print("toggle free camera");
             }
         }
 
@@ -113,6 +158,17 @@ namespace TeamFactory.Player
         public void setPosition(float x, float y)
         {
             Position = new Vector2(x, y);
+        }
+
+        public void JumpCameraTo(Vector2 abs)
+        {
+            CameraFreeMode = true;
+            GetNode<Camera2D>("Camera2D").GlobalPosition = abs;
+        }
+
+        public void ResetCamera()
+        {
+            CameraFreeMode = false;
         }
     }
 }

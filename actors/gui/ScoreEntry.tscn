@@ -1,10 +1,18 @@
-[gd_scene format=2]
+[gd_scene load_steps=3 format=2]
 
-[node name="ColorRect" type="ColorRect"]
+[sub_resource type="StyleBoxFlat" id=1]
+
+[sub_resource type="StyleBoxFlat" id=2]
+bg_color = Color( 1, 1, 1, 1 )
+
+[node name="ColorRect" type="ProgressBar"]
 margin_right = 88.0
 margin_bottom = 14.0
 rect_min_size = Vector2( 0, 14 )
 size_flags_horizontal = 3
+custom_styles/fg = SubResource( 1 )
+custom_styles/bg = SubResource( 2 )
+percent_visible = false
 __meta__ = {
 "_edit_use_anchors_": false
 }

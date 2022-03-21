@@ -50,27 +50,7 @@ namespace TeamFactory.Map
         public void PlayersLoaded()
         {
             Physics2DServer.SetActive(false);
-
-            File testJson = new File();
-            testJson.Open($"res://map/round_{currentRound}.json", File.ModeFlags.Read);
-            //testJson.Open("res://map/testing.json", File.ModeFlags.Read);
-            NetState.Rpc(this, "SetupManager", $"res://map/round_{currentRound}.json");
-
-            Parser parser = new Parser(testJson.GetAsText());
-
-            MapResource template = parser.CreateMapData();
-            GameServer gs = GetNode<GameServer>("../GameServer");
-            gs.UnlockForAll(template.UnlockedItems);
-            gs.TimeTillNextRound = template.Time;
-
-            NetState.Rpc(GetNode<GameNode>("../"), "UpdateTimeTillNextRound", template.Time);
-
-            Manager = new GridManager(this, parser);
-
-            foreach (int playerNetID in GetNode<GameServer>("../GameServer").GetPlayerIDs())
-            {
-                Manager.AddPlayerZone(playerNetID, NextPlayerColor);
-            }
+            InititMap();
         }
 
         [Remote]
@@ -101,6 +81,11 @@ namespace TeamFactory.Map
         public bool NextRound()
         {
             currentRound++;
+            return InititMap();
+        }
+
+        private bool InititMap()
+        {
             File testJson = new File();
             Error err = testJson.Open($"res://map/round_{currentRound}.json", File.ModeFlags.Read); 
             if (err != Error.Ok)
@@ -109,17 +94,26 @@ namespace TeamFactory.Map
             NetState.Rpc(this, "SetupManager", $"res://map/round_{currentRound}.json");
 
             Parser parser = new Parser(testJson.GetAsText());
-
             MapResource template = parser.CreateMapData();
             
             GameServer gs = GetNode<GameServer>("../GameServer");
             gs.UnlockForAll(template.UnlockedItems);
             gs.TimeTillNextRound = template.Time;
+            gs.ScoreLimit = template.ScoreLimit;
+            gs.NewRoundStart();
             
             NetState.Rpc(GetNode<GameNode>("../"), "UpdateTimeTillNextRound", template.Time);
 
-            Manager.Cleanup();
-            Manager.Parser = parser;
+            if (Manager == null)
+            {
+                Manager = new GridManager(this, parser);
+            }
+            else
+            {
+                Manager.Cleanup();
+                Manager.Parser = parser;
+            }
+            
 
             Array playerNodes = GetNode<Node>("../Players").GetChildren();
             foreach (Node2D playerNode in playerNodes)

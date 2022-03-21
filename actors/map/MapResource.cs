@@ -14,6 +14,9 @@ namespace TeamFactory.Map
 
         [Export]
         public int Time;
+
+        [Export]
+        public int ScoreLimit;
         
         public Vector2 SpawnPosition;
 

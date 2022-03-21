@@ -28,6 +28,10 @@ namespace TeamFactory.Game
 
         public float TimeTillNextRound;
 
+        protected Dictionary<int, int> UserRoundPoints = new Dictionary<int, int>();
+
+        public int ScoreLimit;
+
         public override void _Ready()
         {
             if (NetState.Mode == Mode.NET_CLIENT)
@@ -50,13 +54,7 @@ namespace TeamFactory.Game
 
             TimeTillNextRound -= delta;
             if (TimeTillNextRound <= 0)
-            {
-                if (!GetNode<MapNode>("../GridManager").NextRound())
-                {
-                    NetState.Rpc(this, "GameEnd");
-                    GetTree().Quit();
-                }
-            }
+                TriggerNextRound();
         }
 
         [Remote]
@@ -74,13 +72,43 @@ namespace TeamFactory.Game
                 UserPoints[ownerID] = 0;
             }
 
+            if (!UserRoundPoints.ContainsKey(ownerID))
+            {
+                UserRoundPoints[ownerID] = 0;
+            }
+
             if (node == null)
             {
                 node = GetNode<GameNode>("..");
             }
 
             UserPoints[ownerID] = UserPoints[ownerID] + points;
-            NetState.Rpc(node, "SetPoints", ownerID, UserPoints[ownerID]);
+            UserRoundPoints[ownerID] = UserRoundPoints[ownerID] + points;
+            NetState.Rpc(node, "SetPoints", ownerID, UserPoints[ownerID], UserRoundPoints[ownerID]);
+
+            if (ScoreLimit > 0 && UserRoundPoints[ownerID] >= ScoreLimit)
+                TriggerNextRound();
+        }
+
+        private void TriggerNextRound()
+        {
+            if (!GetNode<MapNode>("../GridManager").NextRound())
+            {
+                NetState.Rpc(this, "GameEnd");
+                GetTree().Quit();
+            }
+        }
+
+        public void NewRoundStart()
+        {
+            UserRoundPoints.Clear();
+            NetState.Rpc(node, "SetScoreLimit", ScoreLimit);
+            foreach (int playerID in players.Keys)
+            {
+                int playerTotalScore = 0;
+                UserPoints.TryGetValue(playerID, out playerTotalScore);
+                NetState.Rpc(node, "SetPoints", playerID, playerTotalScore, 0);
+            }
         }
 
         public void AddPlayer(int ownerID, string playerName)
@@ -135,13 +163,14 @@ namespace TeamFactory.Game
             int victomIndex = Rng.RandiRange(0, possibleTagetPlayerIDs.Count - 1);
 
             Sabotage sabotageObj = Sabotage.GetSabotage(sType, this);
-            if (!UserPoints.ContainsKey(NetState.NetworkSenderId(this)))
+            int senderNetId = NetState.NetworkSenderId(this);
+            if (!UserPoints.ContainsKey(senderNetId))
                 return;
-            if (UserPoints[NetState.NetworkSenderId(this)] < sabotageObj.PointsCost)
+            if (UserPoints[senderNetId] < sabotageObj.PointsCost)
                 return;
 
-            UserPoints[NetState.NetworkSenderId(this)] -= sabotageObj.PointsCost;
-            NetState.Rpc(node, "SetPoints", NetState.NetworkSenderId(this), UserPoints[NetState.NetworkSenderId(this)]);
+            UserPoints[senderNetId] -= sabotageObj.PointsCost;
+            NetState.Rpc(node, "SetPoints", senderNetId, UserPoints[senderNetId], UserRoundPoints[senderNetId]);
             sabotageObj.Execute(possibleTagetPlayerIDs[victomIndex]);
         }
 

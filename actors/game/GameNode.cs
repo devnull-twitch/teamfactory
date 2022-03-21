@@ -11,7 +11,11 @@ namespace TeamFactory.Game
     {
         public int UserPoints;
 
+        public int UserRoundPoints;
+
         protected Dictionary<int, int> Scores = new Dictionary<int, int>();
+
+        protected Dictionary<int, int> RoundScores = new Dictionary<int, int>();
 
         private Dictionary<int, string> players = new Dictionary<int, string>();
 
@@ -20,6 +24,8 @@ namespace TeamFactory.Game
         private Label PointUi;
 
         private Label TtnrUi;
+
+        private RoundScore roundScoreUi;
 
         private ScoreGrid ScoresUi;
 
@@ -42,6 +48,7 @@ namespace TeamFactory.Game
             TtnrUi = GetNode<Label>("/root/Game/HUD/TopUI/HBoxContainer/RoundTime");
             PointUi = GetNode<Label>("/root/Game/HUD/TopUI/HBoxContainer/Points");
             ScoresUi = GetNode<ScoreGrid>("/root/Game/HUD/GridContainer");
+            roundScoreUi = GetNode<RoundScore>("HUD/TopUI/HBoxContainer/RoundScore");
 
             GetNode<Button>("/root/Game/HUD/TopUI/HBoxContainer/Control/SabotageOptionsBtn").Connect("pressed", this, nameof(OpenSabotageOptionWindow));
             GetNode<Button>("/root/Game/HUD/TopUI/HBoxContainer/Control/UnlockOpenBtn").Connect("pressed", this, nameof(OpenUnlockWindow));
@@ -85,20 +92,31 @@ namespace TeamFactory.Game
 
         public void OpenUnlockWindow()
         {
-            GetNode<WindowDialog>("/root/Game/HUD/UnlockWindow").Popup_();
+            GetNode<WindowDialog>("HUD/UnlockWindow").Popup_();
         }
 
         [Remote]
-        public void SetPoints(int ownerID, int points)
+        public void SetPoints(int ownerID, int points, int roundPoints)
         {
             if (ownerID == NetState.NetworkId(this))
             {
                 UserPoints = points;
+                UserRoundPoints = roundPoints;
                 PointUi.Text = $"{UserPoints}";
             }
 
             Scores[ownerID] = points;
-            ScoresUi.SetScore(players[ownerID], points);
+            RoundScores[ownerID] = roundPoints;
+            ScoresUi.SetScore(ownerID, players[ownerID], points, roundPoints);
+
+            roundScoreUi.CurrentRoundScore = UserRoundPoints;
+        }
+
+        [Remote]
+        public void SetScoreLimit(int scoreLimit)
+        {
+            roundScoreUi.ScoreLimit = scoreLimit;
+            ScoresUi.ScoreLimit = scoreLimit;
         }
 
         [Remote]
@@ -115,7 +133,7 @@ namespace TeamFactory.Game
             newPlayerNode.Name = $"{ownerID}";
 
             players[ownerID] = name;
-            ScoresUi.SetScore(name, 0);
+            ScoresUi.SetScore(ownerID, name, 0, 0);
 
             GetNode<Node>("Players").AddChild(newPlayerNode);
         }
@@ -133,6 +151,20 @@ namespace TeamFactory.Game
             UnlockWindow unlockWin = GetNode<UnlockWindow>("/root/Game/HUD/UnlockWindow");
             if (unlockWin.Visible)
                 unlockWin.OnShow();
+        }
+
+        public int GetPlayerIDByName(string name)
+        {
+            if (!players.Values.Contains(name))
+                throw new System.Exception("player not found");
+
+            foreach (int playerID in players.Keys)
+            {
+                if (players[playerID] == name)
+                    return playerID;
+            }
+
+            throw new System.Exception("player not found ( should never be thrown )");
         }
     }
 }

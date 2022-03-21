@@ -2,6 +2,7 @@
     "width": 8,
     "height": 8,
     "time": 30,
+    "score_limit": 40000,
     "unlocked_items": [
         "Ironbar", "Copperbar", "Chip"
     ],
