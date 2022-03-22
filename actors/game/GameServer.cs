@@ -150,6 +150,14 @@ namespace TeamFactory.Game
             }
         }
 
+        public Array<string> GetPlayerUnlocks(int playerID)
+        {
+            if (!playerUnlocks.ContainsKey(playerID))
+                return null;
+                
+            return playerUnlocks[playerID];
+        }
+
         [Remote]
         public void RequestSabotage(SabotageType sType)
         {
@@ -229,6 +237,20 @@ namespace TeamFactory.Game
         public System.Collections.Generic.ICollection<int> GetPlayerIDs()
         {
             return players.Keys;
+        }
+
+        public void TriggerFlipPlayerView(int targetNetID)
+        {
+            NetState.RpcId(node, targetNetID, "FlipPlayerView");
+            SceneTreeTimer timer = GetTree().CreateTimer(20);
+            Godot.Collections.Array args = new Godot.Collections.Array();
+            args.Add(targetNetID);
+            timer.Connect("timeout", this, nameof(TriggerResetPlayerView), args);
+        }
+
+        public void TriggerResetPlayerView(int targetNetID)
+        {
+            NetState.RpcId(node, targetNetID, "ResetPlayerView");
         }
     }
 }

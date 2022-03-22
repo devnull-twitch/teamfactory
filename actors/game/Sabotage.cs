@@ -4,13 +4,17 @@ using TeamFactory.Util.Multiplayer;
 using TeamFactory.Map;
 using TeamFactory.Infra;
 using TeamFactory.Factory;
+using TeamFactory.Input;
+using TeamFactory.Items;
 
 namespace TeamFactory.Game
 {
     public enum SabotageType : int
     {
         DeleteConnection,
-        TurnFactoryToBlock
+        TurnFactoryToBlock,
+        FlipPlayerView,
+        ChangeInputResource
     }
 
     public class Sabotage
@@ -50,6 +54,24 @@ namespace TeamFactory.Game
                 s1.gs = gs;
                 return s1;
 
+                case SabotageType.FlipPlayerView:
+                Sabotage s2 = new Sabotage();
+                s2.Identifier = SabotageType.FlipPlayerView;
+                s2.Name = "Flips camera of other player";
+                s2.PointsCost = 100;
+                s2.RoundUsages = 1;
+                s2.gs = gs;
+                return s2;
+
+                case SabotageType.ChangeInputResource:
+                Sabotage s3 = new Sabotage();
+                s3.Identifier = SabotageType.ChangeInputResource;
+                s3.Name = "Changes input resource";
+                s3.PointsCost = 50;
+                s3.RoundUsages = 2;
+                s3.gs = gs;
+                return s3;
+
                 default:
                 throw new System.Exception($"unknown sabotage {typeIdent}");
             }
@@ -84,7 +106,54 @@ namespace TeamFactory.Game
                 case SabotageType.TurnFactoryToBlock:
                 excuteBlockingSabotage(targetNetID);
                 break;
+
+                case SabotageType.FlipPlayerView:
+                executeFlipPlayerView(targetNetID);
+                break;
+
+                case SabotageType.ChangeInputResource:
+                executeChangeResource(targetNetID);
+                break;
             }
+        }
+
+        private void executeChangeResource(int targetNetID)
+        {
+            Array<InputNode> possibleTarget = new Array<InputNode>();
+            MapNode mapNode = gs.GetNode<MapNode>("/root/Game/GridManager");
+            foreach(Node n in mapNode.GetChildren())
+            {
+                if (n is InputNode infraNode && infraNode.OwnerID == targetNetID)
+                    possibleTarget.Add(infraNode);
+            }
+
+            if (possibleTarget.Count <= 0)
+                return;
+
+            int targetInfraIndex = gs.Rng.RandiRange(0, possibleTarget.Count - 1);
+            InputNode targetNode = possibleTarget[targetInfraIndex];
+
+            Array<string> unlockedItems = gs.GetPlayerUnlocks(targetNetID);
+            Array<string> unlockedNonProducable = new Array<string>();
+            ItemDB itemDB = GD.Load<ItemDB>("res://actors/items/ItemDB.tres");
+            foreach(string itemName in unlockedItems)
+            {
+                ItemResource ir = itemDB.Database[itemName];
+                if (ir.Requirements.Count <= 0)
+                    unlockedNonProducable.Add(itemName);
+            }
+            unlockedNonProducable.Shuffle();
+            string switchItem = unlockedNonProducable[0];
+            if (switchItem == targetNode.SpawnResource.Name)
+                switchItem = unlockedNonProducable[1];
+
+            targetNode.SpawnResource = itemDB.Database[switchItem];
+            NetState.Rpc(targetNode, "SpawnResourceChange", switchItem);
+        }
+
+        private void executeFlipPlayerView(int targetNetID)
+        {
+            gs.TriggerFlipPlayerView(targetNetID);
         }
 
         private void excuteBlockingSabotage(int targetNetID)

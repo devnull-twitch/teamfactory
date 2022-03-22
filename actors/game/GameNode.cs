@@ -155,8 +155,20 @@ namespace TeamFactory.Game
                 SabotageRoundUsages[sType] = 0;
 
             SabotageRoundUsages[sType]++;
-            
+
             GetNode<SabotageWindow>("HUD/SabotageOptionsPanel").OnAboutToShow();
+        }
+
+        [Remote]
+        public void FlipPlayerView()
+        {
+            GetNode<Camera2D>($"Players/{NetState.NetworkId(this)}/Camera2D").Zoom = new Vector2(-1.5f, 1.5f);
+        }
+
+        [Remote]
+        public void ResetPlayerView()
+        {
+            GetNode<Camera2D>($"Players/{NetState.NetworkId(this)}/Camera2D").Zoom = new Vector2(1.5f, 1.5f);
         }
 
         public int GetPlayerIDByName(string name)
