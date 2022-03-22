@@ -30,6 +30,8 @@ namespace TeamFactory.Game
 
         protected Dictionary<int, int> UserRoundPoints = new Dictionary<int, int>();
 
+        protected Dictionary<int, Dictionary<SabotageType, int>> sabotageRoundUsages = new Dictionary<int, Dictionary<SabotageType, int>>();
+
         public int ScoreLimit;
 
         public override void _Ready()
@@ -158,12 +160,30 @@ namespace TeamFactory.Game
                     possibleTagetPlayerIDs.Add(netID);
 
             if (possibleTagetPlayerIDs.Count <= 0)
-                throw new System.Exception("Not enough players to execute sabotage");
+            {
+                GD.Print("Not enough players to sabotage");
+                return;
+            }
 
             int victomIndex = Rng.RandiRange(0, possibleTagetPlayerIDs.Count - 1);
 
             Sabotage sabotageObj = Sabotage.GetSabotage(sType, this);
             int senderNetId = NetState.NetworkSenderId(this);
+
+            if (!sabotageRoundUsages.ContainsKey(senderNetId))
+                sabotageRoundUsages[senderNetId] =  new Dictionary<SabotageType, int>();
+
+            if (!sabotageRoundUsages[senderNetId].ContainsKey(sType))
+                sabotageRoundUsages[senderNetId][sType] = 0;
+
+            if (sabotageRoundUsages[senderNetId][sType] >= sabotageObj.RoundUsages)
+            {
+                GD.Print("sabotage usage limit reached");
+                return;
+            }
+
+            sabotageRoundUsages[senderNetId][sType]++;
+
             if (!UserPoints.ContainsKey(senderNetId))
                 return;
             if (UserPoints[senderNetId] < sabotageObj.PointsCost)
@@ -172,6 +192,7 @@ namespace TeamFactory.Game
             UserPoints[senderNetId] -= sabotageObj.PointsCost;
             NetState.Rpc(node, "SetPoints", senderNetId, UserPoints[senderNetId], UserRoundPoints[senderNetId]);
             sabotageObj.Execute(possibleTagetPlayerIDs[victomIndex]);
+            NetState.RpcId(node, NetState.NetworkSenderId(this), "SabotageExecuted", sType);
         }
 
         public void UnlockForAll(Array<string> itemNames)

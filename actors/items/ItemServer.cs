@@ -61,10 +61,8 @@ namespace TeamFactory.Items
                         if (Node.Target is Infra.IServerProvider serverProviderNode)
                         {
                             Node serverNode = serverProviderNode.ServerNode;
-                            if (serverNode is Infra.IItemReceiver itemReceiverNode)
-                            {
+                            if (serverNode is Infra.IItemReceiver itemReceiverNode && IsInstanceValid(serverNode))
                                 itemReceiverNode.ItemArrived(Node);
-                            }
                         }
                         NetState.Rpc(this, "Delete");
                         return;

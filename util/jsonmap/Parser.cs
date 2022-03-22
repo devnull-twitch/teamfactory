@@ -22,6 +22,7 @@ namespace TeamFactory.Util.JsonMap
             mapResource.Width = (int)((System.Single)mapData["width"]);
             mapResource.Height = (int)((System.Single)mapData["height"]);
             mapResource.Tiles = new Array<TileResource>();
+            mapResource.Blockings = new Array<BlockingResource>();
 
             mapResource.Time = (int)((System.Single)mapData["time"]);
             mapResource.ScoreLimit = (int)((System.Single)mapData["score_limit"]);
@@ -38,6 +39,20 @@ namespace TeamFactory.Util.JsonMap
                 (float)spawnData["x"],
                 (float)spawnData["y"]
             );
+
+            if (mapData.Contains("blocking"))
+            {
+                Array blockings = (Array)mapData["blocking"];
+                foreach (Dictionary blockingConfig in blockings)
+                {
+                    BlockingResource br = new BlockingResource();
+                    int x = (int)((System.Single)blockingConfig["x"]);
+                    int y = (int)((System.Single)blockingConfig["y"]);
+                    br.Coords = new Vector2(x, y);
+
+                    mapResource.Blockings.Add(br);
+                }
+            }
 
             Array jsonInfras = (Array)mapData["infras"];
             foreach (Dictionary infraConfig in jsonInfras)

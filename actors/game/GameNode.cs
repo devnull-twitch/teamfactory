@@ -33,6 +33,8 @@ namespace TeamFactory.Game
 
         public Dictionary<string, bool> PlayerUnlocks;
 
+        public Dictionary<SabotageType, int> SabotageRoundUsages = new Dictionary<SabotageType, int>();
+
         public bool GameRunning = true;
 
         // Called when the node enters the scene tree for the first time.
@@ -80,14 +82,7 @@ namespace TeamFactory.Game
 
         public void OpenSabotageOptionWindow()
         {
-            if (GetNodeOrNull<CanvasLayer>("/root/Game/HUD/SabotageOptionsPanel") != null)
-                return;
-
-            PackedScene packedSabotageWindow = GD.Load<PackedScene>("res://actors/game/SabotageWindow.tscn");
-            WindowDialog sabotageWindow = packedSabotageWindow.Instance<WindowDialog>();
-            
-            GetNode<CanvasLayer>("/root/Game/HUD").AddChild(sabotageWindow);
-            sabotageWindow.Popup_();
+            GetNode<SabotageWindow>("HUD/SabotageOptionsPanel").Popup_();
         }
 
         public void OpenUnlockWindow()
@@ -151,6 +146,17 @@ namespace TeamFactory.Game
             UnlockWindow unlockWin = GetNode<UnlockWindow>("/root/Game/HUD/UnlockWindow");
             if (unlockWin.Visible)
                 unlockWin.OnShow();
+        }
+
+        [Remote]
+        public void SabotageExecuted(SabotageType sType)
+        {
+            if (!SabotageRoundUsages.ContainsKey(sType))
+                SabotageRoundUsages[sType] = 0;
+
+            SabotageRoundUsages[sType]++;
+            
+            GetNode<SabotageWindow>("HUD/SabotageOptionsPanel").OnAboutToShow();
         }
 
         public int GetPlayerIDByName(string name)

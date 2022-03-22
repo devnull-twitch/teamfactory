@@ -1,9 +1,9 @@
-[gd_scene load_steps=2 format=2]
+[gd_scene load_steps=3 format=2]
 
 [ext_resource path="res://actors/game/SabotageWindow.cs" type="Script" id=1]
+[ext_resource path="res://actors/game/SabotageUsageLabel.cs" type="Script" id=2]
 
 [node name="SabotageOptionsPanel" type="WindowDialog"]
-visible = true
 anchor_right = 1.0
 anchor_bottom = 1.0
 margin_right = -535.0
@@ -22,20 +22,49 @@ margin_left = 10.0
 margin_top = 10.0
 margin_right = -10.0
 margin_bottom = -10.0
-columns = 2
+columns = 3
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
 [node name="Label" type="Label" parent="GridContainer"]
 margin_top = 3.0
-margin_right = 336.0
+margin_right = 303.0
 margin_bottom = 17.0
 size_flags_horizontal = 3
 text = "Remove radom connection for other palyer"
+
+[node name="DeleteConnectionUsage" type="Label" parent="GridContainer"]
+margin_left = 307.0
+margin_top = 3.0
+margin_right = 336.0
+margin_bottom = 17.0
+text = "0 / 0"
+script = ExtResource( 2 )
 
 [node name="DeleteConnectionBtn" type="Button" parent="GridContainer"]
 margin_left = 340.0
 margin_right = 469.0
 margin_bottom = 20.0
-text = "Buy for 500 points"
+text = "Buy for 50 points"
+
+[node name="Label2" type="Label" parent="GridContainer"]
+margin_top = 27.0
+margin_right = 303.0
+margin_bottom = 41.0
+text = "Turn other players factory to black hole"
+
+[node name="TurnFactoryBlockUsage" type="Label" parent="GridContainer"]
+margin_left = 307.0
+margin_top = 27.0
+margin_right = 336.0
+margin_bottom = 41.0
+text = "0 / 0"
+script = ExtResource( 2 )
+
+[node name="TurnFactoryBlockBtn" type="Button" parent="GridContainer"]
+margin_left = 340.0
+margin_top = 24.0
+margin_right = 469.0
+margin_bottom = 44.0
+text = "Buy for 100 points"

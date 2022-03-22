@@ -3,12 +3,14 @@ using Godot.Collections;
 using TeamFactory.Util.Multiplayer;
 using TeamFactory.Map;
 using TeamFactory.Infra;
+using TeamFactory.Factory;
 
 namespace TeamFactory.Game
 {
     public enum SabotageType : int
     {
-        DeleteConnection
+        DeleteConnection,
+        TurnFactoryToBlock
     }
 
     public class Sabotage
@@ -18,6 +20,8 @@ namespace TeamFactory.Game
         public string Name;
 
         public int PointsCost;
+
+        public int RoundUsages;
 
         private GameServer gs;
 
@@ -33,8 +37,18 @@ namespace TeamFactory.Game
                 s.Identifier = SabotageType.DeleteConnection;
                 s.Name = "Delete connection";
                 s.PointsCost = 50;
+                s.RoundUsages = 3;
                 s.gs = gs;
                 return s;
+
+                case SabotageType.TurnFactoryToBlock:
+                Sabotage s1 = new Sabotage();
+                s1.Identifier = SabotageType.TurnFactoryToBlock;
+                s1.Name = "Turn factory to black hole";
+                s1.PointsCost = 100;
+                s1.RoundUsages = 1;
+                s1.gs = gs;
+                return s1;
 
                 default:
                 throw new System.Exception($"unknown sabotage {typeIdent}");
@@ -66,7 +80,31 @@ namespace TeamFactory.Game
                 GridManager.Direction outDir = getFirstOutDirection(targetNode.OutConnections);
                 mapNode.Manager.DisconnectTileResource(targetMapIndex, outDir);
                 break;
+
+                case SabotageType.TurnFactoryToBlock:
+                excuteBlockingSabotage(targetNetID);
+                break;
             }
+        }
+
+        private void excuteBlockingSabotage(int targetNetID)
+        {
+            Array<InfraSprite> possibleTarget = new Array<InfraSprite>();
+            MapNode mapNode = gs.GetNode<MapNode>("/root/Game/GridManager");
+            foreach(Node n in mapNode.GetChildren())
+            {
+                if (n is FactoryNode infraNode && infraNode.OwnerID == targetNetID)
+                    possibleTarget.Add(infraNode);
+            }
+
+            if (possibleTarget.Count <= 0)
+                return;
+
+            int targetInfraIndex = gs.Rng.RandiRange(0, possibleTarget.Count - 1);
+            InfraSprite targetNode = possibleTarget[targetInfraIndex];
+            int targetMapIndex = mapNode.Manager.WorldToIndex(targetNode.GlobalPosition);
+            mapNode.Manager.RemoveTileResource(targetMapIndex);
+            mapNode.Manager.AddBlockingResource(targetMapIndex);
         }
 
         public GridManager.Direction getFirstOutDirection(Dictionary<GridManager.Direction, ConnectionTarget> outConns)

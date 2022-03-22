@@ -2,7 +2,7 @@
     "width": 10,
     "height": 5,
     "time": 1500,
-    "score_limit": 100,
+    "score_limit": 9999,
     "unlocked_items": [
         "Ironbar", "Copperbar", "Ironore", "Copperore"
     ],
@@ -10,6 +10,12 @@
         "x": 1,
         "y": 3
     },
+    "blocking": [
+        {
+            "x": 2,
+            "y": 2
+        }
+    ],
     "infras": [
         {
             "x": 0,

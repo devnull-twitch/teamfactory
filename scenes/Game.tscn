@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=2]
+[gd_scene load_steps=15 format=2]
 
 [ext_resource path="res://actors/floor/Floor.tscn" type="PackedScene" id=1]
 [ext_resource path="res://actors/game/GameNode.cs" type="Script" id=2]
@@ -12,6 +12,7 @@
 [ext_resource path="res://actors/gui/UnlockWindow.tscn" type="PackedScene" id=10]
 [ext_resource path="res://actors/gui/LockedCamera.png" type="Texture" id=11]
 [ext_resource path="res://actors/gui/RoundScore.cs" type="Script" id=12]
+[ext_resource path="res://actors/game/SabotageWindow.tscn" type="PackedScene" id=13]
 [ext_resource path="res://actors/map/MapNode.cs" type="Script" id=14]
 
 [node name="Game" type="Node2D"]
@@ -37,6 +38,8 @@ margin_left = 75.0
 margin_top = 116.0
 margin_right = -174.0
 margin_bottom = -53.0
+
+[node name="SabotageOptionsPanel" parent="HUD" instance=ExtResource( 13 )]
 
 [node name="HBoxContainer" type="HBoxContainer" parent="HUD"]
 anchor_left = 1.0

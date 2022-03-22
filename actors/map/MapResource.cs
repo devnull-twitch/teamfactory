@@ -25,5 +25,7 @@ namespace TeamFactory.Map
 
         [Export]
         public Array<TileResource> Tiles;
+
+        public Array<BlockingResource> Blockings;
     }
 }

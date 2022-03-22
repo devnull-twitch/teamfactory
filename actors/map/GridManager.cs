@@ -63,6 +63,26 @@ namespace TeamFactory.Map
             return true;
         }
 
+        public void RemoveTileResource(int mapIndex)
+        {
+            infraMap.SetPointDisabled(mapIndex, false);
+            InfraSprite infra = GetInfraAtIndex(mapIndex);
+            
+            foreach (Direction outDir in infra.OutConnections.Keys)
+                DisconnectTileResource(mapIndex, outDir);
+
+            foreach (ConnectionTarget target in infra.InConnections.Values)
+                DisconnectTileResource(MapToIndex(target.TargetCoords), target.Direction);
+
+            infraCache.Remove(mapIndex);
+            NetState.Rpc(infra, "TriggereDeletion");
+        }
+
+        public void AddBlockingResource(int index)
+        {
+            addBlockingNode(index);
+        }
+
         public InfraSprite GetInfraAtIndex(int index)
         {
             if (!infraCache.ContainsKey(index))
@@ -204,6 +224,17 @@ namespace TeamFactory.Map
                 {
                     infraMap.ConnectPoints(absoluteIndex, absoluteIndex - map.Width, true);
                 }
+            }
+
+            for (int i = 0; i < map.Blockings.Count; i++)
+            {
+                BlockingResource br = map.Blockings[i];
+                
+                Vector2 relativeMapPos = br.Coords;
+                int relativeIndex = MapToIndex(relativeMapPos);
+                int absoluteIndex = offset + relativeIndex;
+
+                addBlockingNode(absoluteIndex);
             }
 
             for (int i = 0; i < map.Tiles.Count; i++)
@@ -350,6 +381,19 @@ namespace TeamFactory.Map
             }
 
             return res;
+        }
+
+        private void addBlockingNode(int index)
+        {
+            string infraNodeName = $"InfraNode_{index}";
+            
+            NetState.Rpc(
+                mapNode,
+                "CreateBlockingNode",
+                infraNodeName,
+                index
+            );
+            infraMap.SetPointDisabled(index, true);
         }
 
         private void addInfraNode(TileResource tr, int index)

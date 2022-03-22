@@ -53,5 +53,11 @@ namespace TeamFactory.Infra
         {
             OutConnections.Remove(output);
         }
+
+        [RemoteSync]
+        public void TriggereDeletion()
+        {
+            QueueFree();
+        }
     }
 }

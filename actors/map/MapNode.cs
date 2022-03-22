@@ -169,6 +169,16 @@ namespace TeamFactory.Map
         }
 
         [RemoteSync]
+        public void CreateBlockingNode(string nodeName, int index)
+        {
+            
+            Node2D blockingNode = (Node2D)GD.Load<PackedScene>("res://actors/block/BlockingNode.tscn").Instance();
+            blockingNode.Position = Manager.IndexToWorld(index);
+            blockingNode.Name = nodeName;
+            AddChild(blockingNode);
+        }
+
+        [RemoteSync]
         public void CreateInfraNode(
             string nodeName,
             InfraType.TypeIdentifier infraTypeIdent,
