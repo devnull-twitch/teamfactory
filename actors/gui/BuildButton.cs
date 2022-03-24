@@ -40,9 +40,12 @@ public class BuildButton : TextureButton
                 ghostSprite.RotationDegrees += 90;
             }
 
-            Vector2 pos = ghostSprite.GetGlobalMousePosition();
-            Vector2 roundedPos = mapNode.Manager.IndexToWorld(mapNode.Manager.WorldToIndex(pos));
-            ghostSprite.GlobalPosition = roundedPos;
+            try {
+                Vector2 pos = ghostSprite.GetGlobalMousePosition();
+                Vector2 roundedPos = mapNode.Manager.IndexToWorld(mapNode.Manager.WorldToIndex(pos));
+                ghostSprite.GlobalPosition = roundedPos;
+            } 
+            catch (OutOfMapException) { }
         }
     }
 

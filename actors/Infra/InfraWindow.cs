@@ -36,7 +36,7 @@ namespace TeamFactory.Infra
         {
             Connect("popup_hide", this, nameof(OnHide));
 
-            OptionButton outputSelector = GetNode<OptionButton>("VBoxContainer/HBoxContainer2/OptionButton");
+            OptionButton outputSelector = GetNode<OptionButton>("VBoxContainer/Production/ProductionChanger/OptionButton");
             outputSelector.Connect("item_selected", this, nameof(OnSelectOutputResource));
         }
 
@@ -97,12 +97,11 @@ namespace TeamFactory.Infra
 
         public void UpdateWindow()
         {
-            updateSpawnResourceData();
+            if (infraNode.SpawnResource != null)
+                updateSpawnResourceData();
             
             if (infraNode.Type.Outputs.Count > 0)
-            {
                 updateOutputData();
-            }
 
             UpdateStorage();
         }
@@ -153,8 +152,10 @@ namespace TeamFactory.Infra
 
         private void updateSpawnResourceData()
         {
+            GetNode<VBoxContainer>("VBoxContainer/Production").Visible = true;
+
             // Production
-            VBoxContainer reqBox = GetNode<VBoxContainer>("VBoxContainer/Production/Requirements");
+            VBoxContainer reqBox = GetNode<VBoxContainer>("VBoxContainer/Production/CurrentProduction/Requirements");
             PackedScene reqPacked = GD.Load<PackedScene>("res://actors/Infra/Requirement.tscn");
             ItemDB itemDB = GD.Load<ItemDB>("res://actors/items/ItemDB.tres");
             
@@ -175,10 +176,10 @@ namespace TeamFactory.Infra
             }
 
             // output resource
-            GetNode<TextureRect>("VBoxContainer/Production/CenterContainer/Output").Texture = infraNode.SpawnResource.Texture;
+            GetNode<TextureRect>("VBoxContainer/Production/CurrentProduction/CenterContainer/Output").Texture = infraNode.SpawnResource.Texture;
 
             // Output dropdown
-            outputSelector = GetNode<OptionButton>("VBoxContainer/HBoxContainer2/OptionButton");
+            outputSelector = GetNode<OptionButton>("VBoxContainer/Production/ProductionChanger/OptionButton");
             GodotCol.Dictionary<string, bool> unlockedItems = GetNode<GameNode>("/root/Game").PlayerUnlocks;
             outputSelector.Clear();
 

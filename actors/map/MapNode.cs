@@ -239,8 +239,17 @@ namespace TeamFactory.Map
             string inNodeName = $"InfraNode_{inIndex}";
             Vector2 inMapCoords = Manager.IndexToMap(inIndex);
 
-            GetNode<InfraSprite>(outNodeName).OutConnections[outDir] = new ConnectionTarget(inMapCoords, inDir);
-            GetNode<InfraSprite>(inNodeName).InConnections[inDir] = new ConnectionTarget(outMapCoords, outDir);
+            InfraSprite outNode = GetNode<InfraSprite>(outNodeName);
+            outNode.OutConnections[outDir] = new ConnectionTarget(inMapCoords, inDir);
+            
+            InfraSprite inNode = GetNode<InfraSprite>(inNodeName);
+            inNode.InConnections[inDir] = new ConnectionTarget(outMapCoords, outDir);
+
+            if (outNode is IConnectionObserver outConnectionObs)
+                outConnectionObs.NewOutConnection();
+
+            if (inNode is IConnectionObserver inConnectionObs)
+                inConnectionObs.NewInConnection();
         }
 
         // Calls from server to ask if client is done with setup for player

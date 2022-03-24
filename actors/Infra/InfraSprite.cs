@@ -43,7 +43,7 @@ namespace TeamFactory.Infra
         }
 
         [Remote]
-        public void UpdateOutConnection(GridManager.Direction output, int x, int y, GridManager.Direction targetInputDir)
+        public virtual void UpdateOutConnection(GridManager.Direction output, int x, int y, GridManager.Direction targetInputDir)
         {
             OutConnections[output] = new ConnectionTarget(new Vector2(x, y), targetInputDir);
         }

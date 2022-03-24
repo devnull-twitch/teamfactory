@@ -10,7 +10,7 @@ extents = Vector2( 64, 64 )
 texture = ExtResource( 1 )
 script = ExtResource( 2 )
 
-[node name="Area2D" type="Area2D" parent="."]
+[node name="Picker" type="Area2D" parent="."]
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Picker"]
 shape = SubResource( 1 )

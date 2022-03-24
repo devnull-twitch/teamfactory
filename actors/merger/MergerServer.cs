@@ -2,27 +2,48 @@ using Godot;
 using TeamFactory.Infra;
 using TeamFactory.Items;
 using TeamFactory.Map;
+using TeamFactory.Util.Multiplayer;
 
-public class MergerServer : Node, IItemReceiver
+namespace TeamFactory.Merger
 {
-    public MergerNode Node;
-
-    public void ItemArrived(ItemNode itemNode)
+    public class MergerServer : Node, IItemReceiver
     {
-        int targetIndex = GetTargetIndex();
-        if (targetIndex == -1)
-            return;
+        public MergerNode Node;
 
-        InfraSprite targetNode = Node.GridManager.GetInfraAtIndex(targetIndex);
-        PackedScene packedItemNode = GD.Load<PackedScene>("res://actors/items/Item.tscn");
-        ItemNode newItemNode = packedItemNode.Instance<ItemNode>();
-        newItemNode.Item = itemNode.Item;
-        newItemNode.Target = targetNode;
-        AddChild(newItemNode);
-        newItemNode.GlobalPosition = Node.GlobalPosition;
-    }
+        private int itemCount;
 
-    public int GetTargetIndex()
+        public void ItemArrived(ItemNode itemNode)
+        {
+            int targetIndex = GetTargetIndex();
+            if (targetIndex == -1)
+                return;
+
+            NetState.Rpc(this, "SpawnItem", itemCount, itemNode.Item.Name);
+            itemCount++;
+        }
+
+        [RemoteSync]
+        public void SpawnItem(int itemCount, string itemName)
+        {
+            ItemDB itemDB = GD.Load<ItemDB>("res://actors/items/ItemDB.tres");
+            ItemResource relayedItem = itemDB.Database[itemName];
+
+            int targetIndex = GetTargetIndex();
+            if (targetIndex == -1)
+                return;
+
+            InfraSprite targetNode = Node.GridManager.GetInfraAtIndex(targetIndex);
+            PackedScene packedItemNode = GD.Load<PackedScene>("res://actors/items/Item.tscn");
+            ItemNode newItemNode = packedItemNode.Instance<ItemNode>();
+            newItemNode.Item = relayedItem;
+            newItemNode.Target = targetNode;
+            newItemNode.Name = $"Item_{itemCount}";
+            newItemNode.GlobalPosition = Node.GlobalPosition;
+
+            AddChild(newItemNode);
+        }
+
+        public int GetTargetIndex()
         {
             foreach(System.Collections.Generic.KeyValuePair<GridManager.Direction, ConnectionTarget> tuple in Node.OutConnections)
             {
@@ -31,4 +52,5 @@ public class MergerServer : Node, IItemReceiver
 
             return -1;
         }
+    }
 }

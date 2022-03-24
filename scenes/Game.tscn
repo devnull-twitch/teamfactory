@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=2]
+[gd_scene load_steps=19 format=2]
 
 [ext_resource path="res://actors/floor/Floor.tscn" type="PackedScene" id=1]
 [ext_resource path="res://actors/game/GameNode.cs" type="Script" id=2]
@@ -14,6 +14,10 @@
 [ext_resource path="res://actors/gui/RoundScore.cs" type="Script" id=12]
 [ext_resource path="res://actors/game/SabotageWindow.tscn" type="PackedScene" id=13]
 [ext_resource path="res://actors/map/MapNode.cs" type="Script" id=14]
+[ext_resource path="res://actors/merger/Merger.png" type="Texture" id=15]
+[ext_resource path="res://actors/splitter/Splitter.png" type="Texture" id=16]
+[ext_resource path="res://actors/gui/BuildBtnBackground.png" type="Texture" id=17]
+[ext_resource path="res://font/BtnSubLine.tres" type="DynamicFont" id=18]
 
 [node name="Game" type="Node2D"]
 script = ExtResource( 2 )
@@ -42,36 +46,156 @@ margin_bottom = -53.0
 [node name="SabotageOptionsPanel" parent="HUD" groups=["client_players_loaded"] instance=ExtResource( 13 )]
 visible = false
 
-[node name="HBoxContainer" type="HBoxContainer" parent="HUD"]
+[node name="BottomRight" type="Control" parent="HUD"]
 anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_left = -260.0
-margin_top = -128.0
+margin_left = -400.0
+margin_top = -100.0
+rect_min_size = Vector2( 400, 100 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="BuildMultiFactoryBtn" type="TextureButton" parent="HUD/HBoxContainer"]
-margin_right = 128.0
-margin_bottom = 128.0
+[node name="TextureRect" type="TextureRect" parent="HUD/BottomRight"]
+margin_right = 400.0
+margin_bottom = 100.0
+texture = ExtResource( 17 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label" type="Label" parent="HUD/BottomRight"]
+anchor_right = 1.0
+margin_top = 2.0
+margin_bottom = 14.0
+custom_colors/font_color = Color( 0, 0, 0, 1 )
+text = "Build Menu"
+align = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="HBoxContainer" type="HBoxContainer" parent="HUD/BottomRight"]
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = -276.0
+margin_top = -82.0
+margin_right = -8.0
+margin_bottom = 1.0
+alignment = 2
+__meta__ = {
+"_edit_group_": true,
+"_edit_use_anchors_": false
+}
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HUD/BottomRight/HBoxContainer"]
+margin_right = 64.0
+margin_bottom = 83.0
+
+[node name="BuildMultiFactoryBtn" type="TextureButton" parent="HUD/BottomRight/HBoxContainer/VBoxContainer"]
+margin_right = 64.0
+margin_bottom = 64.0
+rect_min_size = Vector2( 64, 64 )
+mouse_default_cursor_shape = 2
 texture_normal = ExtResource( 5 )
+expand = true
+stretch_mode = 5
 script = ExtResource( 8 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
 InfraToBuild = 1
 
-[node name="BuildFactoryBtn" type="TextureButton" parent="HUD/HBoxContainer"]
-margin_left = 132.0
-margin_right = 260.0
-margin_bottom = 128.0
+[node name="Label" type="Label" parent="HUD/BottomRight/HBoxContainer/VBoxContainer"]
+margin_top = 68.0
+margin_right = 64.0
+margin_bottom = 83.0
+rect_min_size = Vector2( 0, 15 )
+custom_colors/font_color = Color( 0, 0, 0, 1 )
+custom_fonts/font = ExtResource( 18 )
+text = "C Factory"
+align = 1
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="HUD/BottomRight/HBoxContainer"]
+margin_left = 68.0
+margin_right = 132.0
+margin_bottom = 83.0
+
+[node name="BuildFactoryBtn" type="TextureButton" parent="HUD/BottomRight/HBoxContainer/VBoxContainer2"]
+margin_right = 64.0
+margin_bottom = 64.0
+rect_min_size = Vector2( 64, 64 )
+mouse_default_cursor_shape = 2
 texture_normal = ExtResource( 7 )
+expand = true
+stretch_mode = 5
 script = ExtResource( 8 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
+
+[node name="Label" type="Label" parent="HUD/BottomRight/HBoxContainer/VBoxContainer2"]
+margin_top = 68.0
+margin_right = 64.0
+margin_bottom = 80.0
+custom_colors/font_color = Color( 0, 0, 0, 1 )
+custom_fonts/font = ExtResource( 18 )
+text = "S Factory"
+align = 1
+
+[node name="VBoxContainer3" type="VBoxContainer" parent="HUD/BottomRight/HBoxContainer"]
+margin_left = 136.0
+margin_right = 200.0
+margin_bottom = 83.0
+
+[node name="BuildSplitterBtn" type="TextureButton" parent="HUD/BottomRight/HBoxContainer/VBoxContainer3"]
+margin_right = 64.0
+margin_bottom = 64.0
+rect_min_size = Vector2( 64, 64 )
+mouse_default_cursor_shape = 2
+texture_normal = ExtResource( 16 )
+expand = true
+stretch_mode = 5
+script = ExtResource( 8 )
+InfraToBuild = 4
+
+[node name="Label" type="Label" parent="HUD/BottomRight/HBoxContainer/VBoxContainer3"]
+margin_top = 68.0
+margin_right = 64.0
+margin_bottom = 80.0
+custom_colors/font_color = Color( 0, 0, 0, 1 )
+custom_fonts/font = ExtResource( 18 )
+text = "Splitter"
+align = 1
+
+[node name="VBoxContainer4" type="VBoxContainer" parent="HUD/BottomRight/HBoxContainer"]
+margin_left = 204.0
+margin_right = 268.0
+margin_bottom = 83.0
+
+[node name="BuildMergerBtn" type="TextureButton" parent="HUD/BottomRight/HBoxContainer/VBoxContainer4"]
+margin_right = 64.0
+margin_bottom = 64.0
+rect_min_size = Vector2( 64, 64 )
+mouse_default_cursor_shape = 2
+texture_normal = ExtResource( 15 )
+expand = true
+stretch_mode = 5
+script = ExtResource( 8 )
+InfraToBuild = 5
+
+[node name="Label" type="Label" parent="HUD/BottomRight/HBoxContainer/VBoxContainer4"]
+margin_top = 68.0
+margin_right = 64.0
+margin_bottom = 80.0
+custom_colors/font_color = Color( 0, 0, 0, 1 )
+custom_fonts/font = ExtResource( 18 )
+text = "Merger"
+align = 1
 
 [node name="TopUI" type="ColorRect" parent="HUD"]
 anchor_right = 1.0

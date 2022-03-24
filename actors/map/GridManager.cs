@@ -135,9 +135,16 @@ namespace TeamFactory.Map
 
             Vector2 targetMapCoords = IndexToMap(target);
             ConnectionTarget conTarget = new ConnectionTarget(targetMapCoords, bestInDir);
-            
-            sourceNode.OutConnections[outputDir] = conTarget;
-            connectConnection(srcIndex, outputDir, conTarget);
+
+            try
+            {
+                connectConnection(srcIndex, outputDir, conTarget);
+            }
+            catch (PathDuplicationException)
+            {
+                return false;
+            }
+
             NetState.Rpc(sourceNode, "UpdateOutConnection", outputDir, (int)targetMapCoords.x, (int)targetMapCoords.y, bestInDir);
 
             return true;
@@ -161,6 +168,10 @@ namespace TeamFactory.Map
             targetNode.InConnections.Remove(srcNode.OutConnections[outDirection].Direction);
             // remove out connection on source node
             srcNode.OutConnections.Remove(outDirection);
+
+            string pathCacheKey = $"{srcIndex}_{targetIndex}";
+            connectionPathCache.Remove(pathCacheKey);
+            
             // inform client about cleared output state ( client does not care about input state; that is server only )
             NetState.Rpc(srcNode, "ClearOutConnection", outDirection);
 
@@ -438,7 +449,14 @@ namespace TeamFactory.Map
         {
             foreach(System.Collections.Generic.KeyValuePair<Direction, ConnectionTarget> tuple in tr.Connections)
             {
-                connectConnection(index, tuple.Key, tuple.Value);
+                try 
+                {
+                    connectConnection(index, tuple.Key, tuple.Value);
+                }
+                catch (PathDuplicationException)
+                {
+                    GD.Print("Path setup error: duplicated path target");
+                }
             }
         }
 
@@ -449,6 +467,10 @@ namespace TeamFactory.Map
             int startIndex = GetIndicesFromDirection(mapWidth, srcIndex, outDirection);
             int endIndex = GetIndicesFromDirection(mapWidth, targetAbsIndex, target.Direction);
 
+            string pathCacheKey = $"{srcIndex}_{targetAbsIndex}";
+            if (connectionPathCache.ContainsKey(pathCacheKey))
+                throw new PathDuplicationException();
+
             NetState.Rpc(mapNode, "SaveConnection", srcIndex, outDirection, targetAbsIndex, target.Direction);
 
             // make path without source and dest
@@ -458,10 +480,8 @@ namespace TeamFactory.Map
             completePath[0] = srcIndex;
             // add in source and dest ( blocked in a star because they are infra )
             completePath[completePath.Length - 1] = targetAbsIndex;
-
-            string pathCacheKey = $"{srcIndex}_{targetAbsIndex}";
             connectionPathCache[pathCacheKey] = completePath;
-
+            
             if (!conveyorCache.ContainsKey(srcIndex))
             {
                 conveyorCache[srcIndex] = new Dictionary<Direction, Array<string>>();

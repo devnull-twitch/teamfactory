@@ -3,6 +3,7 @@ using TeamFactory.Items;
 using TeamFactory.Infra;
 using TeamFactory.Map;
 using SysGen = System.Collections.Generic;
+using TeamFactory.Util.Multiplayer;
 
 namespace TeamFactory.Splitter
 {
@@ -16,26 +17,41 @@ namespace TeamFactory.Splitter
 
         private InfraSprite targetNode;
 
+        private int itemCount;
+
         public override void _Ready()
         {
-            setNextTarget();
+            if (NetState.Mode != Mode.NET_CLIENT)
+                SetNextTarget();
         }
 
         public void ItemArrived(ItemNode itemNode)
         {
             if (targetNode == null)
-            {
                 return;
-            }
 
+            int targetIndex = Node.GridManager.WorldToIndex(targetNode.GlobalPosition);
+            NetState.Rpc(this, "SpawnItem", itemCount, itemNode.Item.Name, targetIndex);
+            itemCount++;
+
+            SetNextTarget();
+        }
+
+        [RemoteSync]
+        public void SpawnItem(int itemCount, string itemName, int targetIndex)
+        {
+            ItemDB itemDB = GD.Load<ItemDB>("res://actors/items/ItemDB.tres");
+            ItemResource relayedItem = itemDB.Database[itemName];
+
+            InfraSprite targetNode = Node.GridManager.GetInfraAtIndex(targetIndex);
             PackedScene packedItemNode = GD.Load<PackedScene>("res://actors/items/Item.tscn");
             ItemNode newItemNode = packedItemNode.Instance<ItemNode>();
-            newItemNode.Item = itemNode.Item;
+            newItemNode.Item = relayedItem;
             newItemNode.Target = targetNode;
-            AddChild(newItemNode);
+            newItemNode.Name = $"Item_{itemCount}";
             newItemNode.GlobalPosition = Node.GlobalPosition;
 
-            setNextTarget();
+            AddChild(newItemNode);
         }
 
         public static SysGen.IList<GridManager.Direction> ConvertKeyCollection(SysGen.ICollection<GridManager.Direction> keys)
@@ -48,7 +64,7 @@ namespace TeamFactory.Splitter
             return res;
         }
 
-        private void setNextTarget()
+        public void SetNextTarget()
         {
             targetNode = null;
 

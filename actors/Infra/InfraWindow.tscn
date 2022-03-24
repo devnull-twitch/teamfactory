@@ -4,6 +4,7 @@
 [ext_resource path="res://actors/items/ironbar/IronBar.png" type="Texture" id=2]
 
 [node name="Panel" type="WindowDialog"]
+visible = true
 margin_right = 405.0
 margin_bottom = 215.0
 mouse_default_cursor_shape = 4
@@ -25,42 +26,47 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="Production" type="HBoxContainer" parent="VBoxContainer"]
+[node name="Production" type="VBoxContainer" parent="VBoxContainer"]
+visible = false
+margin_right = 395.0
+margin_bottom = 88.0
+
+[node name="CurrentProduction" type="HBoxContainer" parent="VBoxContainer/Production"]
 margin_right = 395.0
 margin_bottom = 64.0
 
-[node name="Requirements" type="VBoxContainer" parent="VBoxContainer/Production"]
+[node name="Requirements" type="VBoxContainer" parent="VBoxContainer/Production/CurrentProduction"]
 margin_bottom = 64.0
 
-[node name="Label" type="Label" parent="VBoxContainer/Production"]
+[node name="Label" type="Label" parent="VBoxContainer/Production/CurrentProduction"]
 margin_left = 4.0
 margin_top = 25.0
 margin_right = 28.0
 margin_bottom = 39.0
 text = "==>"
 
-[node name="CenterContainer" type="CenterContainer" parent="VBoxContainer/Production"]
+[node name="CenterContainer" type="CenterContainer" parent="VBoxContainer/Production/CurrentProduction"]
 margin_left = 32.0
 margin_right = 96.0
 margin_bottom = 64.0
 
-[node name="Output" type="TextureRect" parent="VBoxContainer/Production/CenterContainer"]
+[node name="Output" type="TextureRect" parent="VBoxContainer/Production/CurrentProduction/CenterContainer"]
 margin_right = 64.0
 margin_bottom = 64.0
 texture = ExtResource( 2 )
 
-[node name="HBoxContainer2" type="HBoxContainer" parent="VBoxContainer"]
+[node name="ProductionChanger" type="HBoxContainer" parent="VBoxContainer/Production"]
 margin_top = 68.0
 margin_right = 395.0
 margin_bottom = 88.0
 
-[node name="Label" type="Label" parent="VBoxContainer/HBoxContainer2"]
+[node name="Label" type="Label" parent="VBoxContainer/Production/ProductionChanger"]
 margin_top = 3.0
 margin_right = 133.0
 margin_bottom = 17.0
 text = "Currently producing: "
 
-[node name="OptionButton" type="OptionButton" parent="VBoxContainer/HBoxContainer2"]
+[node name="OptionButton" type="OptionButton" parent="VBoxContainer/Production/ProductionChanger"]
 margin_left = 137.0
 margin_right = 395.0
 margin_bottom = 20.0
@@ -70,17 +76,16 @@ items = [ "Ironbar", null, false, 0, null, "Copperbar", null, false, 1, null ]
 selected = 0
 
 [node name="HSeparator" type="HSeparator" parent="VBoxContainer"]
-margin_top = 92.0
 margin_right = 395.0
-margin_bottom = 96.0
+margin_bottom = 4.0
 
 [node name="Connections" type="VBoxContainer" parent="VBoxContainer"]
-margin_top = 100.0
+margin_top = 8.0
 margin_right = 395.0
-margin_bottom = 100.0
+margin_bottom = 8.0
 
 [node name="GridContainer" type="GridContainer" parent="VBoxContainer"]
-margin_top = 104.0
+margin_top = 12.0
 margin_right = 395.0
-margin_bottom = 104.0
+margin_bottom = 12.0
 columns = 3
