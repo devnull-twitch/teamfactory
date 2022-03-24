@@ -6,8 +6,12 @@ namespace TeamFactory.Game
 {
     public class SabotageWindow : WindowDialog
     {
+        private OptionButton targetSelect;
+
         public override void _Ready()
         {
+            targetSelect = GetNode<OptionButton>("VBoxContainer/TargetSelectionContainer/OptionButton");
+
             PackedScene packedEntry = GD.Load<PackedScene>("res://actors/game/SabotageEntry.tscn");
             VBoxContainer vBox = GetNode<VBoxContainer>("VBoxContainer");
             foreach(SabotageType sType in Enum.GetValues(typeof(SabotageType)))
@@ -29,6 +33,24 @@ namespace TeamFactory.Game
             Connect("about_to_show", this, nameof(OnAboutToShow));
         }
 
+        public void ClientPlayersLoaded()
+        {
+            GameNode gn = GetNode<GameNode>("/root/Game");
+            int itemID = 1;
+            foreach(string playerName in gn.GetPlayerNames())
+            {
+                int playerNetID = gn.GetPlayerIDByName(playerName);
+                if (playerNetID == NetState.NetworkId(this))
+                    continue;
+
+                targetSelect.AddItem(playerName, itemID);
+                int itemIdx = targetSelect.GetItemIndex(itemID);
+                targetSelect.SetItemMetadata(itemIdx, playerNetID);
+
+                itemID++;
+            }
+        }
+
         public void OnAboutToShow()
         {
             GameNode gn = GetNode<GameNode>("/root/Game");
@@ -43,8 +65,12 @@ namespace TeamFactory.Game
 
         public void DoRequestSabotage(SabotageType sType)
         {
+            int targetID = 0;
+            if (targetSelect.GetSelectedId() > 0)
+                targetID = (int)targetSelect.GetSelectedMetadata();
+
             GameServer gs = GetNode<GameServer>("/root/Game/GameServer");
-            NetState.RpcId(gs, 1, "RequestSabotage", sType);
+            NetState.RpcId(gs, 1, "RequestSabotage", sType, targetID);
             GD.Print(sType);
         }
     }

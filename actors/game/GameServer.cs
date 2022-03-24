@@ -142,6 +142,8 @@ namespace TeamFactory.Game
                 NetState.RpcId(node, NetState.NetworkSenderId(this), "AddPlayer", netID, players[netID]);
             }
 
+            NetState.RpcId(node, NetState.NetworkSenderId(this), "InitPlayerFinished");
+
             playersLoaded[NetState.NetworkSenderId(this)] = true;
             if (playersLoaded.Count == players.Count)
             {
@@ -159,21 +161,17 @@ namespace TeamFactory.Game
         }
 
         [Remote]
-        public void RequestSabotage(SabotageType sType)
+        public void RequestSabotage(SabotageType sType, int targetID)
         {
             GD.Print("received sabotage request");
-            Array<int> possibleTagetPlayerIDs = new Array<int>();
-            foreach (int netID in players.Keys)
-                if (netID != NetState.NetworkSenderId(this))
-                    possibleTagetPlayerIDs.Add(netID);
+            if (targetID == 0)
+                targetID = getRandomPlayerID(NetState.NetworkSenderId(this));
 
-            if (possibleTagetPlayerIDs.Count <= 0)
+            if (targetID == 0)
             {
                 GD.Print("Not enough players to sabotage");
                 return;
             }
-
-            int victomIndex = Rng.RandiRange(0, possibleTagetPlayerIDs.Count - 1);
 
             Sabotage sabotageObj = Sabotage.GetSabotage(sType, this);
             int senderNetId = NetState.NetworkSenderId(this);
@@ -199,8 +197,22 @@ namespace TeamFactory.Game
 
             UserPoints[senderNetId] -= sabotageObj.PointsCost;
             NetState.Rpc(node, "SetPoints", senderNetId, UserPoints[senderNetId], UserRoundPoints[senderNetId]);
-            sabotageObj.Execute(possibleTagetPlayerIDs[victomIndex]);
+            sabotageObj.Execute(targetID);
             NetState.RpcId(node, NetState.NetworkSenderId(this), "SabotageExecuted", sType);
+        }
+
+        private int getRandomPlayerID(int excludeID)
+        {
+            Array<int> possibleTagetPlayerIDs = new Array<int>();
+            foreach (int netID in players.Keys)
+                if (netID != excludeID)
+                    possibleTagetPlayerIDs.Add(netID);
+
+            if (possibleTagetPlayerIDs.Count <= 0)
+                return 0;
+
+            int victomIndex = Rng.RandiRange(0, possibleTagetPlayerIDs.Count - 1);
+            return possibleTagetPlayerIDs[victomIndex];
         }
 
         public void UnlockForAll(Array<string> itemNames)

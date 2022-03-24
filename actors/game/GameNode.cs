@@ -1,3 +1,4 @@
+using SysGen = System.Collections.Generic;
 using Godot;
 using Godot.Collections;
 using TeamFactory.Util.Multiplayer;
@@ -61,6 +62,12 @@ namespace TeamFactory.Game
                 NetState.RpcId(gsNode, 1, "RequestClientInit");
                 GD.Print("requesting players");
             }
+        }
+
+        [Remote]
+        public void InitPlayerFinished()
+        {
+            GetTree().CallGroup("client_players_loaded", "ClientPlayersLoaded");
         }
 
         public override void _Process(float delta)
@@ -183,6 +190,11 @@ namespace TeamFactory.Game
             }
 
             throw new System.Exception("player not found ( should never be thrown )");
+        }
+
+        public SysGen.ICollection<string> GetPlayerNames()
+        {
+            return players.Values;
         }
     }
 }

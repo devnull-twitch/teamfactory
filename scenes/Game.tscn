@@ -39,7 +39,8 @@ margin_top = 116.0
 margin_right = -174.0
 margin_bottom = -53.0
 
-[node name="SabotageOptionsPanel" parent="HUD" instance=ExtResource( 13 )]
+[node name="SabotageOptionsPanel" parent="HUD" groups=["client_players_loaded"] instance=ExtResource( 13 )]
+visible = false
 
 [node name="HBoxContainer" type="HBoxContainer" parent="HUD"]
 anchor_left = 1.0

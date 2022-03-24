@@ -22,3 +22,30 @@ margin_left = 5.0
 margin_top = 5.0
 margin_right = -5.0
 margin_bottom = -5.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="TargetSelectionContainer" type="HBoxContainer" parent="VBoxContainer"]
+margin_right = 479.0
+margin_bottom = 20.0
+
+[node name="Label" type="Label" parent="VBoxContainer/TargetSelectionContainer"]
+margin_top = 3.0
+margin_right = 394.0
+margin_bottom = 17.0
+size_flags_horizontal = 3
+text = "Select player to sabotage"
+
+[node name="OptionButton" type="OptionButton" parent="VBoxContainer/TargetSelectionContainer"]
+margin_left = 398.0
+margin_right = 479.0
+margin_bottom = 20.0
+text = "Random"
+items = [ "Random", null, false, 0, null ]
+selected = 0
+
+[node name="HSeparator" type="HSeparator" parent="VBoxContainer"]
+margin_top = 24.0
+margin_right = 479.0
+margin_bottom = 28.0
