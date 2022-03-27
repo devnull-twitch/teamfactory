@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=2]
+[gd_scene load_steps=32 format=2]
 
 [ext_resource path="res://actors/floor/Floor.tscn" type="PackedScene" id=1]
 [ext_resource path="res://actors/game/GameNode.cs" type="Script" id=2]
@@ -18,6 +18,114 @@
 [ext_resource path="res://actors/splitter/Splitter.png" type="Texture" id=16]
 [ext_resource path="res://actors/gui/BuildBtnBackground.png" type="Texture" id=17]
 [ext_resource path="res://font/BtnSubLine.tres" type="DynamicFont" id=18]
+[ext_resource path="res://scenes/PowerUI.cs" type="Script" id=19]
+[ext_resource path="res://font/Comfortaa-Medium.ttf" type="DynamicFontData" id=20]
+[ext_resource path="res://actors/powerplant/Powerplant.png" type="Texture" id=21]
+
+[sub_resource type="VisualShaderNodeInput" id=9]
+input_name = "uv"
+
+[sub_resource type="VisualShaderNodeInput" id=10]
+output_port_for_preview = 0
+input_name = "screen_texture"
+
+[sub_resource type="VisualShaderNodeTexture" id=11]
+output_port_for_preview = 0
+source = 5
+
+[sub_resource type="VisualShaderNodeInput" id=12]
+input_name = "screen_uv"
+
+[sub_resource type="VisualShaderNodeVectorOp" id=15]
+default_input_values = [ 0, Vector3( 1, 1, 1 ), 1, Vector3( 1, 1, 1 ) ]
+operator = 1
+
+[sub_resource type="VisualShaderNodeInput" id=13]
+input_name = "texture"
+
+[sub_resource type="VisualShaderNodeTexture" id=14]
+source = 5
+
+[sub_resource type="VisualShader" id=7]
+code = "shader_type canvas_item;
+
+
+
+void vertex() {
+// Output:0
+
+}
+
+void fragment() {
+// Input:14
+	vec3 n_out14p0 = vec3(SCREEN_UV, 0.0);
+
+// Input:12
+
+// Texture:13
+	vec3 n_out13p0;
+	float n_out13p1;
+	{
+		vec4 SCREEN_TEXTURE_tex_read = texture(SCREEN_TEXTURE, n_out14p0.xy);
+		n_out13p0 = SCREEN_TEXTURE_tex_read.rgb;
+		n_out13p1 = SCREEN_TEXTURE_tex_read.a;
+	}
+
+// VectorOp:15
+	vec3 n_in15p0 = vec3(1.00000, 1.00000, 1.00000);
+	vec3 n_out15p0 = n_in15p0 - n_out13p0;
+
+// Input:10
+	vec3 n_out10p0 = vec3(UV, 0.0);
+
+// Input:8
+
+// Texture:9
+	vec3 n_out9p0;
+	float n_out9p1;
+	{
+		vec4 TEXTURE_tex_read = texture(TEXTURE, n_out10p0.xy);
+		n_out9p0 = TEXTURE_tex_read.rgb;
+		n_out9p1 = TEXTURE_tex_read.a;
+	}
+
+// Output:0
+	COLOR.rgb = n_out15p0;
+	COLOR.a = n_out9p1;
+
+}
+
+void light() {
+// Output:0
+
+}
+"
+graph_offset = Vector2( -457.62, -66.699 )
+mode = 1
+flags/light_only = false
+nodes/fragment/0/position = Vector2( 20, 120 )
+nodes/fragment/8/node = SubResource( 13 )
+nodes/fragment/8/position = Vector2( -680, 400 )
+nodes/fragment/9/node = SubResource( 14 )
+nodes/fragment/9/position = Vector2( -360, 260 )
+nodes/fragment/10/node = SubResource( 9 )
+nodes/fragment/10/position = Vector2( -680, 300 )
+nodes/fragment/12/node = SubResource( 10 )
+nodes/fragment/12/position = Vector2( -1140, 240 )
+nodes/fragment/13/node = SubResource( 11 )
+nodes/fragment/13/position = Vector2( -640, 20 )
+nodes/fragment/14/node = SubResource( 12 )
+nodes/fragment/14/position = Vector2( -1140, 120 )
+nodes/fragment/15/node = SubResource( 15 )
+nodes/fragment/15/position = Vector2( -320, 0 )
+nodes/fragment/connections = PoolIntArray( 8, 0, 9, 2, 10, 0, 9, 0, 12, 0, 13, 2, 14, 0, 13, 0, 15, 0, 0, 0, 13, 0, 15, 1, 9, 1, 0, 1 )
+
+[sub_resource type="ShaderMaterial" id=8]
+shader = SubResource( 7 )
+
+[sub_resource type="DynamicFont" id=16]
+size = 19
+font_data = ExtResource( 20 )
 
 [node name="Game" type="Node2D"]
 script = ExtResource( 2 )
@@ -54,9 +162,6 @@ anchor_bottom = 1.0
 margin_left = -400.0
 margin_top = -100.0
 rect_min_size = Vector2( 400, 100 )
-__meta__ = {
-"_edit_use_anchors_": false
-}
 
 [node name="TextureRect" type="TextureRect" parent="HUD/BottomRight"]
 margin_right = 400.0
@@ -73,23 +178,17 @@ margin_bottom = 14.0
 custom_colors/font_color = Color( 0, 0, 0, 1 )
 text = "Build Menu"
 align = 1
-__meta__ = {
-"_edit_use_anchors_": false
-}
 
 [node name="HBoxContainer" type="HBoxContainer" parent="HUD/BottomRight"]
 anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_left = -276.0
-margin_top = -82.0
-margin_right = -8.0
-margin_bottom = 1.0
+margin_left = -336.0
+margin_top = -83.0
 alignment = 2
 __meta__ = {
-"_edit_group_": true,
-"_edit_use_anchors_": false
+"_edit_group_": true
 }
 
 [node name="VBoxContainer" type="VBoxContainer" parent="HUD/BottomRight/HBoxContainer"]
@@ -197,12 +296,33 @@ custom_fonts/font = ExtResource( 18 )
 text = "Merger"
 align = 1
 
+[node name="VBoxContainer5" type="VBoxContainer" parent="HUD/BottomRight/HBoxContainer"]
+margin_left = 272.0
+margin_right = 336.0
+margin_bottom = 83.0
+
+[node name="BuildMergerBtn" type="TextureButton" parent="HUD/BottomRight/HBoxContainer/VBoxContainer5"]
+margin_right = 64.0
+margin_bottom = 64.0
+rect_min_size = Vector2( 64, 64 )
+mouse_default_cursor_shape = 2
+texture_normal = ExtResource( 21 )
+expand = true
+stretch_mode = 5
+script = ExtResource( 8 )
+InfraToBuild = 6
+
+[node name="Label" type="Label" parent="HUD/BottomRight/HBoxContainer/VBoxContainer5"]
+margin_top = 68.0
+margin_right = 64.0
+margin_bottom = 80.0
+custom_colors/font_color = Color( 0, 0, 0, 1 )
+custom_fonts/font = ExtResource( 18 )
+text = "Powerplant"
+
 [node name="TopUI" type="ColorRect" parent="HUD"]
 anchor_right = 1.0
 margin_bottom = 47.0
-__meta__ = {
-"_edit_use_anchors_": false
-}
 
 [node name="HBoxContainer" type="HBoxContainer" parent="HUD/TopUI"]
 anchor_right = 1.0
@@ -355,3 +475,38 @@ margin_right = 219.0
 margin_bottom = 38.0
 text = "Ok"
 script = ExtResource( 9 )
+
+[node name="PowerContainer" type="ColorRect" parent="HUD"]
+anchor_left = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = -40.0
+margin_top = 60.0
+margin_right = -20.0
+margin_bottom = -120.0
+rect_min_size = Vector2( 10, 0 )
+color = Color( 0, 0.180392, 0.611765, 1 )
+script = ExtResource( 19 )
+MaxValue = 100
+Current = 83
+
+[node name="PowerLevel" type="ColorRect" parent="HUD/PowerContainer"]
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color( 0.701961, 0.921569, 0.768627, 1 )
+
+[node name="Label" type="Label" parent="HUD/PowerContainer"]
+material = SubResource( 8 )
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = 10.0
+margin_top = -28.0
+margin_right = 20.0
+margin_bottom = -4.0
+rect_rotation = 90.0
+custom_fonts/font = SubResource( 16 )
+text = "Power"
+align = 1

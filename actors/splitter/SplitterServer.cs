@@ -70,6 +70,9 @@ namespace TeamFactory.Splitter
 
             if (Node.OutConnections.Count <= 0)
                 return;
+
+            if (currentTargetIndex >= Node.OutConnections.Count)
+                currentTargetIndex = 0;
             
             SysGen.IList<GridManager.Direction> keyList = SplitterServer.ConvertKeyCollection(Node.OutConnections.Keys);
             Vector2 targetCoords = Node.OutConnections[keyList[currentTargetIndex]].TargetCoords;
@@ -78,10 +81,6 @@ namespace TeamFactory.Splitter
             targetNode = Node.GridManager.GetInfraAtIndex(targetIndex);
 
             currentTargetIndex++;
-            if (currentTargetIndex >= Node.OutConnections.Count)
-            {
-                currentTargetIndex = 0;
-            }
         }
     }
 }

@@ -5,6 +5,7 @@ using TeamFactory.Util.Multiplayer;
 using TeamFactory.Player;
 using TeamFactory.Map;
 using TeamFactory.Items;
+using TeamFactory.Powerplant;
 
 namespace TeamFactory.Game
 {
@@ -28,9 +29,13 @@ namespace TeamFactory.Game
 
         public float TimeTillNextRound;
 
+        public float TimerTillNextEnergy;
+
         protected Dictionary<int, int> UserRoundPoints = new Dictionary<int, int>();
 
         protected Dictionary<int, Dictionary<SabotageType, int>> sabotageRoundUsages = new Dictionary<int, Dictionary<SabotageType, int>>();
+
+        protected Dictionary<int, PlayerPower> playerPowers = new Dictionary<int, PlayerPower>();
 
         public int ScoreLimit;
 
@@ -57,6 +62,14 @@ namespace TeamFactory.Game
             TimeTillNextRound -= delta;
             if (TimeTillNextRound <= 0)
                 TriggerNextRound();
+
+            TimerTillNextEnergy -= delta;
+            if (TimerTillNextEnergy <= 0)
+            {
+                TriggerDefaultEnergyProduction();
+                TimerTillNextEnergy = 1f;
+            }
+                
         }
 
         [Remote]
@@ -92,12 +105,45 @@ namespace TeamFactory.Game
                 TriggerNextRound();
         }
 
+        public void AddPower(int ownerID, int points)
+        {
+            if (!playerPowers.ContainsKey(ownerID))
+            {
+                playerPowers[ownerID] = new PlayerPower();
+                playerPowers[ownerID].MaxValue = 100;
+            }
+
+            playerPowers[ownerID].Add(points);
+            NetState.Rpc(node, "SetPower", ownerID, playerPowers[ownerID].Current, playerPowers[ownerID].MaxValue);
+        }
+
+        public bool ReducePlayerPower(int playerID, int points)
+        {
+            if (!playerPowers.ContainsKey(playerID))
+                return false;
+
+            if (playerPowers[playerID].Current < points)
+                return false;
+
+            playerPowers[playerID].Current -= points;
+            NetState.Rpc(node, "SetPower", playerID, playerPowers[playerID].Current, playerPowers[playerID].MaxValue);
+            return true;
+        }
+
         private void TriggerNextRound()
         {
             if (!GetNode<MapNode>("../GridManager").NextRound())
             {
                 NetState.Rpc(this, "GameEnd");
                 GetTree().Quit();
+            }
+        }
+
+        private void TriggerDefaultEnergyProduction()
+        {
+            foreach(int playerNetID in players.Keys)
+            {
+                AddPower(playerNetID, 2);
             }
         }
 

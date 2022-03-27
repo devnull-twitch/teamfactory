@@ -8,6 +8,8 @@ script = ExtResource( 1 )
 Name = "Copperbar"
 PointValue = 10
 UnlockCost = 0
+PowerValue = 0
+PowerCost = 8
 Texture = ExtResource( 2 )
 Requirements = {
 "Copperore": 4

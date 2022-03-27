@@ -3,6 +3,7 @@ using TeamFactory.Util.Multiplayer;
 using TeamFactory.Map;
 using TeamFactory.Items;
 using TeamFactory.Infra;
+using TeamFactory.Game;
 
 namespace TeamFactory.Factory
 {
@@ -13,6 +14,13 @@ namespace TeamFactory.Factory
         public FactoryNode Node;
 
         private int itemCount;
+
+        private GameServer gameServer;
+
+        public override void _Ready()
+        {
+            gameServer = GetNode<GameServer>("/root/Game/GameServer");
+        }
 
         public override void _PhysicsProcess(float delta)
         {
@@ -40,22 +48,19 @@ namespace TeamFactory.Factory
         private bool RequiredmentsCheck()
         {
             if (Node.SpawnResource == null)
-            {
                 return false;
-            }
 
             foreach(System.Collections.Generic.KeyValuePair<string, int> tuple in Node.SpawnResource.Requirements)
             {
                 if (!Node.Storage.ContainsKey(tuple.Key))
-                {
                     return false;
-                }
 
                 if (Node.Storage[tuple.Key] < tuple.Value)
-                {
                     return false;
-                }
             }
+
+            if (!gameServer.ReducePlayerPower(Node.OwnerID, Node.SpawnResource.PowerCost))
+                return false;
 
             return true;
         }

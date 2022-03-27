@@ -5,6 +5,7 @@ using TeamFactory.Util.Multiplayer;
 using TeamFactory.Gui;
 using TeamFactory.Player;
 using TeamFactory.Map;
+using TeamFactory.Powerplant;
 
 namespace TeamFactory.Game
 {
@@ -30,6 +31,8 @@ namespace TeamFactory.Game
 
         private ScoreGrid ScoresUi;
 
+        private PowerUI powerUi;
+
         private PackedScene playerPackaged;
 
         public Dictionary<string, bool> PlayerUnlocks;
@@ -52,6 +55,7 @@ namespace TeamFactory.Game
             PointUi = GetNode<Label>("/root/Game/HUD/TopUI/HBoxContainer/Points");
             ScoresUi = GetNode<ScoreGrid>("/root/Game/HUD/GridContainer");
             roundScoreUi = GetNode<RoundScore>("HUD/TopUI/HBoxContainer/RoundScore");
+            powerUi = GetNode<PowerUI>("/root/Game/HUD/PowerContainer");
 
             GetNode<Button>("/root/Game/HUD/TopUI/HBoxContainer/Control/SabotageOptionsBtn").Connect("pressed", this, nameof(OpenSabotageOptionWindow));
             GetNode<Button>("/root/Game/HUD/TopUI/HBoxContainer/Control/UnlockOpenBtn").Connect("pressed", this, nameof(OpenUnlockWindow));
@@ -95,6 +99,13 @@ namespace TeamFactory.Game
         public void OpenUnlockWindow()
         {
             GetNode<WindowDialog>("HUD/UnlockWindow").Popup_();
+        }
+
+        [Remote]
+        public void SetPower(int ownerID, int currentPower, int maxPower)
+        {
+            powerUi.Current = currentPower;
+            powerUi.MaxValue = maxPower;
         }
 
         [Remote]

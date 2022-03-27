@@ -7,7 +7,9 @@
 script = ExtResource( 1 )
 Name = "Coal"
 PointValue = 0
-UnlockCost = 0
+UnlockCost = 300
+PowerValue = 50
+PowerCost = 0
 Texture = ExtResource( 2 )
 Requirements = {
 }

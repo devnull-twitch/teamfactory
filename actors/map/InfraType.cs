@@ -13,6 +13,7 @@ namespace TeamFactory.Map
             Output,
             Splitter,
             Merger,
+            Powerplant
         }
 
         private InfraType()
@@ -95,6 +96,16 @@ namespace TeamFactory.Map
                     typeObj.Inputs.Add(GridManager.Direction.Down);
                     typeObj.Outputs = new Array<GridManager.Direction>();
                     typeObj.Outputs.Add(GridManager.Direction.Right);
+                    return typeObj;
+
+                case TypeIdentifier.Powerplant:
+                    typeObj = new InfraType();
+                    typeObj.Identifier = TypeIdentifier.Powerplant;
+                    typeObj.Script = GD.Load<Reference>("res://actors/powerplant/PowerplantNode.cs");
+                    typeObj.Texture = GD.Load<Texture>("res://actors/powerplant/Powerplant.png");
+                    typeObj.Inputs = new Array<GridManager.Direction>();
+                    typeObj.Inputs.Add(GridManager.Direction.Left);
+                    typeObj.Outputs = new Array<GridManager.Direction>();
                     return typeObj;
 
                 default:

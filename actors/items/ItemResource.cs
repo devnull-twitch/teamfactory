@@ -15,6 +15,12 @@ namespace TeamFactory.Items
         public int UnlockCost;
 
         [Export]
+        public int PowerValue;
+
+        [Export]
+        public int PowerCost;
+
+        [Export]
         public Texture Texture;
 
         [Export]
