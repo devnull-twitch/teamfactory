@@ -50,8 +50,17 @@ namespace TeamFactory.Infra
                 Vector2 pos = infraNode.GetGlobalMousePosition();
                 
                 MapNode mapNode = GetNode<MapNode>("/root/Game/GridManager");
-                int targetIndex = mapNode.Manager.WorldToIndex(pos);
-                int srcIndex = mapNode.Manager.WorldToIndex(infraNode.GlobalPosition);
+                int targetIndex;
+                int srcIndex;
+                try
+                {
+                    targetIndex = mapNode.Manager.WorldToIndex(pos);
+                    srcIndex = mapNode.Manager.WorldToIndex(infraNode.GlobalPosition);
+                }
+                catch (OutOfMapException)
+                {
+                    return;
+                }
 
                 if (targetIndex == srcIndex)
                     return;

@@ -25,29 +25,38 @@ namespace TeamFactory.Factory
         public override void _PhysicsProcess(float delta)
         {
             if (NetState.Mode == Mode.NET_CLIENT)
-            {
                 return;
-            }
 
-            if (Node.OutConnections.Count <= 0)
+            if (RequiredmentsCheck())
             {
-                return;
+                NetState.Rpc(Node, "SetWorkingFlag", true);
+                cooldown -= delta;
+
+                if (cooldown <= 0)
+                {
+                    gameServer.ReducePlayerPower(Node.OwnerID, Node.SpawnResource.PowerCost);
+                    PopFromStorage();
+                    cooldown = Node.SpawnInterval;
+
+                    NetState.Rpc(this, "SpawnItem", itemCount);
+                    itemCount++;
+                }
             }
-
-            cooldown -= delta;
-            if (cooldown <= 0 && RequiredmentsCheck())
+            else
             {
-                PopFromStorage();
-                cooldown = Node.SpawnInterval;
-
-                NetState.Rpc(this, "SpawnItem", itemCount);
-                itemCount++;
+                NetState.Rpc(Node, "SetWorkingFlag", false);
             }
         }
 
         private bool RequiredmentsCheck()
         {
             if (Node.SpawnResource == null)
+                return false;
+
+            if (Node.Disabled)
+                return false;
+
+            if (Node.OutConnections.Count <= 0)
                 return false;
 
             foreach(System.Collections.Generic.KeyValuePair<string, int> tuple in Node.SpawnResource.Requirements)
@@ -59,7 +68,7 @@ namespace TeamFactory.Factory
                     return false;
             }
 
-            if (!gameServer.ReducePlayerPower(Node.OwnerID, Node.SpawnResource.PowerCost))
+            if (gameServer.GetPlayerPower(Node.OwnerID) < Node.SpawnResource.PowerCost)
                 return false;
 
             return true;
@@ -80,6 +89,8 @@ namespace TeamFactory.Factory
                 newVal = Node.Storage[itemNode.Item.Name] + 1;
             }
             NetState.Rpc(this, "StorageUpdate", itemNode.Item.Name, newVal);
+
+            NetState.Rpc(Node, "SetWorkingFlag", RequiredmentsCheck());
         }
 
         [RemoteSync]

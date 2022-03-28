@@ -17,6 +17,8 @@ namespace TeamFactory.Input
             server.Node = this;
             server.Name = "InputServer";
             AddChild(server);
+
+            base._Ready();
         }
 
         public void OnInput(Node viewport, InputEvent e, int shape_idx)

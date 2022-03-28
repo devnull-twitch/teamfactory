@@ -24,15 +24,13 @@ namespace TeamFactory.Factory
             Server.Name = "FactoryServer";
             AddChild(Server);
 
+            base._Ready();
+
             if (IsMulti)
-            {
                 Texture = GD.Load<Texture>("res://actors/factory/MultiFactory.png");
-            }
 
             if (NetState.Mode == Mode.NET_SERVER)
-            {
                 return;
-            }
 
             GetNode<Area2D>("Picker").Connect("input_event", this, nameof(OnInput));
         }
@@ -44,9 +42,7 @@ namespace TeamFactory.Factory
                 eventMouseButton.Pressed == true)
             {
                 if (GetNodeOrNull<CanvasLayer>("/root/Game/HUD/FactoryPanel") != null)
-                {
                     return;
-                }
 
                 PackedScene packedPanel = GD.Load<PackedScene>("res://actors/Infra/InfraWindow.tscn");
                 InfraWindow infraWindow = packedPanel.Instance<InfraWindow>();

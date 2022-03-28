@@ -102,7 +102,7 @@ namespace TeamFactory.Game
         }
 
         [Remote]
-        public void SetPower(int ownerID, int currentPower, int maxPower)
+        public void SetPower(int currentPower, int maxPower)
         {
             powerUi.Current = currentPower;
             powerUi.MaxValue = maxPower;
@@ -187,6 +187,12 @@ namespace TeamFactory.Game
         public void ResetPlayerView()
         {
             GetNode<Camera2D>($"Players/{NetState.NetworkId(this)}/Camera2D").Zoom = new Vector2(1.5f, 1.5f);
+        }
+
+        [Remote]
+        public void PlayerLeft(int peerID)
+        {
+            players.Remove(peerID);
         }
 
         public int GetPlayerIDByName(string name)

@@ -21,6 +21,8 @@ namespace TeamFactory.Output
             Server.Node = this;
             Server.Name = "OutputServer";
             AddChild(Server);
+
+            base._Ready();
         }
     }
 }

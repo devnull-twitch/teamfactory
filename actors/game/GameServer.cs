@@ -6,6 +6,7 @@ using TeamFactory.Player;
 using TeamFactory.Map;
 using TeamFactory.Items;
 using TeamFactory.Powerplant;
+using TeamFactory.Infra;
 
 namespace TeamFactory.Game
 {
@@ -37,6 +38,8 @@ namespace TeamFactory.Game
 
         protected Dictionary<int, PlayerPower> playerPowers = new Dictionary<int, PlayerPower>();
 
+        protected Dictionary<int, float> playerPowerCostMultiplier = new Dictionary<int, float>();
+
         public int ScoreLimit;
 
         public override void _Ready()
@@ -45,6 +48,8 @@ namespace TeamFactory.Game
                 return;
 
             Rng.Seed = (ulong)(DateTime.Now.Ticks);
+
+            GetTree().Connect("network_peer_disconnected", this, nameof(onNetworkPeerDisconnected));
         }
 
         public override void _Process(float delta)
@@ -70,6 +75,16 @@ namespace TeamFactory.Game
                 TimerTillNextEnergy = 1f;
             }
                 
+        }
+
+        public void onNetworkPeerDisconnected(int peerID)
+        {
+            players.Remove(peerID);
+            playerPowers.Remove(peerID);
+            UserPoints.Remove(peerID);
+            UserRoundPoints.Remove(peerID);
+
+            NetState.Rpc(node, "PlayerLeft", peerID);
         }
 
         [Remote]
@@ -114,19 +129,32 @@ namespace TeamFactory.Game
             }
 
             playerPowers[ownerID].Add(points);
-            NetState.Rpc(node, "SetPower", ownerID, playerPowers[ownerID].Current, playerPowers[ownerID].MaxValue);
+            NetState.RpcId(node, ownerID, "SetPower", playerPowers[ownerID].Current, playerPowers[ownerID].MaxValue);
+        }
+
+        public int GetPlayerPower(int playerID)
+        {
+            if (!playerPowers.ContainsKey(playerID))
+                return 0;
+
+            return playerPowers[playerID].Current;
         }
 
         public bool ReducePlayerPower(int playerID, int points)
         {
+            if (points <= 0)
+                return true;
+
             if (!playerPowers.ContainsKey(playerID))
                 return false;
+
+            points = (int)Math.Floor((float)points * getPowerCostMultiplier(playerID));
 
             if (playerPowers[playerID].Current < points)
                 return false;
 
             playerPowers[playerID].Current -= points;
-            NetState.Rpc(node, "SetPower", playerID, playerPowers[playerID].Current, playerPowers[playerID].MaxValue);
+            NetState.RpcId(node, playerID, "SetPower", playerPowers[playerID].Current, playerPowers[playerID].MaxValue);
             return true;
         }
 
@@ -175,6 +203,20 @@ namespace TeamFactory.Game
             GetNode<Node>("../Players").AddChild(newPlayerNode);
         }
 
+        public void DisableNode(int nodeIndex)
+        {
+            MapNode mapNode = GetNode<MapNode>("/root/Game/GridManager");
+            InfraSprite infraNode = mapNode.Manager.GetInfraAtIndex(nodeIndex);
+            NetState.Rpc(infraNode, "TriggerDisable");
+        }
+
+        public void EnableNode(int nodeIndex)
+        {
+            MapNode mapNode = GetNode<MapNode>("/root/Game/GridManager");
+            InfraSprite infraNode = mapNode.Manager.GetInfraAtIndex(nodeIndex);
+            NetState.Rpc(infraNode, "TriggerEnable");
+        }
+
         [Remote]
         public void RequestClientInit()
         {
@@ -196,6 +238,13 @@ namespace TeamFactory.Game
                 GetTree().CallGroup("spawners", "PlayersLoaded");
                 gameRunning = true;
             }
+        }
+
+        [Remote]
+        public void RequestEnable(int nodeIndex)
+        {
+            // TODO: Validate player position relative to map index
+            EnableNode(nodeIndex);
         }
 
         public Array<string> GetPlayerUnlocks(int playerID)
@@ -300,15 +349,26 @@ namespace TeamFactory.Game
         public void TriggerFlipPlayerView(int targetNetID)
         {
             NetState.RpcId(node, targetNetID, "FlipPlayerView");
-            SceneTreeTimer timer = GetTree().CreateTimer(20);
-            Godot.Collections.Array args = new Godot.Collections.Array();
-            args.Add(targetNetID);
-            timer.Connect("timeout", this, nameof(TriggerResetPlayerView), args);
         }
 
         public void TriggerResetPlayerView(int targetNetID)
         {
             NetState.RpcId(node, targetNetID, "ResetPlayerView");
+        }
+
+        public void SetPowerCostMultiplier(int targetNetID, float multiplyer)
+        {
+            GD.Print($"set power cost for {targetNetID} to {multiplyer}");
+            playerPowerCostMultiplier[targetNetID] = multiplyer;
+        }
+
+        private float getPowerCostMultiplier(int targetNetID)
+        {
+            float m = 0;
+            if (!playerPowerCostMultiplier.TryGetValue(targetNetID, out m))
+                return 1f;
+
+            return m;
         }
     }
 }
