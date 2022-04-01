@@ -25,6 +25,8 @@ namespace TeamFactory.Infra
 
         private EnableFactoryPromt promtUi;
 
+        public GridManager.Direction Direction;
+
         public float SpawnInterval;
 
         private bool working = false;
@@ -87,17 +89,17 @@ namespace TeamFactory.Infra
 
         public void RotateFromDirection(GridManager.Direction direction)
         {
-            if (direction == GridManager.Direction.Up)
+            if (direction == GridManager.Direction.Down)
             {
                 RotationDegrees = 90;
                 return;
             }
-            if (direction == GridManager.Direction.Right)
+            if (direction == GridManager.Direction.Left)
             {
                 RotationDegrees = 180;
                 return;
             }
-            if (direction == GridManager.Direction.Down)
+            if (direction == GridManager.Direction.Up)
             {
                 RotationDegrees = 270;
                 return;

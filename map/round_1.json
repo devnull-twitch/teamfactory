@@ -3,6 +3,7 @@
     "height": 5,
     "time": 1500,
     "score_limit": 9999,
+    "infra_tokens": 5,
     "unlocked_items": [
         "Ironbar", "Copperbar", "Ironore", "Copperore"
     ],
@@ -22,7 +23,7 @@
             "y": 3,
             "type_identifier": 2,
             "is_final": false,
-            "direction": 4,
+            "direction": 3,
             "connections": {},
             "spawn_interval": 1.5,
             "spawn_resource": "res://actors/items/ironore/Ironore.tres"
@@ -32,7 +33,7 @@
             "y": 3,
             "type_identifier": 3,
             "is_final": true,
-            "direction": 4,
+            "direction": 1,
             "connections": {},
             "spawn_interval": 0,
             "spawn_resource": ""

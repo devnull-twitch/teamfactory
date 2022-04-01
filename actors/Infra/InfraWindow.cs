@@ -227,7 +227,7 @@ namespace TeamFactory.Infra
                 childNode.QueueFree();
 
             PackedScene connectionPackaged = GD.Load<PackedScene>("res://actors/Infra/ConnectionButtonContainer.tscn");
-            foreach (GridManager.Direction dir in infraNode.Type.Outputs)
+            foreach (GridManager.Direction dir in infraNode.Type.GetOutputs(infraNode.Direction))
             {
                 Node innerConnectionNode = connectionPackaged.Instance();
                 innerConnectionNode.GetNode<Label>("Label").Text = $"{dir.ToString()} output";

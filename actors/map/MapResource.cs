@@ -16,6 +16,9 @@ namespace TeamFactory.Map
         public int Time;
 
         [Export]
+        public int InfraTokens;
+
+        [Export]
         public int ScoreLimit;
         
         public Vector2 SpawnPosition;

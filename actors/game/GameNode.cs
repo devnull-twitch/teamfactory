@@ -33,6 +33,8 @@ namespace TeamFactory.Game
 
         private PowerUI powerUi;
 
+        private Label tokenLabel;
+
         private PackedScene playerPackaged;
 
         public Dictionary<string, bool> PlayerUnlocks;
@@ -56,6 +58,7 @@ namespace TeamFactory.Game
             ScoresUi = GetNode<ScoreGrid>("/root/Game/HUD/GridContainer");
             roundScoreUi = GetNode<RoundScore>("HUD/TopUI/HBoxContainer/RoundScore");
             powerUi = GetNode<PowerUI>("/root/Game/HUD/PowerContainer");
+            tokenLabel = GetNode<Label>("/root/Game/HUD/TopUI/HBoxContainer/Tokens");
 
             GetNode<Button>("/root/Game/HUD/TopUI/HBoxContainer/Control/SabotageOptionsBtn").Connect("pressed", this, nameof(OpenSabotageOptionWindow));
             GetNode<Button>("/root/Game/HUD/TopUI/HBoxContainer/Control/UnlockOpenBtn").Connect("pressed", this, nameof(OpenUnlockWindow));
@@ -164,6 +167,12 @@ namespace TeamFactory.Game
             UnlockWindow unlockWin = GetNode<UnlockWindow>("/root/Game/HUD/UnlockWindow");
             if (unlockWin.Visible)
                 unlockWin.OnShow();
+        }
+
+        [Remote]
+        public void SetInfraTokens(int tokens)
+        {
+            tokenLabel.Text = $"{tokens}";
         }
 
         [Remote]

@@ -238,9 +238,6 @@ anchor_right = 1.0
 margin_left = 20.0
 margin_right = -20.0
 margin_bottom = 47.0
-__meta__ = {
-"_edit_use_anchors_": false
-}
 
 [node name="RoundTimeLabel" type="Label" parent="HUD/TopUI/HBoxContainer"]
 margin_top = 16.0
@@ -281,18 +278,35 @@ script = ExtResource( 12 )
 
 [node name="VSeparator" type="VSeparator" parent="HUD/TopUI/HBoxContainer"]
 margin_left = 232.0
-margin_right = 684.0
+margin_right = 567.0
 margin_bottom = 47.0
 size_flags_horizontal = 3
 
 [node name="CameraModeIndicator" type="TextureRect" parent="HUD/TopUI/HBoxContainer"]
-margin_left = 688.0
-margin_right = 728.0
+margin_left = 571.0
+margin_right = 611.0
 margin_bottom = 47.0
 rect_min_size = Vector2( 40, 0 )
 texture = ExtResource( 11 )
 expand = true
 stretch_mode = 5
+
+[node name="TokensLabel" type="Label" parent="HUD/TopUI/HBoxContainer"]
+margin_left = 615.0
+margin_top = 16.0
+margin_right = 699.0
+margin_bottom = 30.0
+custom_colors/font_color = Color( 0, 0, 0, 1 )
+text = "Build tokens:"
+
+[node name="Tokens" type="Label" parent="HUD/TopUI/HBoxContainer"]
+margin_left = 703.0
+margin_top = 16.0
+margin_right = 728.0
+margin_bottom = 30.0
+rect_min_size = Vector2( 25, 0 )
+custom_colors/font_color = Color( 0, 0, 0, 1 )
+text = "0"
 
 [node name="PointsLabel" type="Label" parent="HUD/TopUI/HBoxContainer"]
 margin_left = 732.0

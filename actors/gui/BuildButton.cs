@@ -55,7 +55,6 @@ public class BuildButton : TextureButton
             return;
         
         InfraType it = InfraType.GetByIdentifier(InfraToBuild);
-
         ghostSprite = new Sprite();
         ghostSprite.Texture = it.Texture;
         ShaderMaterial shaderMat = GD.Load<ShaderMaterial>("res://materials/FactoryBtn.tres");
@@ -69,14 +68,14 @@ public class BuildButton : TextureButton
     {
         float cappedDegree = degree % 360;
         if (cappedDegree >= 0 && cappedDegree < 90)
-            return GridManager.Direction.Left;
-
-        if (cappedDegree >= 90 && cappedDegree < 180)
-            return GridManager.Direction.Up;
-
-        if (cappedDegree >= 180 && cappedDegree < 270)
             return GridManager.Direction.Right;
 
-        return GridManager.Direction.Down;
+        if (cappedDegree >= 90 && cappedDegree < 180)
+            return GridManager.Direction.Down;
+
+        if (cappedDegree >= 180 && cappedDegree < 270)
+            return GridManager.Direction.Left;
+
+        return GridManager.Direction.Up;
     }
 }

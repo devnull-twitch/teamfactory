@@ -3,6 +3,7 @@
     "height": 8,
     "time": 30,
     "score_limit": 40000,
+    "infra_tokens": 10,
     "unlocked_items": [
         "Ironbar", "Copperbar", "Chip"
     ],

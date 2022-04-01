@@ -53,6 +53,7 @@ namespace TeamFactory.Map
             InititMap();
         }
 
+        // client side only
         [Remote]
         public void SetupManager(string filePath)
         {
@@ -97,6 +98,7 @@ namespace TeamFactory.Map
             MapResource template = parser.CreateMapData();
             
             GameServer gs = GetNode<GameServer>("../GameServer");
+            gs.SetInfraTokensForAll(template.InfraTokens);
             gs.UnlockForAll(template.UnlockedItems);
             gs.TimeTillNextRound = template.Time;
             gs.ScoreLimit = template.ScoreLimit;
@@ -140,12 +142,20 @@ namespace TeamFactory.Map
         [Remote]
         public void RequestBuild(int srcIndex, GridManager.Direction rotation, InfraType.TypeIdentifier infraTypeIdent)
         {
+            GD.Print($"requested to build {infraTypeIdent} direction is {rotation}");
+            int senderNetID = NetState.NetworkSenderId(this);
+            GameServer gs = GetNode<GameServer>("../GameServer");
+            if (!gs.UserInfraTokens.ContainsKey(senderNetID) || gs.UserInfraTokens[senderNetID] <= 0)
+                return;
+
+            gs.SubInfraToken(senderNetID);
+
             TileResource tileResource = new TileResource();
             tileResource.Connections = new Dictionary<GridManager.Direction, ConnectionTarget>();
             tileResource.Coords = Manager.IndexToMap(srcIndex);
             tileResource.Direction = rotation;
             tileResource.InfraTypeIdentifier = infraTypeIdent;
-            tileResource.OwnerID = NetState.NetworkSenderId(this);
+            tileResource.OwnerID = senderNetID;
             
             Manager.AddTileResouce(tileResource, srcIndex);
         }
@@ -183,7 +193,7 @@ namespace TeamFactory.Map
             string nodeName,
             InfraType.TypeIdentifier infraTypeIdent,
             int index,
-            GridManager.Direction rotation,
+            GridManager.Direction baseDirection,
             string spawnResourceName,
             int ownerID
         ) 
@@ -197,7 +207,8 @@ namespace TeamFactory.Map
             InfraSprite infraNode = (InfraSprite)GD.InstanceFromId(objId);
             infraNode.Texture = infraType.Texture;
             infraNode.Position = Manager.IndexToWorld(index);
-            infraNode.RotateFromDirection(rotation);
+            infraNode.RotateFromDirection(baseDirection);
+            infraNode.Direction = baseDirection;
             infraNode.GridManager = Manager;
             infraNode.Name = nodeName;
             infraNode.Type = infraType;

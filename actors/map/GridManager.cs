@@ -12,10 +12,10 @@ namespace TeamFactory.Map
     {
         public enum Direction : int
         {
-            Up = 1,
+            Right = 1,
             Down = 2,
             Left = 3,
-            Right = 4
+            Up = 4
         }
 
         const int CELLSIZE = 128;
@@ -108,8 +108,9 @@ namespace TeamFactory.Map
             int startIndex = GetIndicesFromDirection(mapWidth, srcIndex, outputDir);
             Direction bestInDir = Direction.Left;
             float currentBestPathCost = 0;
-            foreach (Direction inDir in targetNode.Type.Inputs)
+            foreach (Direction inDir in targetNode.Type.GetInputs(targetNode.Direction))
             {
+                GD.Print($"testing a connection to {inDir} and target base direction is {targetNode.Direction}");
                 if (targetNode.InConnections.ContainsKey(inDir))
                     continue;
                 

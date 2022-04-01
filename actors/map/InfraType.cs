@@ -59,7 +59,7 @@ namespace TeamFactory.Map
                     typeObj.Texture = GD.Load<Texture>("res://actors/input/InputNode.png");
                     typeObj.Inputs = new Array<GridManager.Direction>();
                     typeObj.Outputs = new Array<GridManager.Direction>();
-                    typeObj.Outputs.Add(GridManager.Direction.Right);
+                    typeObj.Outputs.Add(GridManager.Direction.Left);
                     return typeObj;
 
                 case TypeIdentifier.Output:
@@ -123,6 +123,33 @@ namespace TeamFactory.Map
 
         public Array<GridManager.Direction> Inputs;
 
-        public Array<GridManager.Direction> Outputs; 
+        public Array<GridManager.Direction> Outputs;
+
+        public Array<GridManager.Direction> GetOutputs(GridManager.Direction baseDirection)
+        {
+            return rotateAllByBase(Outputs, baseDirection);
+        }
+
+        public Array<GridManager.Direction> GetInputs(GridManager.Direction baseDirection)
+        {
+            return rotateAllByBase(Inputs, baseDirection);
+        }
+
+        private Array<GridManager.Direction> rotateAllByBase(Array<GridManager.Direction> directions, GridManager.Direction baseDirection)
+        {
+            Array<GridManager.Direction> corrected = new Array<GridManager.Direction>();
+            foreach (GridManager.Direction dir in directions)
+            {
+                int intDir = (int)dir;
+                int intBase = (int)baseDirection;
+                int res = intDir + (intBase - 1);
+                if (res >= 5)
+                    res = res % 4;
+
+                corrected.Add((GridManager.Direction)res);
+            }
+
+            return corrected;
+        }
     }
 }

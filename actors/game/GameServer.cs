@@ -40,6 +40,8 @@ namespace TeamFactory.Game
 
         protected Dictionary<int, float> playerPowerCostMultiplier = new Dictionary<int, float>();
 
+        public Dictionary<int, int> UserInfraTokens = new Dictionary<int, int>();
+
         public int ScoreLimit;
 
         public override void _Ready()
@@ -323,6 +325,24 @@ namespace TeamFactory.Game
                     NetState.RpcId(node, netID, "AddPlayerUnlock", itemName);
                 }
             }
+        }
+
+        public void SetInfraTokensForAll(int tokenCount)
+        {
+            foreach(int netID in players.Keys)
+            {
+                UserInfraTokens[netID] = tokenCount;
+                NetState.RpcId(node, netID, "SetInfraTokens", tokenCount);
+            }
+        }
+
+        public void SubInfraToken(int netID)
+        {
+            if (!UserInfraTokens.ContainsKey(netID))
+                return;
+
+            UserInfraTokens[netID]--;
+            NetState.RpcId(node, netID, "SetInfraTokens", UserInfraTokens[netID]);
         }
 
         [Remote]
