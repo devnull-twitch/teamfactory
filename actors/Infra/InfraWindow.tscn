@@ -26,10 +26,15 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="Production" type="VBoxContainer" parent="VBoxContainer"]
-visible = false
+[node name="DeleteBuilding" type="Button" parent="VBoxContainer"]
 margin_right = 395.0
-margin_bottom = 88.0
+margin_bottom = 20.0
+text = "Remove building"
+
+[node name="Production" type="VBoxContainer" parent="VBoxContainer"]
+margin_top = 24.0
+margin_right = 395.0
+margin_bottom = 112.0
 
 [node name="CurrentProduction" type="HBoxContainer" parent="VBoxContainer/Production"]
 margin_right = 395.0
@@ -76,16 +81,17 @@ items = [ "Ironbar", null, false, 0, null, "Copperbar", null, false, 1, null ]
 selected = 0
 
 [node name="HSeparator" type="HSeparator" parent="VBoxContainer"]
+margin_top = 116.0
 margin_right = 395.0
-margin_bottom = 4.0
+margin_bottom = 120.0
 
 [node name="Connections" type="VBoxContainer" parent="VBoxContainer"]
-margin_top = 8.0
+margin_top = 124.0
 margin_right = 395.0
-margin_bottom = 8.0
+margin_bottom = 124.0
 
 [node name="GridContainer" type="GridContainer" parent="VBoxContainer"]
-margin_top = 12.0
+margin_top = 128.0
 margin_right = 395.0
-margin_bottom = 12.0
+margin_bottom = 128.0
 columns = 3

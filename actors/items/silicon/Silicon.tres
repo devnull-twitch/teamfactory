@@ -8,6 +8,8 @@ script = ExtResource( 1 )
 Name = "Silicon"
 PointValue = 10
 UnlockCost = 0
+PowerValue = 0
+PowerCost = 0
 Texture = ExtResource( 2 )
 Requirements = {
 "Sand": 2

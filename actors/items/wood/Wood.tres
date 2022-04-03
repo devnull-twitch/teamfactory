@@ -7,7 +7,9 @@
 script = ExtResource( 1 )
 Name = "Wood"
 PointValue = 1
-UnlockCost = 0
+UnlockCost = 50
+PowerValue = 6
+PowerCost = 0
 Texture = ExtResource( 2 )
 Requirements = {
 }

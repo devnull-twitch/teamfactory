@@ -1,9 +1,9 @@
 {
-    "width": 8,
-    "height": 8,
-    "time": 300,
-    "score_limit": 500,
-    "infra_tokens": 10,
+    "width": 10,
+    "height": 10,
+    "time": 360,
+    "score_limit": 1000,
+    "infra_tokens": 20,
     "unlocked_items": [],
     "spwan_position": {
         "x": 1,
@@ -31,8 +31,28 @@
             "spawn_resource": "res://actors/items/copperore/Copperore.tres"
         },
         {
-            "x": 7,
-            "y": 3,
+            "x": 0,
+            "y": 7,
+            "type_identifier": 2,
+            "is_final": false,
+            "direction": 3,
+            "connections": {},
+            "spawn_interval": 2,
+            "spawn_resource": "res://actors/items/copperore/Copperore.tres"
+        },
+        {
+            "x": 0,
+            "y": 9,
+            "type_identifier": 2,
+            "is_final": false,
+            "direction": 3,
+            "connections": {},
+            "spawn_interval": 2,
+            "spawn_resource": "res://actors/items/copperore/Copperore.tres"
+        },
+        {
+            "x": 9,
+            "y": 5,
             "type_identifier": 3,
             "is_final": true,
             "direction": 1,

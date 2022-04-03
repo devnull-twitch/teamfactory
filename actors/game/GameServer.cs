@@ -345,6 +345,15 @@ namespace TeamFactory.Game
             NetState.RpcId(node, netID, "SetInfraTokens", UserInfraTokens[netID]);
         }
 
+        public void IncInfraToken(int netID)
+        {
+            if (!UserInfraTokens.ContainsKey(netID))
+                return;
+
+            UserInfraTokens[netID]++;
+            NetState.RpcId(node, netID, "SetInfraTokens", UserInfraTokens[netID]);
+        }
+
         [Remote]
         public void RequestUnlock(string itemName)
         {

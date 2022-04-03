@@ -39,6 +39,8 @@ public class UnlockItemContainer : VBoxContainer
         GetNode<Label>("Name").Text = item.Name;
         GetNode<Label>("GridContainer/Cost").Text = $"{item.UnlockCost}";
         GetNode<Label>("GridContainer/Value").Text = $"{item.PointValue}";
+        GetNode<Label>("GridContainer/Power").Text = $"{item.PowerCost}";
+        GetNode<Label>("GridContainer/PV").Text = $"{item.PowerValue}";
 
         mat = (ShaderMaterial)GD.Load<ShaderMaterial>("res://materials/UnlockResourceBtn.tres").Duplicate();
         mat.SetShaderParam("ButtonTexture", item.Texture);

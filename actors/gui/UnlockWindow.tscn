@@ -4,7 +4,6 @@
 [ext_resource path="res://actors/gui/UnlockWindow.cs" type="Script" id=6]
 
 [node name="UnlockWindow" type="WindowDialog"]
-visible = true
 anchor_right = 1.0
 anchor_bottom = 1.0
 margin_left = 114.0
@@ -27,3 +26,4 @@ __meta__ = {
 }
 
 [node name="Control" parent="ScrollContainer" instance=ExtResource( 1 )]
+margin_right = 775.0

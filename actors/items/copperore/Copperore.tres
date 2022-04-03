@@ -8,6 +8,8 @@ script = ExtResource( 1 )
 Name = "Copperore"
 PointValue = 1
 UnlockCost = 0
+PowerValue = 3
+PowerCost = 0
 Texture = ExtResource( 2 )
 Requirements = {
 }

@@ -1,0 +1,16 @@
+[gd_resource type="Resource" load_steps=3 format=2]
+
+[ext_resource path="res://actors/items/copperwire/Copperwire.png" type="Texture" id=1]
+[ext_resource path="res://actors/items/ItemResource.cs" type="Script" id=2]
+
+[resource]
+script = ExtResource( 2 )
+Name = "Copperwire"
+PointValue = 15
+UnlockCost = 20
+PowerValue = 0
+PowerCost = 6
+Texture = ExtResource( 1 )
+Requirements = {
+"Copperbar": 1
+}

@@ -54,7 +54,6 @@ script = ExtResource( 14 )
 script = ExtResource( 6 )
 
 [node name="UnlockWindow" parent="HUD" instance=ExtResource( 10 )]
-visible = false
 margin_left = 75.0
 margin_top = 116.0
 margin_right = -174.0

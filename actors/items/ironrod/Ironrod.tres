@@ -1,15 +1,16 @@
 [gd_resource type="Resource" load_steps=3 format=2]
 
 [ext_resource path="res://actors/items/ItemResource.cs" type="Script" id=1]
-[ext_resource path="res://actors/items/sand/Sand.png" type="Texture" id=2]
+[ext_resource path="res://actors/items/ironrod/Ironrod.png" type="Texture" id=2]
 
 [resource]
 script = ExtResource( 1 )
-Name = "Sand"
-PointValue = 1
-UnlockCost = 0
-PowerValue = 0
-PowerCost = 0
+Name = "Ironrod"
+PointValue = 15
+UnlockCost = 20
+PowerValue = 1
+PowerCost = 4
 Texture = ExtResource( 2 )
 Requirements = {
+"Ironbar": 1
 }

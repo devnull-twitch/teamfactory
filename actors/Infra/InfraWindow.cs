@@ -38,6 +38,8 @@ namespace TeamFactory.Infra
 
             OptionButton outputSelector = GetNode<OptionButton>("VBoxContainer/Production/ProductionChanger/OptionButton");
             outputSelector.Connect("item_selected", this, nameof(OnSelectOutputResource));
+
+            GetNode<Button>("VBoxContainer/DeleteBuilding").Connect("pressed", this, nameof(OnDelete));
         }
 
         public override void _Input(InputEvent @event)
@@ -95,6 +97,12 @@ namespace TeamFactory.Infra
             {
                 connectionLine.QueueFree();
             }
+            QueueFree();
+        }
+
+        public void OnDelete()
+        {
+            NetState.RpcId(infraNode, 1, "RequestDeletion");
             QueueFree();
         }
 

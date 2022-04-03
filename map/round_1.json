@@ -1,19 +1,23 @@
 {
     "width": 10,
     "height": 5,
-    "time": 1500,
-    "score_limit": 9999,
+    "time": 150,
+    "score_limit": 250,
     "infra_tokens": 5,
     "unlocked_items": [
         "Ironbar", "Copperbar", "Ironore", "Copperore"
     ],
     "spwan_position": {
-        "x": 1,
+        "x": 5,
         "y": 3
     },
     "blocking": [
         {
             "x": 2,
+            "y": 2
+        },
+        {
+            "x": 7,
             "y": 2
         }
     ],

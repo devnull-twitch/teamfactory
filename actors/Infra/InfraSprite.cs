@@ -4,6 +4,7 @@ using TeamFactory.Map;
 using TeamFactory.Items;
 using TeamFactory.Util.Multiplayer;
 using TeamFactory.Player;
+using TeamFactory.Game;
 
 namespace TeamFactory.Infra
 {
@@ -63,6 +64,21 @@ namespace TeamFactory.Infra
                 if (!disabled && NetState.Mode != Mode.NET_SERVER)
                     promtUi.RemoveAvilableInfraSprite(this);
             }
+        }
+
+        [Remote]
+        public void RequestDeletion()
+        {
+            int senderID = NetState.NetworkSenderId(this);
+            if (senderID != OwnerID)
+                return;
+
+            MapNode mapNode = GetNode<MapNode>("/root/Game/GridManager");
+            int selfMapIndex = mapNode.Manager.WorldToIndex(this.GlobalPosition);
+            mapNode.Manager.RemoveTileResource(selfMapIndex);
+
+            GameServer gs = GetNode<GameServer>("/root/Game/GameServer");
+            gs.IncInfraToken(senderID);
         }
 
         public override void _Ready()
