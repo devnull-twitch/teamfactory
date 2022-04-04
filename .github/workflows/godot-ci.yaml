@@ -6,7 +6,7 @@ on:
       - 'v*'
 
 env:
-  GODOT_VERSION: 3.4.2
+  GODOT_VERSION: 3.4.4
   EXPORT_NAME: TeamFactory
 
 jobs:
@@ -14,7 +14,7 @@ jobs:
     name: Windows Export
     runs-on: ubuntu-latest
     container:
-      image: barichello/godot-ci:mono-3.4.2
+      image: barichello/godot-ci:mono-3.4.4
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -36,7 +36,7 @@ jobs:
     name: Linux Export
     runs-on: ubuntu-latest
     container:
-      image: barichello/godot-ci:mono-3.4.2
+      image: barichello/godot-ci:mono-3.4.4
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -58,7 +58,7 @@ jobs:
     name: Linux Export
     runs-on: ubuntu-latest
     container:
-      image: barichello/godot-ci:mono-3.4.2
+      image: barichello/godot-ci:mono-3.4.4
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -68,10 +68,10 @@ jobs:
         run: |
           mkdir -v -p build/linux build/windows build/linux-server ~/.local/share/godot/templates
           mv /root/.local/share/godot/templates/${GODOT_VERSION}.stable.mono ~/.local/share/godot/templates/${GODOT_VERSION}.stable.mono
-          wget https://downloads.tuxfamily.org/godotengine/3.4.2/mono/Godot_v3.4.2-stable_mono_linux_server_64.zip
-          unzip Godot_v3.4.2-stable_mono_linux_server_64.zip && rm Godot_v3.4.2-stable_mono_linux_server_64.zip
-          cp Godot_v3.4.2-stable_mono_linux_server_64/Godot_v3.4.2-stable_mono_linux_server.64 ~/.local/share/godot/templates/${GODOT_VERSION}.stable.mono/linux_x11_64_debug
-          cp Godot_v3.4.2-stable_mono_linux_server_64/Godot_v3.4.2-stable_mono_linux_server.64 ~/.local/share/godot/templates/${GODOT_VERSION}.stable.mono/linux_x11_64_release
+          wget https://downloads.tuxfamily.org/godotengine/${GODOT_VERSION}/mono/Godot_v${GODOT_VERSION}-stable_mono_linux_server_64.zip
+          unzip Godot_v${GODOT_VERSION}-stable_mono_linux_server_64.zip && rm Godot_v${GODOT_VERSION}-stable_mono_linux_server_64.zip
+          cp Godot_v${GODOT_VERSION}-stable_mono_linux_server_64/Godot_v${GODOT_VERSION}-stable_mono_linux_server.64 ~/.local/share/godot/templates/${GODOT_VERSION}.stable.mono/linux_x11_64_debug
+          cp Godot_v${GODOT_VERSION}-stable_mono_linux_server_64/Godot_v${GODOT_VERSION}-stable_mono_linux_server.64 ~/.local/share/godot/templates/${GODOT_VERSION}.stable.mono/linux_x11_64_release
       - name: Linux Build
         run: godot -v --export "Linux/X11" build/linux-server/$EXPORT_NAME.server.x86_64
       - name: Upload Artifact

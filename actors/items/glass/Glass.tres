@@ -7,7 +7,7 @@
 script = ExtResource( 1 )
 Name = "Glass"
 PointValue = 10
-UnlockCost = 0
+UnlockCost = 60
 PowerValue = 0
 PowerCost = 0
 Texture = ExtResource( 2 )

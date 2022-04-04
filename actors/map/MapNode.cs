@@ -81,18 +81,21 @@ namespace TeamFactory.Map
 
         public bool NextRound()
         {
-            currentRound++;
-            return InititMap();
+            return false;
+            // currentRound++;
+            // return InititMap();
         }
 
         private bool InititMap()
         {
             File testJson = new File();
-            Error err = testJson.Open($"res://map/round_{currentRound}.json", File.ModeFlags.Read); 
+            Error err = testJson.Open($"res://map/testing.json", File.ModeFlags.Read); 
+            //Error err = testJson.Open($"res://map/round_{currentRound}.json", File.ModeFlags.Read); 
             if (err != Error.Ok)
                 return false;
 
-            NetState.Rpc(this, "SetupManager", $"res://map/round_{currentRound}.json");
+            NetState.Rpc(this, "SetupManager", $"res://map/testing.json");
+            // NetState.Rpc(this, "SetupManager", $"res://map/round_{currentRound}.json");
 
             Parser parser = new Parser(testJson.GetAsText());
             MapResource template = parser.CreateMapData();

@@ -6,8 +6,8 @@
 [resource]
 script = ExtResource( 1 )
 Name = "Sand"
-PointValue = 1
-UnlockCost = 0
+PointValue = 2
+UnlockCost = 60
 PowerValue = 0
 PowerCost = 0
 Texture = ExtResource( 2 )

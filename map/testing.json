@@ -1,7 +1,8 @@
 {
-    "width": 15,
-    "height": 13,
-    "time": 9999,
+    "width": 10,
+    "height": 10,
+    "time": 10,
+    "score_limit": 9999,
     "infra_tokens": 99,
     "spwan_position": {
         "x": 1,
@@ -10,6 +11,7 @@
     "unlocked_items": [
         "Ironbar", "Copperbar", "Chip"
     ],
+    "blocking": [],
     "infras": [
         {
             "x": 0,
@@ -18,7 +20,6 @@
             "is_final": false,
             "is_lock": true,
             "direction": 4,
-            "outputs": [4],
             "connections": {},
             "spawn_resource": "res://actors/items/ironore/Ironore.tres"
         },
@@ -29,14 +30,7 @@
             "is_final": false,
             "is_lock": true,
             "direction": 4,
-            "outputs": [4],
-            "connections": {
-                "4": {
-                    "target_direction": 3,
-                    "target_coords_x": 5,
-                    "target_coords_y": 5
-                }
-            },
+            "connections": {},
             "spawn_resource": "res://actors/items/copperore/Copperore.tres"
         },
         {
@@ -44,16 +38,8 @@
             "y": 3,
             "type_identifier": 0,
             "is_final": false,
-            "direction": 3,
-            "inputs": [3],
-            "outputs": [4],
-            "connections": {
-                "4": {
-                    "target_direction": 1,
-                    "target_coords_x": 10,
-                    "target_coords_y": 10
-                }
-            },
+            "direction": 1,
+            "connections": {},
             "spawn_resource": "res://actors/items/ironbar/Ironbar.tres"
         },
         {
@@ -62,48 +48,32 @@
             "type_identifier": 0,
             "is_final": false,
             "direction": 3,
-            "inputs": [3],
-            "outputs": [4],
             "connections": {},
             "spawn_resource": "res://actors/items/copperbar/Copperbar.tres"
         },
         {
-            "x": 14,
+            "x": 9,
             "y": 4,
             "type_identifier": 3,
             "is_final": true,
-            "direction": 3,
-            "inputs": [4],
+            "direction": 1,
             "connections": {},
             "spawn_resource": ""
         },
         {
-            "x": 10,
-            "y": 10,
+            "x": 8,
+            "y": 8,
             "type_identifier": 1,
             "is_final": false,
-            "options": {
-                "is_multi": "1"
-            },
-            "inputs": [3, 1, 2],
-            "outputs": [4],
             "direction": 3,
-            "connections": {
-                "4": {
-                    "target_direction": 3,
-                    "target_coords_x": 14,
-                    "target_coords_y": 4
-                }
-            },
+            "connections": {},
             "spawn_resource": "res://actors/items/chip/Chip.tres"
         },
         {
             "x": 3,
-            "y": 10,
+            "y": 9,
             "type_identifier": 4,
             "is_final": false,
-            "inputs": [3],
-            "outputs": [1,2,4],
             "direction": 3,
             "connections": {},
             "spawn_resource": ""

@@ -29,11 +29,11 @@ align = 1
 [node name="Columns" type="HBoxContainer" parent="VBoxContainer"]
 margin_top = 28.0
 margin_right = 509.0
-margin_bottom = 1392.0
+margin_bottom = 1389.0
 
 [node name="Row1" type="MarginContainer" parent="VBoxContainer/Columns"]
 margin_right = 167.0
-margin_bottom = 1364.0
+margin_bottom = 1361.0
 rect_min_size = Vector2( 140, 0 )
 custom_constants/margin_right = 45
 custom_constants/margin_left = 45
@@ -41,7 +41,7 @@ custom_constants/margin_left = 45
 [node name="InnerRow" type="VBoxContainer" parent="VBoxContainer/Columns/Row1"]
 margin_left = 45.0
 margin_right = 122.0
-margin_bottom = 1364.0
+margin_bottom = 1361.0
 
 [node name="HSeparator5" type="HSeparator" parent="VBoxContainer/Columns/Row1/InnerRow"]
 margin_right = 77.0
@@ -62,36 +62,36 @@ margin_bottom = 581.0
 [node name="HSeparator3" type="HSeparator" parent="VBoxContainer/Columns/Row1/InnerRow"]
 margin_top = 585.0
 margin_right = 77.0
-margin_bottom = 680.0
-custom_constants/separation = 95
+margin_bottom = 679.0
+custom_constants/separation = 94
 custom_styles/separator = SubResource( 2 )
 
 [node name="SandContainer" parent="VBoxContainer/Columns/Row1/InnerRow" instance=ExtResource( 1 )]
-margin_top = 684.0
+margin_top = 683.0
 margin_right = 77.0
-margin_bottom = 875.0
+margin_bottom = 874.0
 
 [node name="HSeparator2" type="HSeparator" parent="VBoxContainer/Columns/Row1/InnerRow"]
-margin_top = 879.0
+margin_top = 878.0
 margin_right = 77.0
-margin_bottom = 974.0
-custom_constants/separation = 95
+margin_bottom = 971.0
+custom_constants/separation = 93
 custom_styles/separator = SubResource( 2 )
 
 [node name="WoodContainer" parent="VBoxContainer/Columns/Row1/InnerRow" instance=ExtResource( 1 )]
-margin_top = 978.0
+margin_top = 975.0
 margin_right = 77.0
-margin_bottom = 1169.0
+margin_bottom = 1166.0
 
 [node name="CoalContainer" parent="VBoxContainer/Columns/Row1/InnerRow" instance=ExtResource( 1 )]
-margin_top = 1173.0
+margin_top = 1170.0
 margin_right = 77.0
-margin_bottom = 1364.0
+margin_bottom = 1361.0
 
 [node name="Row2" type="MarginContainer" parent="VBoxContainer/Columns"]
 margin_left = 171.0
 margin_right = 338.0
-margin_bottom = 1364.0
+margin_bottom = 1361.0
 rect_min_size = Vector2( 140, 0 )
 custom_constants/margin_right = 45
 custom_constants/margin_left = 45
@@ -99,7 +99,7 @@ custom_constants/margin_left = 45
 [node name="InnerRow" type="VBoxContainer" parent="VBoxContainer/Columns/Row2"]
 margin_left = 45.0
 margin_right = 122.0
-margin_bottom = 1364.0
+margin_bottom = 1361.0
 
 [node name="HSeparator4" type="HSeparator" parent="VBoxContainer/Columns/Row2/InnerRow"]
 margin_right = 77.0
@@ -127,10 +127,15 @@ margin_top = 780.0
 margin_right = 77.0
 margin_bottom = 971.0
 
+[node name="CharcoalContainer" parent="VBoxContainer/Columns/Row2/InnerRow" instance=ExtResource( 1 )]
+margin_top = 975.0
+margin_right = 77.0
+margin_bottom = 1166.0
+
 [node name="Row3" type="MarginContainer" parent="VBoxContainer/Columns"]
 margin_left = 342.0
 margin_right = 509.0
-margin_bottom = 1364.0
+margin_bottom = 1361.0
 rect_min_size = Vector2( 140, 0 )
 custom_constants/margin_right = 45
 custom_constants/margin_left = 45
@@ -138,7 +143,7 @@ custom_constants/margin_left = 45
 [node name="InnerRow" type="VBoxContainer" parent="VBoxContainer/Columns/Row3"]
 margin_left = 45.0
 margin_right = 122.0
-margin_bottom = 1364.0
+margin_bottom = 1361.0
 
 [node name="GearContainer" parent="VBoxContainer/Columns/Row3/InnerRow" instance=ExtResource( 1 )]
 margin_right = 77.0
@@ -153,3 +158,13 @@ margin_bottom = 386.0
 margin_top = 390.0
 margin_right = 77.0
 margin_bottom = 581.0
+
+[node name="CopperwireContainer" parent="VBoxContainer/Columns/Row3/InnerRow" instance=ExtResource( 1 )]
+margin_top = 585.0
+margin_right = 77.0
+margin_bottom = 776.0
+
+[node name="LensContainer" parent="VBoxContainer/Columns/Row3/InnerRow" instance=ExtResource( 1 )]
+margin_top = 780.0
+margin_right = 77.0
+margin_bottom = 971.0

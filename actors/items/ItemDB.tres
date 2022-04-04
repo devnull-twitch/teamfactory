@@ -1,4 +1,4 @@
-[gd_resource type="Resource" load_steps=15 format=2]
+[gd_resource type="Resource" load_steps=17 format=2]
 
 [ext_resource path="res://actors/items/ItemDB.cs" type="Script" id=1]
 [ext_resource path="res://actors/items/ironbar/Ironbar.tres" type="Resource" id=2]
@@ -14,10 +14,13 @@
 [ext_resource path="res://actors/items/gear/Gear.tres" type="Resource" id=12]
 [ext_resource path="res://actors/items/ironrod/Ironrod.tres" type="Resource" id=13]
 [ext_resource path="res://actors/items/copperwire/Copperwire.tres" type="Resource" id=14]
+[ext_resource path="res://actors/items/lens/Lens.tres" type="Resource" id=15]
+[ext_resource path="res://actors/items/charcoal/Charcoal.tres" type="Resource" id=16]
 
 [resource]
 script = ExtResource( 1 )
 Database = {
+"Charcoal": ExtResource( 16 ),
 "Chip": ExtResource( 6 ),
 "Coal": ExtResource( 7 ),
 "Copperbar": ExtResource( 4 ),
@@ -28,6 +31,7 @@ Database = {
 "Ironbar": ExtResource( 2 ),
 "Ironore": ExtResource( 3 ),
 "Ironrod": ExtResource( 13 ),
+"Lens": ExtResource( 15 ),
 "Sand": ExtResource( 8 ),
 "Silicon": ExtResource( 11 ),
 "Wood": ExtResource( 9 )

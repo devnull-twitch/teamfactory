@@ -87,12 +87,16 @@ namespace TeamFactory.Game
             UserRoundPoints.Remove(peerID);
 
             NetState.Rpc(node, "PlayerLeft", peerID);
+
+            if (players.Count <= 0)
+                GetTree().Quit();
         }
 
         [Remote]
-        public void GameEnd()
+        public void GameEnd(string winnerName)
         {
             GetTree().NetworkPeer = null;
+            GetNode<Label>("/root/Game/HUD/GameEndDialog/CenterContainer/VBoxContainer/Winner").Text = winnerName;
             GetNode<PopupDialog>("/root/Game/HUD/GameEndDialog").Popup_();
             GetNode<GameNode>("..").GameRunning = false;
         }
@@ -100,9 +104,7 @@ namespace TeamFactory.Game
         public void AddPoints(int ownerID, int points)
         {
             if (!UserPoints.ContainsKey(ownerID))
-            {
-                UserPoints[ownerID] = 0;
-            }
+                return;
 
             if (!UserRoundPoints.ContainsKey(ownerID))
             {
@@ -162,9 +164,21 @@ namespace TeamFactory.Game
 
         private void TriggerNextRound()
         {
+            GD.Print("moving along to next round");
             if (!GetNode<MapNode>("../GridManager").NextRound())
             {
-                NetState.Rpc(this, "GameEnd");
+                string winnerName = "";
+                int winningPoints = 0;
+                foreach (int netID in players.Keys)
+                {
+                    if (UserPoints[netID] > winningPoints)
+                    {
+                        winnerName = players[netID];
+                        winningPoints = UserPoints[netID];
+                    }
+                }
+
+                NetState.Rpc(this, "GameEnd", winnerName);
                 GetTree().Quit();
             }
         }
@@ -202,6 +216,7 @@ namespace TeamFactory.Game
             newPlayerNode.Name = $"{ownerID}";
 
             players[ownerID] = playerName;
+            UserPoints[ownerID] = 0;
             GetNode<Node>("../Players").AddChild(newPlayerNode);
         }
 

@@ -1,16 +1,16 @@
 [gd_resource type="Resource" load_steps=3 format=2]
 
 [ext_resource path="res://actors/items/ItemResource.cs" type="Script" id=1]
-[ext_resource path="res://actors/items/silicon/Silicon.png" type="Texture" id=2]
+[ext_resource path="res://actors/items/lens/Lens.png" type="Texture" id=2]
 
 [resource]
 script = ExtResource( 1 )
-Name = "Silicon"
-PointValue = 10
-UnlockCost = 60
+Name = "Lens"
+PointValue = 20
+UnlockCost = 80
 PowerValue = 0
-PowerCost = 2
+PowerCost = 6
 Texture = ExtResource( 2 )
 Requirements = {
-"Sand": 2
+"Glass": 1
 }

@@ -1,7 +1,6 @@
 using Godot;
 using TeamFactory.Conveyor;
 using TeamFactory.Infra;
-using TeamFactory.Factory;
 using Godot.Collections;
 using TeamFactory.Util.JsonMap;
 using TeamFactory.Util.Multiplayer;
@@ -186,6 +185,7 @@ namespace TeamFactory.Map
 
         public void Cleanup()
         {
+            GD.Print("clear old map data");
             infraMap = new AStar2D();
             infraCache = new Dictionary<int, string>();
             offset = 0;
@@ -324,21 +324,73 @@ namespace TeamFactory.Map
 
             Vector2 offsetCoords = IndexToMap(playerOffset);
 
+            // top left corner
+            floor.SetCell((int)offsetCoords.x - 1, (int)offsetCoords.y - 1, 4, false, false, true);
+            int aboveTileIndex = floor.GetCell((int)offsetCoords.x - 1, (int)offsetCoords.y - 2);
+            if (aboveTileIndex != Godot.TileMap.InvalidCell)
+            {
+                floor.SetCell((int)offsetCoords.x - 1, (int)offsetCoords.y - 1, 3, false, false, false);
+                int leftTileIndex = floor.GetCell((int)offsetCoords.x - 2, (int)offsetCoords.y - 1);
+                if (leftTileIndex != Godot.TileMap.InvalidCell)
+                    floor.SetCell((int)offsetCoords.x - 1, (int)offsetCoords.y - 1, 2);
+            }
+
+            // top right corner
+            floor.SetCell((int)offsetCoords.x + mapWidth, (int)offsetCoords.y - 1, 4, true, false, false);
+            aboveTileIndex = floor.GetCell((int)offsetCoords.x + mapWidth, (int)offsetCoords.y - 2);
+            if (aboveTileIndex != Godot.TileMap.InvalidCell)
+            {
+                floor.SetCell((int)offsetCoords.x + mapWidth, (int)offsetCoords.y - 1, 3, true, false, false);
+                int leftTileIndex = floor.GetCell((int)offsetCoords.x + mapWidth + 1, (int)offsetCoords.y - 1);
+                if (leftTileIndex != Godot.TileMap.InvalidCell)
+                    floor.SetCell((int)offsetCoords.x + mapWidth, (int)offsetCoords.y - 1, 2);
+            }
+
+            // bottom left corner
+            floor.SetCell((int)offsetCoords.x - 1, (int)offsetCoords.y + mapHeight, 4, false, true, true);
+            aboveTileIndex = floor.GetCell((int)offsetCoords.x - 1, (int)offsetCoords.y + mapHeight + 1);
+            if (aboveTileIndex != Godot.TileMap.InvalidCell)
+            {
+                floor.SetCell((int)offsetCoords.x - 1, (int)offsetCoords.y + mapHeight, 3, false, true, false);
+                int leftTileIndex = floor.GetCell((int)offsetCoords.x - 2, (int)offsetCoords.y + mapHeight);
+                if (leftTileIndex != Godot.TileMap.InvalidCell)
+                    floor.SetCell((int)offsetCoords.x - 1, (int)offsetCoords.y + mapHeight, 2);
+            }
+
+            // bottom right corner
+            floor.SetCell((int)offsetCoords.x + mapHeight, (int)offsetCoords.y + mapHeight, 4, true, true, true);
+            aboveTileIndex = floor.GetCell((int)offsetCoords.x + mapWidth, (int)offsetCoords.y + mapHeight + 1);
+            if (aboveTileIndex != Godot.TileMap.InvalidCell)
+            {
+                floor.SetCell((int)offsetCoords.x + mapHeight, (int)offsetCoords.y + mapHeight, 3, true, false, false);
+                int leftTileIndex = floor.GetCell((int)offsetCoords.x + mapWidth + 1, (int)offsetCoords.y + mapHeight);
+                if (leftTileIndex != Godot.TileMap.InvalidCell)
+                    floor.SetCell((int)offsetCoords.x + mapHeight, (int)offsetCoords.y + mapHeight, 2);
+            }
+            
             for (int x = 0; x < mapWidth; x++)
             {
+                // top wall
                 floor.SetCell((int)offsetCoords.x + x, (int)offsetCoords.y - 1, 1, false, false, true);
                 for (int y = 0; y < mapHeight; y++)
                 {
+                    // left wall
                     if (x == 0)
                     {
                         floor.SetCell((int)offsetCoords.x - 1, (int)offsetCoords.y + y, 1);
                     }
+
+                    // normal floor
                     floor.SetCell((int)offsetCoords.x + x, (int)offsetCoords.y + y, newTileID);
+                    
+                    // rigth wall 
                     if (x == mapWidth - 1)
                     {
                         floor.SetCell((int)offsetCoords.x + mapWidth, (int)offsetCoords.y + y, 1);
                     }
                 }
+
+                // bottom wall
                 floor.SetCell((int)offsetCoords.x + x, (int)offsetCoords.y + mapHeight, 1, false, false, true);
             }
         }
