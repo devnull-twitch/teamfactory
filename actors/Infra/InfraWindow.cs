@@ -36,10 +36,10 @@ namespace TeamFactory.Infra
         {
             Connect("popup_hide", this, nameof(OnHide));
 
-            OptionButton outputSelector = GetNode<OptionButton>("VBoxContainer/Production/ProductionChanger/OptionButton");
+            OptionButton outputSelector = GetNode<OptionButton>("ScrollContainer/VBoxContainer/Production/ProductionChanger/OptionButton");
             outputSelector.Connect("item_selected", this, nameof(OnSelectOutputResource));
 
-            GetNode<Button>("VBoxContainer/DeleteBuilding").Connect("pressed", this, nameof(OnDelete));
+            GetNode<Button>("ScrollContainer/VBoxContainer/DeleteBuilding").Connect("pressed", this, nameof(OnDelete));
         }
 
         public override void _Input(InputEvent @event)
@@ -80,6 +80,24 @@ namespace TeamFactory.Infra
                     GetNode<PlayerNode>($"/root/Game/Players/{NetState.NetworkId(this)}")._UnhandledInput(@event);
                 }
             }
+
+            if (@event is InputEventMouseButton mouseEvent2 && 
+                mouseEvent2.ButtonIndex == (int)ButtonList.Left && 
+                mouseEvent2.Pressed && 
+                !isConnecting
+            ) {
+                Vector2 pos = infraNode.GetGlobalMousePosition();
+                Godot.Collections.Array res = GetWorld2d().DirectSpaceState.IntersectPoint(pos, 10, null, 1, false, true);
+                foreach(Godot.Collections.Dictionary resData in res)
+                {
+                    Node collider = (Node)resData["collider"];
+                    if (collider.GetParent() is InfraSprite otherInfra && otherInfra != InfraNode)
+                    {
+                        InfraNode = otherInfra;
+                        return;
+                    }
+                }
+            }
         }
 
         public override void _Process(float delta)
@@ -102,6 +120,10 @@ namespace TeamFactory.Infra
 
         public void OnDelete()
         {
+            if (isConnecting && connectionLine != null)
+            {
+                connectionLine.QueueFree();
+            }
             NetState.RpcId(infraNode, 1, "RequestDeletion");
             QueueFree();
         }
@@ -125,7 +147,7 @@ namespace TeamFactory.Infra
 
         public void UpdateStorage()
         {
-            GridContainer storage = GetNode<GridContainer>("VBoxContainer/GridContainer");
+            GridContainer storage = GetNode<GridContainer>("ScrollContainer/VBoxContainer/GridContainer");
             PackedScene reqPacked = GD.Load<PackedScene>("res://actors/Infra/Requirement.tscn");
             ItemDB itemDB = GD.Load<ItemDB>("res://actors/items/ItemDB.tres");
 
@@ -169,10 +191,10 @@ namespace TeamFactory.Infra
 
         private void updateSpawnResourceData()
         {
-            GetNode<VBoxContainer>("VBoxContainer/Production").Visible = true;
+            GetNode<VBoxContainer>("ScrollContainer/VBoxContainer/Production").Visible = true;
 
             // Production
-            VBoxContainer reqBox = GetNode<VBoxContainer>("VBoxContainer/Production/CurrentProduction/Requirements");
+            VBoxContainer reqBox = GetNode<VBoxContainer>("ScrollContainer/VBoxContainer/Production/CurrentProduction/Requirements");
             PackedScene reqPacked = GD.Load<PackedScene>("res://actors/Infra/Requirement.tscn");
             ItemDB itemDB = GD.Load<ItemDB>("res://actors/items/ItemDB.tres");
             
@@ -193,10 +215,10 @@ namespace TeamFactory.Infra
             }
 
             // output resource
-            GetNode<TextureRect>("VBoxContainer/Production/CurrentProduction/CenterContainer/Output").Texture = infraNode.SpawnResource.Texture;
+            GetNode<TextureRect>("ScrollContainer/VBoxContainer/Production/CurrentProduction/CenterContainer/Output").Texture = infraNode.SpawnResource.Texture;
 
             // Output dropdown
-            outputSelector = GetNode<OptionButton>("VBoxContainer/Production/ProductionChanger/OptionButton");
+            outputSelector = GetNode<OptionButton>("ScrollContainer/VBoxContainer/Production/ProductionChanger/OptionButton");
             GodotCol.Dictionary<string, bool> unlockedItems = GetNode<GameNode>("/root/Game").PlayerUnlocks;
             outputSelector.Clear();
 
@@ -230,7 +252,7 @@ namespace TeamFactory.Infra
 
         private void updateOutputData()
         {
-            VBoxContainer connectionContainer = GetNode<VBoxContainer>("VBoxContainer/Connections");
+            VBoxContainer connectionContainer = GetNode<VBoxContainer>("ScrollContainer/VBoxContainer/Connections");
             foreach(Node childNode in connectionContainer.GetChildren())
                 childNode.QueueFree();
 

@@ -199,6 +199,7 @@ namespace TeamFactory.Game
             {
                 int playerTotalScore = 0;
                 UserPoints.TryGetValue(playerID, out playerTotalScore);
+                UserRoundPoints[playerID] = 0;
                 NetState.Rpc(node, "SetPoints", playerID, playerTotalScore, 0);
             }
         }
@@ -372,17 +373,21 @@ namespace TeamFactory.Game
         [Remote]
         public void RequestUnlock(string itemName)
         {
+            int senderNetId = NetState.NetworkSenderId(this);
             ItemDB itemDB = GD.Load<ItemDB>("res://actors/items/ItemDB.tres");
             ItemResource unlockItem = itemDB.Database[itemName];
 
-            if (!UserPoints.ContainsKey(NetState.NetworkSenderId(this)))
-                UserPoints[NetState.NetworkSenderId(this)] = 0;
+            if (!UserPoints.ContainsKey(senderNetId))
+                UserPoints[senderNetId] = 0;
 
-            if (UserPoints[NetState.NetworkSenderId(this)] < unlockItem.UnlockCost)
+            if (UserPoints[senderNetId] < unlockItem.UnlockCost)
                 return;
 
-            playerUnlocks[NetState.NetworkSenderId(this)].Add(itemName);
-            NetState.RpcId(node, NetState.NetworkSenderId(this), "AddPlayerUnlock", itemName);
+            UserPoints[senderNetId] -= unlockItem.UnlockCost;
+            NetState.Rpc(node, "SetPoints", senderNetId, UserPoints[senderNetId], UserRoundPoints[senderNetId]);
+
+            playerUnlocks[senderNetId].Add(itemName);
+            NetState.RpcId(node, senderNetId, "AddPlayerUnlock", itemName);
         }
 
         public System.Collections.Generic.ICollection<int> GetPlayerIDs()

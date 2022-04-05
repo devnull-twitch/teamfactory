@@ -2,7 +2,7 @@ using Godot;
 using TeamFactory.Map;
 using TeamFactory.Util.Multiplayer;
 
-namespace TeamFactory.Player 
+namespace TeamFactory.Player
 {
     public class PlayerServer : Node
     {
@@ -27,9 +27,9 @@ namespace TeamFactory.Player
             if (Path != null && Path.Length > 0)
             {
                 float totalDistance = Node.GlobalPosition.DistanceTo(Path[0]);
-                if(totalDistance < 2)
+                if (totalDistance < 2)
                 {
-                    if(Path.Length > 1)
+                    if (Path.Length > 1)
                     {
                         Path = shiftArray(Path);
                         NetState.Rpc(
@@ -59,9 +59,31 @@ namespace TeamFactory.Player
         public void setNewTarget(int targetIndex)
         {
             MapNode mapNode = GetNode<MapNode>("../../../GridManager");
-            int[] indexPath = mapNode.Manager.GetPathTo(mapNode.Manager.WorldToIndex(Node.GlobalPosition), targetIndex);
-            Path = mapNode.Manager.IndicesToWorld(indexPath);
-            NetState.Rpc(this, "SetupPath", Path);
+
+            if (Path != null && Path.Length > 0)
+            {
+                int lastPathIndex = mapNode.Manager.WorldToIndex(Path[0]);
+                if (lastPathIndex == targetIndex)
+                {
+                    Path = new Vector2[] { Path[0] };
+                }
+                else
+                {
+                    Vector2 nextWorldStep = Path[0];
+                    int[] indexPath = mapNode.Manager.GetPathTo(lastPathIndex, targetIndex);
+                    Vector2[] endPath = mapNode.Manager.IndicesToWorld(indexPath);
+                    Path = new Vector2[endPath.Length + 1];
+                    System.Array.Copy(endPath, 0, Path, 1, endPath.Length);
+                    Path[0] = nextWorldStep;
+                }
+            }
+            else
+            {
+                int[] indexPath = mapNode.Manager.GetPathTo(mapNode.Manager.WorldToIndex(Node.GlobalPosition), targetIndex);
+                Path = mapNode.Manager.IndicesToWorld(indexPath);
+            }
+
+            NetState.Rpc(this, "SetupPath", Path);            
         }
 
         private Vector2[] shiftArray(Vector2[] src)

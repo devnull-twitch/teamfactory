@@ -96,6 +96,7 @@ namespace TeamFactory.Map
                     typeObj.Inputs.Add(GridManager.Direction.Down);
                     typeObj.Outputs = new Array<GridManager.Direction>();
                     typeObj.Outputs.Add(GridManager.Direction.Right);
+                    typeObj.isProducer = false;
                     return typeObj;
 
                 case TypeIdentifier.Powerplant:

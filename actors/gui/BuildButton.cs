@@ -21,6 +21,13 @@ public class BuildButton : TextureButton
     {
         if (inProcess)
         {
+            if (Input.IsActionPressed("ui_cancel"))
+            {
+                inProcess = false;
+                ghostSprite.QueueFree();
+                return;
+            }
+
             MapNode mapNode = GetNode<MapNode>("/root/Game/GridManager");
 
             if (@event is InputEventMouseButton mouseEvent && mouseEvent.ButtonIndex == (int)ButtonList.Left &&  mouseEvent.Pressed)
